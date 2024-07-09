@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.1</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>at.scch.freiseisen.ma</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>parent</name>
+    <packaging>pom</packaging>
+
+    <developers>
+        <developer>
+            <name>Lukas Freiseisen</name>
+            <email>lukas.freiseisen@scch.at</email>
+            <organization>SCCH</organization>
+            <organizationUrl>www.scch.at</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:ssh://git@github.scch.at:SCCH-GMBH/master-thesis-freiseisen.git</connection>
+        <developerConnection>scm:git:ssh://git@github.scch.at:SCCH-GMBH/master-thesis-freiseisen.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <modules>
+        <module>commons</module>
+        <module>data-layer</module>
+        <module>trace-receiver</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,27 @@
+name: master-project
+services:
+  rabbitmq-server:
+    user: "1000:1000"
+    cap_drop:
+      - "ALL"
+    security_opt:
+      - "no-new-privileges"
+    image: rabbitmq:3-management-alpine
+  trace-receiver:
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges=true"
+    build:
+      context: java
+      dockerfile: ./trace-receiver/Dockerfile
+      args:
+        JAR_FILE: /java/trace-receiver/target/trace-receiver*.jar
+        ARTIFACT_ID: :trace-receiver
+    restart: on-failure
+    depends_on:
+      - rabbitmq-server
+networks:
+  default:
+    name: "master-project-network"
