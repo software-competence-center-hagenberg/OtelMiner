@@ -52,7 +52,7 @@ public class RabbitConfiguration {
     @Bean
     public MessageConverter messageConverter() {
         SimpleMessageConverter simpleMessageConverter = new SimpleMessageConverter();
-        simpleMessageConverter.addAllowedListPatterns("at.scch.freiseisen.datalayer.model.rabbit.*");
+        simpleMessageConverter.addAllowedListPatterns("*");
         return simpleMessageConverter;
     }
 

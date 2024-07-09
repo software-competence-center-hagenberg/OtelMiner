@@ -1,0 +1,13 @@
+name: master-project-dev
+services:
+  spring-dev-procs:
+    container_name: "spring-dev-procs"
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges=true"
+    image: maven:3.9.6-eclipse-temurin-21
+networks:
+  default:
+    name: "master-project-network"
+    external: true

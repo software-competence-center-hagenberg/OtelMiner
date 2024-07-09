@@ -1,7 +1,7 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
-import io.micrometer.tracing.Span;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 public class CollectorService {
 
     @RabbitListener(queues = "${open_telemetry.exporter.routing_key.traces}")
-    public void collectTraces(Span span) {
-        log.info("received trace: {}", span);
+    public void collectTraces(Message msg) {
+        log.info("received trace: {}", msg);
     }
 
 //    @RabbitListener(queues = "${open_telemetry.exporter.routing_key.metrics}")
