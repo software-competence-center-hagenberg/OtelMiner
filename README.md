@@ -2,6 +2,6 @@
 
 ## install:
 Prerequisites:
-	* docker installed
+* docker installed
 
 run "docker compose up --detach" in the repository root and you are good to go
