@@ -17,16 +17,8 @@ processors:
 receivers:
   otlp:
     protocols:
-      http:
-        endpoint: "localhost:4318"
-        cors:
-          allowed_origins:
-            - http://test.com
-            # Origins can have wildcards with *, use * by itself to match any origin.
-            - https://*.example.com
-          allowed_headers:
-            - Example-Header
-          max_age: 7200
+      grpc:
+        endpoint: otel-collector:4317
 service:
   pipelines:
     logs:
