@@ -9,7 +9,10 @@ services:
     image: rabbitmq:3-management-alpine
   otel-generator:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
-    command: "traces --otlp-endpoint otel-collector:4317 --otlp-insecure --duration 5s"#"traces --help" #
+    command: "traces --otlp-endpoint otel-collector:4317 --otlp-insecure --duration 5s"
+    restart: on-failure
+    depends_on:
+      - otel-collector
   otel-collector:
     build:
       context: go
