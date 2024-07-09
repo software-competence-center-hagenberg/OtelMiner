@@ -1,0 +1,43 @@
+exporters:
+  rabbitmq:
+      connection:
+        endpoint: amqp://rabbitmq-server:5672
+        auth:
+          plain:
+            username: guest
+            password: guest
+      #encoding_extension: otlp_encoding/rabbitmq
+#extensions:
+#  otlp_encoding/rabbitmq:
+#    protocol: otlp_json
+processors:
+  batch:
+    send_batch_max_size: 10000
+    timeout: 0s
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: "localhost:4318"
+        cors:
+          allowed_origins:
+            - http://test.com
+            # Origins can have wildcards with *, use * by itself to match any origin.
+            - https://*.example.com
+          allowed_headers:
+            - Example-Header
+          max_age: 7200
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [rabbitmq]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [rabbitmq]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [rabbitmq]

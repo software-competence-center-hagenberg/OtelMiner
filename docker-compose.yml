@@ -7,6 +7,14 @@ services:
     security_opt:
       - "no-new-privileges"
     image: rabbitmq:3-management-alpine
+  otel-collector:
+    build:
+      context: go
+      dockerfile: Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbitmq-server
+      - trace-receiver
   trace-receiver:
     user: "1000:1000"
     cap_drop:
