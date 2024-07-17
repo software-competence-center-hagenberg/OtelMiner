@@ -1,0 +1,9 @@
+(executable
+    (name main)
+    (libraries amqp-client-async)
+)
+
+(alias
+    (name otel_to_probdeclare_converter)
+    (deps main.bc)
+)

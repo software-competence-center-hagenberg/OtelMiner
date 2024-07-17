@@ -14,7 +14,8 @@ services:
     command: "traces --otlp-http --otlp-insecure --otlp-endpoint otel-collector:4318"#"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
     restart: on-failure
     depends_on:
-      - otel-collector
+      - otelcol
+#      - otel-collector
 ##########################custom otel collector##########################
 # custom otel collector that exports to RabbitMQ, probably the nicer solution
 # NOTE for the future: If there is enough time then,
@@ -58,6 +59,14 @@ services:
       args:
         JAR_FILE: /java/trace-receiver/target/trace-receiver*.jar
         ARTIFACT_ID: :trace-receiver
+    restart: on-failure
+    depends_on:
+      - rabbitmq-server
+  otel-to-probdeclare-converter:
+    # runs as non-root user opam
+    build:
+      context: ocaml
+      dockerfile: ./Dockerfile
     restart: on-failure
     depends_on:
       - rabbitmq-server

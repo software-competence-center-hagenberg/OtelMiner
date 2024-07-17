@@ -3,7 +3,7 @@ FROM golang:1.23rc1-bookworm AS build
 
 WORKDIR /otel
 
-COPY --chmod=755 . .
+COPY --chmod=750 . .
 
 RUN ./ocb --config builder-config.yaml
 

@@ -1,6 +1,6 @@
 spring:
   application:
-  name: trace-transformer
+    name: trace-transformer
   rabbitmq:
     port: 5672
     host: rabbitmq-server

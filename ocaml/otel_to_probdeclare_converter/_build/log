@@ -1,0 +1,17 @@
+# dune exec otel_to_probdeclare_converter
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /home/freiseisen/.cache/dune/db
+# Workspace root:
+# /home/freiseisen/git/scch/master-thesis/project/ocaml/otel_to_probdeclare_converter
+# Auto-detected concurrency: 20
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; instrument_with = []
+#  }
+$ /home/freiseisen/.opam/default/bin/ocamlc.opt -config > /tmp/dune_adda14_output
