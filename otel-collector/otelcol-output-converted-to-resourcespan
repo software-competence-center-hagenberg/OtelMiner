@@ -1,0 +1,60 @@
+resource {
+  attributes {
+  key: "service.name"
+  value {
+  string_value: "telemetrygen"
+}
+}
+}
+scope_spans {
+scope {
+name: "telemetrygen"
+}
+spans {
+trace_id: "\361\346\236\323F\234wv\265\355\315\334\355\366\233\355\316\270\177\255w\347Mz"
+span_id: "\367\306\235w\247\275\337\177=\343m\236"
+parent_span_id: "\341\355]s\316\367\363GzwW\032"
+name: "okey-dokey-0"
+kind: SPAN_KIND_SERVER
+start_time_unix_nano: 1721214646137418014
+end_time_unix_nano: 1721214646137541014
+attributes {
+key: "net.peer.ip"
+value {
+string_value: "1.2.3.4"
+}
+}
+attributes {
+key: "peer.service"
+value {
+string_value: "telemetrygen-client"
+}
+}
+status {
+}
+flags: 256
+}
+spans {
+trace_id: "\361\346\236\323F\234wv\265\355\315\334\355\366\233\355\316\270\177\255w\347Mz"
+span_id: "\341\355]s\316\367\363GzwW\032"
+name: "lets-go"
+kind: SPAN_KIND_CLIENT
+start_time_unix_nano: 1721214646137418014
+end_time_unix_nano: 1721214646137541014
+attributes {
+key: "net.peer.ip"
+value {
+string_value: "1.2.3.4"
+}
+}
+attributes {
+key: "peer.service"
+value {
+string_value: "telemetrygen-server"
+}
+}
+status {
+}
+flags: 256
+}
+}

@@ -11,3 +11,8 @@ open_telemetry:
       traces: otlp_spans
       metrics: otlp_metrics
       logs: otlp_logs
+
+server:
+  port: 4020
+#  servlet:
+#    context-path: /trace-receiver/

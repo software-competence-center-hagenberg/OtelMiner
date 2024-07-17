@@ -1,14 +1,14 @@
 exporters:
   rabbitmq:
-      connection:
-        endpoint: amqp://rabbitmq-server:5672
-        auth:
-          plain:
-            username: guest
-            password: guest
-      #encoding_extension: otlp_encoding/rabbitmq
+    connection:
+      endpoint: amqp://rabbitmq-server:5672
+      auth:
+        plain:
+          username: guest
+          password: guest
+#    encoding_extension: otlp_encoding
 #extensions:
-#  otlp_encoding/rabbitmq:
+#  otlp_encoding:
 #    protocol: otlp_json
 processors:
   batch:
@@ -17,9 +17,12 @@ processors:
 receivers:
   otlp:
     protocols:
-      grpc:
-        endpoint: otel-collector:4317
+      http:
+        endpoint: otel-collector:4318
+#      grpc:
+#        endpoint: otel-collector:4317
 service:
+#  extensions: [otlp_encoding]
   pipelines:
     logs:
       receivers: [otlp]

@@ -1,12 +1,12 @@
 name: master-project-dev
 services:
-  spring-dev-procs:
-    container_name: "spring-dev-procs"
+  trace-receiver:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: "trace-receiver-dev"
     cap_drop:
       - ALL
     security_opt:
       - "no-new-privileges=true"
-    image: maven:3.9.6-eclipse-temurin-21
 networks:
   default:
     name: "master-project-network"

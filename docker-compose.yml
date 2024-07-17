@@ -11,18 +11,41 @@ services:
     image: rabbitmq:3-management-alpine
   otel-generator:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
-    command: "traces --otlp-endpoint otel-collector:4317 --otlp-insecure --duration 5s"
+    command: "traces --otlp-http --otlp-insecure --otlp-endpoint otel-collector:4318"#"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
     restart: on-failure
     depends_on:
       - otel-collector
-  otel-collector:
-    build:
-      context: go
-      dockerfile: Dockerfile
-    restart: on-failure
-    depends_on:
-      - rabbitmq-server
-      - trace-receiver
+##########################custom otel collector##########################
+# custom otel collector that exports to RabbitMQ, probably the nicer solution
+# NOTE for the future: If there is enough time then,
+# TODO find out how to get AMQP message body as otlp_json instead of otlp_proto
+# TODO OR how to properly convert olpt_proto to JSON
+#  otel-collector:
+#    build:
+#      context: go
+#      dockerfile: Dockerfile
+#    restart: on-failure
+#    depends_on:
+#      - rabbitmq-server
+#      - trace-receiver
+  #######################standard otel collector##########################
+  otelcol:
+    image: otel/opentelemetry-collector
+    hostname: otelcol
+    volumes:
+      - ./otel-collector/otelcol-config.yml:/etc/otelcol/config.yaml
+      - ./otel-collector/otelcol-output.json:/otelcol-output/otelcol-output.json
+    ports:
+      - 1888:1888 # pprof extension
+      - 8887:8887 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+#########################################################################
   trace-receiver:
     user: "1000:1000"
     cap_drop:
