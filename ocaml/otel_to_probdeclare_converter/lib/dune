@@ -1,2 +1,3 @@
 (library
- (name otel_to_probdeclare_converter))
+ (name otel_to_probdeclare_converter)
+ (libraries opentelemetry))

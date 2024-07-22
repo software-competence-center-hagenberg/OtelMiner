@@ -11,7 +11,7 @@ services:
     image: rabbitmq:3-management-alpine
   otel-generator:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
-    command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
+    command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318 --traces 10" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
     restart: on-failure
     depends_on:
       - otelcol
@@ -23,7 +23,7 @@ services:
 # TODO OR how to properly convert olpt_proto to JSON
 #  otel-collector:
 #    build:
-#      context: go
+#      context: ocaml/custom
 #      dockerfile: Dockerfile
 #    restart: on-failure
 #    depends_on:
