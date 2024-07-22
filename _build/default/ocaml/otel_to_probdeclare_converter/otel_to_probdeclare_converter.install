@@ -1,8 +1,0 @@
-lib: [
-  "_build/install/default/lib/otel_to_probdeclare_converter/META"
-  "_build/install/default/lib/otel_to_probdeclare_converter/dune-package"
-  "_build/install/default/lib/otel_to_probdeclare_converter/opam"
-]
-bin: [
-  "_build/install/default/bin/otel_to_probdeclare_converter"
-]

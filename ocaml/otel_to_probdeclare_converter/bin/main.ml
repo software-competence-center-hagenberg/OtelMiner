@@ -5,7 +5,7 @@ let host = Sys.argv.(1)
 
 let handler channel probd_result_queue message =
   let _content, data = message.Message.message in
-  Log.info "Recieved message: %s" data;
+  Log.info "Received message: %s" data;
   Queue.publish channel probd_result_queue (Message.make data) >>= fun `Ok ->
   Log.info "Sent result to trace-receiver";
   return ()
@@ -28,5 +28,5 @@ let _ =
   return ()
 
 let () =
-  Log.info "%s" Sys.argv.(1);
+  Log.info "RabbitMQ host name: %s" Sys.argv.(1);
   Scheduler.go ()
