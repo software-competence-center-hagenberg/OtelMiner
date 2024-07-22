@@ -13,5 +13,4 @@ RUN opam install dune amqp-client-async && \
     dune build
 
 # execute the program in a shell
-CMD eval $(opam env) && dune exec otel_to_probdeclare_converter
-
+CMD eval $(opam env) && dune exec otel_to_probdeclare_converter rabbitmq-server

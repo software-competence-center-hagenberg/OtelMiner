@@ -12,6 +12,11 @@ open_telemetry:
       metrics: otlp_metrics
       logs: otlp_logs
 
+otel_to_probd:
+  routing_key:
+    out: otel-to-probd-queue
+    in: probd-result-queue
+
 server:
   port: 4020
 #  servlet:

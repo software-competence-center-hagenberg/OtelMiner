@@ -5,22 +5,22 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github git@github.scch.at:SCCH-GMBH/master-thesis-freiseisen.git))
 
-(authors "Author Name")
+(authors "Lukas Freiseisen")
 
-(maintainers "Maintainer Name")
+(maintainers "Lukas Freiseisen")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
+(documentation https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen)
 
 (package
  (name otel_to_probdeclare_converter)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "OTEL to ProbDeclare")
+ (description "A converter that accepts otel-spans via RabbitMQ and converts them to ProbDeclare clauses.")
  (depends ocaml dune)
  (tags
-  (topics "to describe" your project)))
+  ("process mining", "probabilistic declarative process mining", "LTL", "otel", "ProbDeclare")))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
