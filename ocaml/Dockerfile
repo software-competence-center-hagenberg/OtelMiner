@@ -1,11 +1,17 @@
+# Use an OCaml and opam ready image
 FROM ocaml/opam:debian-12-ocaml-4.14-afl
 
-COPY --chmod=750 ./otel_to_probdeclare_converter /otel_to_probdeclare_converter
+# Copy the local project to the Docker image
+COPY --chown=opam ./otel_to_probdeclare_converter /home/opam/otel_to_probdeclare_converter
 
-RUN cd /otel_to_probdeclare_converter
-RUN opam install dune
-RUN eval $(opam env)
-RUN opam install amqp-client-async
-RUN dune build
+# Set the working directory
+WORKDIR /home/opam/otel_to_probdeclare_converter
 
-ENTRYPOINT ["dune", "exec"]
+# Install dune and amqp-client-async, and build the project
+RUN opam install dune amqp-client-async && \
+    eval $(opam env) && \
+    dune build
+
+# execute the program in a shell
+CMD eval $(opam env) && dune exec otel_to_probdeclare_converter
+

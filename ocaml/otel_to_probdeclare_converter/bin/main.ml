@@ -1,7 +1,7 @@
 open Amqp_client_async
 open Thread
 
-let host = "localhost"
+let host = "rabbitmq-server"
 
 let handler _channel message =
   let _content, data = message.Message.message in
