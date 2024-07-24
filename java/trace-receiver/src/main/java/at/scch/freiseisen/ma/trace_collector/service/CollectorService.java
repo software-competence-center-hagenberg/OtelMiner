@@ -44,9 +44,9 @@ public class CollectorService {
     }
 
     public void transformAndPipe(String trace) {
-        List<ResourceSpans> resourceSpansList = transformTraceToResourceSpans(trace);
+//        List<ResourceSpans> resourceSpansList = transformTraceToResourceSpans(trace);
         rabbitTemplate.convertAndSend(otelToProbdeclareConfiguration.getOtelToProbdeclareRoutingKey()
-                , resourceSpansList.toString());
+                , trace);
     }
 
     private List<ResourceSpans> transformTraceToResourceSpans(String trace) {
