@@ -8,7 +8,7 @@ COPY --chown=opam ./otel_to_probdeclare_converter /home/opam/otel_to_probdeclare
 WORKDIR /home/opam/otel_to_probdeclare_converter
 
 # Install dune and amqp-client-async, and build the project
-RUN opam install dune amqp-client-async opentelemetry && \
+RUN opam install dune amqp-client-async opentelemetry yojson base64 && \
     eval $(opam env) && \
     dune build
 

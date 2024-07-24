@@ -1,17 +1,19 @@
 open Amqp_client_async
 open Thread
-open Otel_to_probdeclare_converter
+open Otel_to_prob_declare_converter
+open Otel_decoder
 
 let host = Sys.argv.(1)
 
 let handler channel probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  Queue.publish channel probd_result_queue (Message.make (Converter.get_ltl_string data)) >>= fun `Ok ->
+  Queue.publish channel probd_result_queue (Message.make (Converter.get_ltl_string (Converter.convert (Decoder.decode data)))) >>= fun `Ok ->
+  (*Queue.publish channel probd_result_queue (Message.make data) >>= fun `Ok -> *)
   Log.info "Sent result to trace-receiver";
   return ()
 
-let consumer_cancelled () =
+let rabbitmq_consumer_cancelled () =
   Log.info "Consumer cancelled"
 
 let _ =
@@ -23,7 +25,7 @@ let _ =
   Log.info "Created listener queue";
   Queue.declare channel "probd-result-queue" >>= fun probd_result_queue ->
   Log.info "Created result queue";
-  Queue.consume ~id:"accept_traces" ~on_cancel:consumer_cancelled ~no_ack:true ~exclusive:true channel otel_to_probd_queue >>= fun (_consumer, reader) ->
+  Queue.consume ~id:"accept_traces" ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel otel_to_probd_queue >>= fun (_consumer, reader) ->
   spawn (Pipe.iter reader ~f:(handler channel probd_result_queue));
   Log.info "Listening for traces";
   return ()
