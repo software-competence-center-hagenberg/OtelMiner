@@ -3,7 +3,7 @@ open Opentelemetry_proto
 (*open Base64*)
 module type Otel_decoder = sig
 
-  val decode : string -> Trace.resource_spans
+  val decode : string -> Trace.resource_spans list
 end
 
 (* Define the JsonDecoder module *)
@@ -49,37 +49,49 @@ module Decoder: Otel_decoder = struct
       ~key: (json |> member "key" |> to_string)
       ~value: (Some (decode_any_value (json |> member "value" |> member "stringValue"))) 
     ()
-
-  let decode_attributes_list json =
-    json |> member "attributes" |> to_list |> List.map decode_attribute
   
-  let decode_span_kind json : Trace.span_span_kind =
-    match json |> member "kind" |> to_string with
-        | "SPAN_KIND_INTERNAL" -> Span_kind_internal
-        | "SPAN_KIND_SERVER" -> Span_kind_server
-        | "SPAN_KIND_CLIENT" -> Span_kind_client
-        | "SPAN_KIND_PRODUCER" -> Span_kind_producer
-        | "SPAN_KIND_CONSUMER" -> Span_kind_consumer
-        | _ -> Span_kind_unspecified
+  let decode_span_kind sk : Trace.span_span_kind =
+    match sk with
+    | 1 -> Span_kind_internal
+    | 2-> Span_kind_server
+    | 3 -> Span_kind_client
+    | 4 -> Span_kind_producer
+    | 5 -> Span_kind_consumer
+    | _ -> Span_kind_unspecified
+    (*| "SPAN_KIND_INTERNAL" -> Span_kind_internal
+    | "SPAN_KIND_SERVER" -> Span_kind_server
+    | "SPAN_KIND_CLIENT" -> Span_kind_client
+    | "SPAN_KIND_PRODUCER" -> Span_kind_producer
+    | "SPAN_KIND_CONSUMER" -> Span_kind_consumer
+    | _ -> Span_kind_unspecified*)
+  
+  (*let decode_status_code s : Trace.status_status_code=
+    match s with
+    | "STATUS_CODE_OK" -> Status_code_ok
+    | "STATUS_CODE_ERROR" -> Status_code_error
+    | _ -> Status_code_unset*)
 
+  (*let decode_status s m =
+    Some (
+      Trace.make_status
+        ~code: (decode_status_code s)
+        ~message: m (* Optional: Add if status message is needed *)
+      ()
+    )*)
+      
   (* Decode a Span from JSON *)
   let decode_span json : Trace.span =
     Trace.default_span
       ~trace_id: (Bytes.of_string (json |> member "traceId" |> to_string))
       ~span_id: (Bytes.of_string (json |> member "spanId" |> to_string))
       ~parent_span_id: (Bytes.of_string (json |> member "parentSpanId" |> to_string))
+      (*~flags: (json |> member "flags" |> to_int)*)
       ~name: (json |> member "name" |> to_string)
-      ~kind: (decode_span_kind json)
-      ~start_time_unix_nano: (Int64.of_int (json |> member "startTimeUnixNano" |> to_int))
-      ~end_time_unix_nano: (Int64.of_int (json |> member "endTimeUnixNano" |> to_int))
-      ~attributes: (decode_attributes_list json)
-      ~status: (Some (Trace.make_status
-        ~code: (match json |> member "status" |> to_string with
-          | "STATUS_CODE_OK" -> Status_code_ok
-          | "STATUS_CODE_ERROR" -> Status_code_error
-          | _ -> Status_code_unset)
-        ~message: "" (* Optional: Add if status message is needed *)
-      ()))
+      ~kind: (json |> member "kind" |> to_int |> decode_span_kind)
+      ~start_time_unix_nano: (Int64.of_string (json |> member "startTimeUnixNano" |> to_string))
+      ~end_time_unix_nano: (Int64.of_string (json |> member "endTimeUnixNano" |> to_string))
+      ~attributes: (json |> member "attributes" |> to_list |> List.map decode_attribute)
+      (*~status: (decode_status (json |> member "status" |> to_string) "")*)
       ~events: []
       ~links: []
       ~dropped_attributes_count: (Int32.of_int 0)
@@ -107,7 +119,8 @@ module Decoder: Otel_decoder = struct
 
   (* Decode a Resource from JSON *)
   let decode_resource json =
-    Some (Resource.make_resource
+    Some (
+      Resource.make_resource
       ~attributes: (json |> member "attributes" |> to_list |> List.map decode_attribute)
       ~dropped_attributes_count: (Int32.of_int 0) 
     ())
@@ -117,12 +130,13 @@ module Decoder: Otel_decoder = struct
     Trace.make_resource_spans
       ~resource: (json |> member "resource" |> decode_resource)
       ~scope_spans: (json |> member "scopeSpans" |> to_list |> List.map decode_scope_spans)
-      ~schema_url: "" (* Optional: Add if schema URL is needed *)
+      ~schema_url: (json |> member "schemaUrl" |> to_string)
     ()
 
   (* Decode the JSON string into a ResourceSpans object *)
   let decode json_string =
     let json = Yojson.Basic.from_string json_string in
-    decode_resource_spans (json |> member "resourceSpans")
+    let rs = json |> member "resourceSpans" |> to_list in
+    List.map decode_resource_spans rs
 
 end

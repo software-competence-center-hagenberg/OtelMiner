@@ -40,7 +40,7 @@ public class CollectorService {
 
     @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
     public void receiveProbDeclare(Message msg) {
-        log.info("received probdeclare result: {}", msg);
+        log.info("received probdeclare result: {}", new String(msg.getBody()));
     }
 
     public void transformAndPipe(String trace) {
