@@ -11,6 +11,7 @@ open Opentelemetry_proto
  * binary operators:
  * U ... until
  * THEN ... implication
+ * IFF ... if and only if (<->)
  * AND
  * OR
  * Note that there is no weak until -> instead use OR (U(a,b), G(V (a)))
@@ -23,6 +24,7 @@ type ltl =
   | NOT of ltl
   | U of ltl * ltl
   | THEN of ltl * ltl
+  | IFF of ltl * ltl
   | AND of ltl * ltl
   | OR of ltl * ltl
 
@@ -40,41 +42,30 @@ let rec string_of_ltl t =
   | THEN (t0, t1) -> "THEN(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | AND (t0, t1) -> "AND(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | OR (t0, t1) -> "OR(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
+  | IFF (t0, t1) -> "IFF(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
 
-let map_to_ltl (rs : Trace.resource_spans) : ltl =
-  (*let span_trees = build_span_trees rs*)
-  let l = List.length rs.scope_spans in
-  if l > 1 then V "a"
-  else if l > 2 then G (V "b")
-  else if l > 3 then F (V "a")
-  else if l > 4 then N (V "a")
-  else if l > 5 then NOT (V "b")
-  else if l > 6 then U (V "a", V "b")
-  else if l > 7 then AND (V "a", V "b")
-  else THEN (OR (V "a", V "b"), V "A")
+let map_to_ltl (span_tree : Span_tree.span_tree_node) : ltl list =
+  let ltl = F (V span_tree.span.name) in
+  [ltl]
 
-(*let parse (resource_spans_string : string) : Trace.resource_spans =
-  Trace.make_resource_spans ~attrs: resource_spans_string
-  let resource_spans = (Opentelemetry_proto.Trace.resource_spans) [@@deriving yojson] in
-  resource_spans*)
-(*let lex_buf = BatLexing.from_string resource_spans_string in*)
-
-(*    let rec parse_aux rss acc = *)
-(*      match rss with *)
-(*      | "resource" -> acc *)
-(*      | _ -> failwith "parse: wrong format!" *)
-(*  in parse_aux resource_spans_string Trace.make_resource_spans. *)
-(*let resource_spans_decoder rss: Trace.resource_spans =
-  Json_decoder.decode_resource_spans rss *)
+(*let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
+  let span_trees = Span_tree.create_span_trees resource_spans in
+  let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
+    match l with
+    | [] -> f []
+    | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h) :: a)
+  in
+  create_ltls_aux span_trees (fun x -> x)*)
 
 let convert (resource_spans : Trace.resource_spans list) : ltl list =
   (*map_to_ltl resource_spans*)
-  let rec convert_aux l k =
+  []
+  (*let rec convert_aux l k =
     match l with
     | [] -> k []
-    | h :: t -> convert_aux t (fun a -> k (map_to_ltl h :: a))
+    | h :: t -> convert_aux t (fun a -> k (create_ltls h :: a))
   in
-  convert_aux resource_spans (fun x -> x)
+  List.flatten (convert_aux resource_spans (fun x -> x))*)
 
 let get_ltl_string (ltls : ltl list) : string =
   (*let resource_spans = Trace.make_resource_spans resource_spans_string in*)

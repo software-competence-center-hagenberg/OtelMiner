@@ -22,7 +22,7 @@ and decode_key_value_list json =
 and decode_any_value json : Common.any_value =
   match json with
   | `String s when String.length s mod 4 = 0 -> (
-      (* Example: Check if the string can be decoded as base64 for bytes *)
+      (* Check if the string can be decoded as base64 for bytes *)
       try Bytes_value (Base64.decode_exn s |> Bytes.of_string)
       with _ -> String_value s (* Fallback if base64 decoding fails *))
   | `String s -> String_value s

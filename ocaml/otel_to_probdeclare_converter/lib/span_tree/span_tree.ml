@@ -6,7 +6,8 @@ let string_of_span_id node = String.of_bytes node.span.span_id
 let create_span_tree_node span = { span; children = [] }
 
 (*
- * Extracts all spans contained in the scope spans of a single resource_spans object
+ * Extracts all spans contained in the scope spans of a single resource_spans 
+ * object
  *)
 let extract_spans (resource_spans : Trace.resource_spans) =
   let scs = resource_spans.scope_spans in
@@ -17,20 +18,20 @@ let extract_spans (resource_spans : Trace.resource_spans) =
  * returns (r, n) where r is a list of roots and n is a list of non-root nodes. 
  * Note: The original order of spans is kept.
  *)
-let generate_nodes spans =
-  let rec gen_aux spans fr fn =
+let generate_nodes (spans: Trace.span list) =
+  let rec gen_aux (spans: Trace.span list) fr fn =
     match spans with
     | [] -> (fr [], fn [])
     | s :: t ->
-        let n = create_span_tree_node s in
         if s.parent_span_id = Bytes.empty then
-          gen_aux t (fun a -> fr (n :: a)) fn
-        else gen_aux t fr (fun a -> fn (n :: a))
+          gen_aux t (fun a -> fr ((create_span_tree_node s) :: a)) fn
+        else gen_aux t fr (fun a -> fn ((create_span_tree_node s) :: a))
   in
   gen_aux spans (fun x -> x) (fun x -> x)
 
 (*
- * Finds and returns span given span_id in given tree. Returns None if not found.
+ * Finds and returns span given span_id in given tree. Returns None if not
+ * found.
  *)
 let rec find_span span_id tree =
   if tree.span.span_id = span_id then Some tree
@@ -54,9 +55,7 @@ let rec insert_at ps_id subtree tree =
     let new_children = List.map (insert_at ps_id subtree) tree.children in
     { tree with children = new_children }
 
-(*
- * Builds all span trees with given roots and nodes.
- *)
+(* Builds all span trees with given roots and nodes. *)
 let rec build_span_trees nodes n_tmp roots r_tmp =
   match nodes with
   | [] ->
@@ -82,6 +81,7 @@ let rec build_span_trees nodes n_tmp roots r_tmp =
  * Generates (root) nodes out of them and
  * builds all possible trees.
  * Fails if an orphan is included!
+ * TODO: check if needed for list of span trees!
  *)
 let create_span_trees (resource_spans : Trace.resource_spans) :
     span_tree_node list =
