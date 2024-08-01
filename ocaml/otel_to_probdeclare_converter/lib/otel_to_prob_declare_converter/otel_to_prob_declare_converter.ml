@@ -48,24 +48,23 @@ let map_to_ltl (span_tree : Span_tree.span_tree_node) : ltl list =
   let ltl = F (V span_tree.span.name) in
   [ltl]
 
-(*let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
+let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
   let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
     match l with
     | [] -> f []
     | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h) :: a)
   in
-  create_ltls_aux span_trees (fun x -> x)*)
+  create_ltls_aux span_trees (fun x -> x)
 
 let convert (resource_spans : Trace.resource_spans list) : ltl list =
   (*map_to_ltl resource_spans*)
-  []
-  (*let rec convert_aux l k =
+  let rec convert_aux l k =
     match l with
     | [] -> k []
     | h :: t -> convert_aux t (fun a -> k (create_ltls h :: a))
   in
-  List.flatten (convert_aux resource_spans (fun x -> x))*)
+  List.flatten (convert_aux resource_spans (fun x -> x))
 
 let get_ltl_string (ltls : ltl list) : string =
   (*let resource_spans = Trace.make_resource_spans resource_spans_string in*)
