@@ -1,14 +1,13 @@
 open Amqp_client_async
 open Thread
 open Otel_to_prob_declare_converter
-open Otel_decoder
 
 let host = Sys.argv.(1)
 
 let handler channel probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  Queue.publish channel probd_result_queue (Message.make (Converter.get_ltl_string (Converter.convert (Decoder.decode data)))) >>= fun `Ok ->
+  Queue.publish channel probd_result_queue (Message.make (get_ltl_string (convert (Otel_decoder.decode data)))) >>= fun `Ok ->
 (*  Queue.publish channel probd_result_queue (Message.make data) >>= fun `Ok -> *)
   Log.info "Sent result to trace-receiver";
   return ()
