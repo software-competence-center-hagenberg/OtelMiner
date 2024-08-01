@@ -1,0 +1,3 @@
+(library
+ (name span_tree)
+ (libraries opentelemetry))
