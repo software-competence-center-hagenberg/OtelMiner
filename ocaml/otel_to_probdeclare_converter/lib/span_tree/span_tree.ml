@@ -3,6 +3,38 @@ open Opentelemetry_proto
 type span_tree_node = { span : Trace.span; children : span_tree_node list }
 
 let string_of_span_id node = String.of_bytes node.span.span_id
+
+(* Helper function to repeat a string n times *)
+(*let rec repeat_string s n =
+  if n <= 0 then "" else s ^ repeat_string s (n - 1)
+
+(* Function to construct the tree representation *)
+let rec string_of_span_tree ?(indent_level=0) (node : span_tree_node) : string =
+  let span_id = string_of_span_id node in
+  let indent = repeat_string " " (2 * indent_level) in
+  match node.children with
+  | [] -> indent ^ span_id ^ "\n"  (* Node with no children *)
+  | [child] ->  (* Node with one child *)
+      indent ^ span_id ^ "\n" ^
+      indent ^ "|\n" ^
+      indent ^ "|\n" ^
+      indent ^ "|\n" ^
+      string_of_span_tree ~indent_level:(indent_level + 1) child
+  | children ->  (* Node with two or more children *)
+      let children_strings = List.map (string_of_span_tree ~indent_level:(indent_level + 1)) children in
+      let connector = 
+        if List.length children = 2 then
+          indent ^ "+----+\n" ^ 
+          indent ^ "|    |\n"
+        else
+          indent ^ "+----+" ^ repeat_string "---" (List.length children - 2) ^ "+\n" ^
+          indent ^ "|    " ^ repeat_string "    " (List.length children - 2) ^ "|\n"
+      in
+      indent ^ span_id ^ "\n" ^
+      indent ^ "|\n" ^
+      connector ^
+      String.concat "" children_strings*)
+
 let create_span_tree_node span = { span; children = [] }
 
 (*
@@ -18,14 +50,14 @@ let extract_spans (resource_spans : Trace.resource_spans) =
  * returns (r, n) where r is a list of roots and n is a list of non-root nodes. 
  * Note: The original order of spans is kept.
  *)
-let generate_nodes (spans: Trace.span list) =
-  let rec gen_aux (spans: Trace.span list) fr fn =
+let generate_nodes (spans : Trace.span list) =
+  let rec gen_aux (spans : Trace.span list) fr fn =
     match spans with
     | [] -> (fr [], fn [])
     | s :: t ->
         if s.parent_span_id = Bytes.empty then
-          gen_aux t (fun a -> fr ((create_span_tree_node s) :: a)) fn
-        else gen_aux t fr (fun a -> fn ((create_span_tree_node s) :: a))
+          gen_aux t (fun a -> fr (create_span_tree_node s :: a)) fn
+        else gen_aux t fr (fun a -> fn (create_span_tree_node s :: a))
   in
   gen_aux spans (fun x -> x) (fun x -> x)
 

@@ -28,32 +28,74 @@ type ltl =
   | AND of ltl * ltl
   | OR of ltl * ltl
 
-(*type p_ltl = float * ltl
-  type prob_declare = p_ltl list * p_ltl list*)
-
 let rec string_of_ltl t =
   match t with
   | V s -> s
-  | G t0 -> "G" ^ string_of_ltl t0
-  | F t0 -> "F" ^ string_of_ltl t0
-  | N t0 -> "N" ^ string_of_ltl t0
-  | NOT t0 -> "NOT" ^ string_of_ltl t0
+  | G t0 -> "G(" ^ string_of_ltl t0 ^ ")"
+  | F t0 -> "F(" ^ string_of_ltl t0 ^ ")"
+  | N t0 -> "N(" ^ string_of_ltl t0 ^ ")"
+  | NOT t0 -> "NOT(" ^ string_of_ltl t0 ^ ")"
   | U (t0, t1) -> "U(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | THEN (t0, t1) -> "THEN(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | AND (t0, t1) -> "AND(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | OR (t0, t1) -> "OR(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | IFF (t0, t1) -> "IFF(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
 
-let map_to_ltl (span_tree : Span_tree.span_tree_node) : ltl list =
-  let ltl = F (V span_tree.span.name) in
-  [ltl]
+let list_ltls =
+  let v0 = V "t0" in
+  let v1 = V "t1" in
+  Printf.printf "{|
+    All possible ltl terms:
+    %s
+    %s
+    %s
+    %s
+    %s
+    %s
+    %s
+    %s
+    %s
+    %s
+  |}"
+  (string_of_ltl v0)
+  (string_of_ltl (G v0))
+  (string_of_ltl (F v0))
+  (string_of_ltl (N v0))
+  (string_of_ltl (NOT v0))
+  (string_of_ltl (U (v0, v1)))
+  (string_of_ltl (THEN (v0, v1)))
+  (string_of_ltl (AND (v0, v1)))
+  (string_of_ltl (OR (v0, v1)))
+  (string_of_ltl (IFF (v0, v1)))
+
+
+let create_val (node : Span_tree.span_tree_node) = V node.span.name
+
+(*let log_mapping_info root =
+  "processing span_tree: \n" ^Span_tree.string_of_span_tree ^ (list_ltls ())*)
+
+let map_to_ltl (root : Span_tree.span_tree_node) : ltl =
+  (*Log.info (log_mapping_info root);*)
+  list_ltls;
+  let eventually_parent = F (V root.span.name) in
+  let rec map_children (t : ltl) (children : Span_tree.span_tree_node list) =
+    match children with
+    | [] -> t
+    | c0 :: [] -> map_children (U (t, F (create_val c0))) c0.children
+    | c0 :: c1 :: rest ->
+        let uec0 = map_children (U (t, F (create_val c0))) c0.children in
+        let uec1 = map_children (U (t, F (create_val c1))) c1.children in
+        let ac0c1 = AND (uec0, uec1) in
+        if rest = [] then ac0c1 else AND (ac0c1, map_children t rest)
+  in
+  map_children eventually_parent root.children
 
 let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
   let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
     match l with
     | [] -> f []
-    | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h) :: a)
+    | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h :: a))
   in
   create_ltls_aux span_trees (fun x -> x)
 

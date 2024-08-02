@@ -1,0 +1,3 @@
+(library
+ (name otel_encoder)
+ (libraries base64 yojson opentelemetry))

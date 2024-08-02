@@ -7,8 +7,16 @@ let host = Sys.argv.(1)
 let handler channel probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  Queue.publish channel probd_result_queue
-    (Message.make (get_ltl_string (convert (Otel_decoder.decode data))))
+  Log.info "decoding ...";
+  let decoded = Otel_decoder.decode data in
+  Log.info "decoding complete";
+  Log.info "converting ...";
+  let converted = convert decoded in
+  Log.info "conversion complete";
+  Log.info "encoding result as string ...";
+  let ltl_string = get_ltl_string converted in
+  Log.info "encoding complete";
+  Queue.publish channel probd_result_queue (Message.make ltl_string)
   >>= fun `Ok ->
   Log.info "Sent result to trace-receiver";
   return ()
