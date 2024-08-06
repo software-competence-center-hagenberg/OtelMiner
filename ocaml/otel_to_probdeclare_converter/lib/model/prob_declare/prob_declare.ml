@@ -1,54 +1,105 @@
 open Ltl
 
 (*
- * exactly(a,n)         Activity a must occur exactly n times
- * existence(a,n)       a must occur at least n times
- * max(a,n)             a must occur at most n times
- * init(a)              a must be the first executed activity in every trace
- * last(a)              a must be the last executed activity in every trace
- * precedence(a,b)      activity b must be preceded by activity a   
- *                      (not necessarily directly)
- * response(a,b)        If a is executed, b must be executed afterward (not
- *                      necessarily directly afterward)
- * succession(a,b)      Combines precedence(a,b) and response(a,b)
- * chain_response(a,b)  If a is executed, b is executed directly afterward
- * coexistence(a,b)     If a is executed, b must be executed and vice versa
- * neg_response(a,b)    If a is executed, b must not be executed afterward
- * neg_coexistence(a,b) a and b cannot co-occur in any trace
+ * -----------------------------------------------------------------------------
+ * TODO: eval if ltl better than string!
+ * -----------------------------------------------------------------------------
+ * Definition taken from Table 1 of N. Schützemmeier et al. "Upper-Bounded 
+ * Model Checking for Declarative Process Models"
+ * -----------------------------------------------------------------------------
+ * existence(A) = F(A)
+ * absence(A) = ¬F(A)
+ * atLeast(A, n) = F(A ∧ X(atLeast(A, n − 1))), atLeast(A, 1) = F(A)
+ * atMost(A, n) = G(¬A ∨ X(atMost(A, n − 1))), atMost(A, 0) = G(¬A)
+ * init(A) = A
+ * last(A) = G(¬A → F(A))
+ * respondedExistence(A, B) = F(A) → F(B)
+ * response(A, B) = G(A → F(B))
+ * alternateResponse(A, B) = G(A → X(¬AUB))
+ * chainResponse(A, B) = G(A → X(B)) ∧ response(A, B)
+ * precedence(A, B) = F(B) → ((¬B)UA)
+ * alternatePrecedence(A, B) = precedence(A, B) ∧ G(B → X(precedence(A, B))
+ * chainPrecedence(A, B) = precedence(A, B) ∧ G(X(B) → A)
+ * succession(A, B) = response(A, B) ∧ precedence(A, B)
+ * chainSuccession(A, B) = G(A ↔ X(B))
+ * alternateSuccession(A, B) = alternateResponse(A, B) 
+ *                               ∧ alternatePrecedence(A, B)
+ * notRespondedExistence(A, B) =  F(A) → F(B)
+ * notResponse(A, B) = G(A → ¬F(B))
+ * notPrecedence(A, B) = G(F (B) → ¬A)
+ * notChainResponse(A, B) = G(A → ¬X(B))
+ * notChainPrecedence(A, B) = G(X(B) → ¬A)
+ * coExistence(A, B) = F(A) ↔ F(B)
+ * notCoExistence(A, B) = ¬(F(A) ∧ F(B))
+ * choice(A, B) = F(A) ∨ F(B)
+ * exclusiveChoice(A, B) = (F(A) ∨ F(B)) ∧ ¬(F(A) ∧ F(B))
+ * -----------------------------------------------------------------------------
+ * addition: exactly(A, n) = atLeast(A,n) ∧ atMost(A,n)
+ * -----------------------------------------------------------------------------
  *)
-type declare =
+type declare_constraint =
   (* existence *)
-  | EXACTLY of string * int
-  | EXISTENCE of string * int
-  | MAX of string * int
-  | INIT of string
-  | LAST of string
+  | EXISTENCE of term
+  | AT_LEAST of term * int
+  | AT_MOST of term * int
+  | EXACTLY of term * int
+  | INIT of term
+  | LAST of term
   (* relation *)
-  | RESPONDED_EXISTENCE of string * string
-  | RESPONSE of string * string
-  | ALTERNATE_RESPONSE of string *string
-  | CHAIN_RESPONSE of string * string
-  | PRECEDENCE of string * string
-  | ALTERNATE_PRECEDENCE of string *string
-  | CHAIN_PRECEDENCE of string * string
-  | SUCCESSION of string * string
-  | ALTERNATE_SUCCESSION of string *string
-  | CHAIN_SUCCESSION of string * string
-  | COEXISTENCE of string * string
+  | RESPONDED_EXISTENCE of term * term
+  | RESPONSE of term * term
+  | ALTERNATE_RESPONSE of term * term
+  | CHAIN_RESPONSE of term * term
+  | PRECEDENCE of term * term
+  | ALTERNATE_PRECEDENCE of term * term
+  | CHAIN_PRECEDENCE of term * term
+  | SUCCESSION of term * term
+  | ALTERNATE_SUCCESSION of term * term
+  | CHAIN_SUCCESSION of term * term
+  | CO_EXISTENCE of term * term
   (* negation *)
-  | NOT_RESPONDED_EXISTENCE of string * string
-  | NOT_RESPONSE of string * string
-  | NOT_CHAIN_RESPONSE of string * string
-  | NOT_PRECEDENCE of string * string
-  | NOT_CHAIN_PRECEDENCE of string * string
-  | NOT_EXISTENCE of string * string
-  | NOT_COEXISTENCE of string * string
+  | NOT_RESPONDED_EXISTENCE of term * term
+  | NOT_RESPONSE of term * term
+  | NOT_CHAIN_RESPONSE of term * term
+  | NOT_PRECEDENCE of term * term
+  | NOT_CHAIN_PRECEDENCE of term * term
+  | NOT_COEXISTENCE of term * term
   (* choice *)
-  | CHOICE of string * string
-  | EXCLUSIVE_CHOICE of string * string
+  | CHOICE of term * term
+  | EXCLUSIVE_CHOICE of term * term
 
-type term = D of declare | L of ltl
+type pd_val = { declare : declare_constraint; ltl : term }
 
 type prob_declare =
-  | PROB_DECLARE of { crisps : term list; probabilities : float * term list }
+  | PROB_DECLARE of {
+      crisps : pd_val list;
+      probabilities : float * pd_val list;
+    }
 
+let map_declare_to_ltl d =
+  match d with
+  | EXISTENCE a -> Ltl.existence a
+  | AT_LEAST (a, n) -> Ltl.at_most a n
+  | AT_MOST (a, n) -> Ltl.at_most a n
+  | EXACTLY (a, n) -> Ltl.exactly a n
+  | INIT a -> Ltl.init a
+  | LAST a -> Ltl.last a
+  | RESPONDED_EXISTENCE (a, b) -> Ltl.responded_existence a b
+  | RESPONSE (a, b) -> Ltl.response a b
+  | ALTERNATE_RESPONSE (a, b) -> Ltl.alternate_response a b
+  | CHAIN_RESPONSE (a, b) -> Ltl.chain_response a b
+  | PRECEDENCE (a, b) -> Ltl.precedence a b
+  | ALTERNATE_PRECEDENCE (a, b) -> Ltl.alternate_precedence a b
+  | CHAIN_PRECEDENCE (a, b) -> Ltl.chain_precedence a b
+  | SUCCESSION (a, b) -> Ltl.succession a b
+  | ALTERNATE_SUCCESSION (a, b) -> Ltl.alternate_succession a b
+  | CHAIN_SUCCESSION (a, b) -> Ltl.chain_succession a b
+  | CO_EXISTENCE (a, b) -> Ltl.co_existence a b
+  | NOT_RESPONDED_EXISTENCE (a, b) -> Ltl.not_responded_existence a b
+  | NOT_RESPONSE (a, b) -> Ltl.not_response a b
+  | NOT_CHAIN_RESPONSE (a, b) -> Ltl.not_chain_response a b
+  | NOT_PRECEDENCE (a, b) -> Ltl.not_precedence a b
+  | NOT_CHAIN_PRECEDENCE (a, b) -> Ltl.not_chain_precedence a b
+  | NOT_COEXISTENCE (a, b) -> Ltl.not_co_existence a b
+  | CHOICE (a, b) -> Ltl.choice a b
+  | EXCLUSIVE_CHOICE (a, b) -> Ltl.exclusive_choice a b

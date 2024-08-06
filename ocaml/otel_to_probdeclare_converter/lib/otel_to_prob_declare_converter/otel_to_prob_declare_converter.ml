@@ -8,11 +8,11 @@ let create_val (node : Span_tree.span_tree_node) = V node.span.name
 (*let log_mapping_info root =
   "processing span_tree: \n" ^Span_tree.string_of_span_tree ^ (list_ltls ())*)
 
-let map_to_ltl (root : Span_tree.span_tree_node) : ltl =
+let map_to_ltl (root : Span_tree.span_tree_node) : term =
   (*Log.info (log_mapping_info root);*)
   print_ltls;
   let eventually_parent = F (V root.span.name) in
-  let rec map_children (t : ltl) (children : Span_tree.span_tree_node list) =
+  let rec map_children (t : term) (children : Span_tree.span_tree_node list) =
     match children with
     | [] -> t
     | c0 :: [] -> map_children (U (t, F (create_val c0))) c0.children
@@ -24,7 +24,7 @@ let map_to_ltl (root : Span_tree.span_tree_node) : ltl =
   in
   map_children eventually_parent root.children
 
-let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
+let create_ltls (resource_spans : Trace.resource_spans) : term list =
   let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
     match l with
@@ -33,7 +33,7 @@ let create_ltls (resource_spans : Trace.resource_spans) : ltl list =
   in
   create_ltls_aux span_trees (fun x -> x)
 
-let convert (resource_spans : Trace.resource_spans list) : ltl list =
+let convert (resource_spans : Trace.resource_spans list) : term list =
   (*map_to_ltl resource_spans*)
   let rec convert_aux l k =
     match l with

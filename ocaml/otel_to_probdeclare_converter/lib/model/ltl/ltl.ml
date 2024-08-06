@@ -1,18 +1,22 @@
 (* 
- *Note that there is no weak until -> instead use OR (U(a,b), G(V (a)))
- *BLACK has next operator and X ... FIXME check if X is ok
+ * -----------------------------------------------------------------------------
+ * TODO eval if differentiation between variable and term is needed!
+ * -----------------------------------------------------------------------------
+ * Note that there is no weak until -> instead use OR (U(a,b), G(V (a)))
+ * BLACK has next operator and X ... FIXME check if X is ok
+ * -----------------------------------------------------------------------------
  *)
-type ltl =
+type term =
   | V of string (* Represents a variable or proposition *)
-  | G of ltl (* Globally operator *)
-  | F of ltl (* Eventually operator *)
-  | X of ltl (* Next operator *)
-  | NOT of ltl (* Negation operator *)
-  | U of ltl * ltl (* Until operator *)
-  | THEN of ltl * ltl (* Implication operator *)
-  | IFF of ltl * ltl (* If and only if operator *)
-  | AND of ltl * ltl (* Logical AND operator *)
-  | OR of ltl * ltl (* Logical OR operator *)
+  | G of term (* Globally operator *)
+  | F of term (* Eventually operator *)
+  | X of term (* Next operator *)
+  | NOT of term (* Negation operator *)
+  | U of term * term (* Until operator *)
+  | THEN of term * term (* Implication operator *)
+  | IFF of term * term (* If and only if operator *)
+  | AND of term * term (* Logical AND operator *)
+  | OR of term * term (* Logical OR operator *)
 
 (* existence(A) = F(A) *)
 let existence a = F a
@@ -33,6 +37,9 @@ let rec at_most a n =
   | 0 -> G (NOT a)
   | _ when n < 0 -> failwith "at_most n must not be < 0!"
   | _ -> G (OR (NOT a, X (at_most a (n - 1))))
+
+(* exactly(A, n) = atLeast(A, n) ∧ atMost(A, n) *)
+let exactly a n = AND (at_least a n, at_most a n)
 
 (* init(A) = A *)
 let init a = a
@@ -116,7 +123,7 @@ let rec string_of_ltl t =
   | OR (t0, t1) -> "OR(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | IFF (t0, t1) -> "IFF(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
 
-let string_of_ltl_list (ltls : ltl list) : string =
+let string_of_ltl_list (ltls : term list) : string =
   let rec get_ltl_string_aux ltls acc =
     match ltls with
     | [] -> acc

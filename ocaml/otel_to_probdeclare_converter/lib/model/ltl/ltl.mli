@@ -1,43 +1,44 @@
-type ltl =
+type term =
   | V of string (* Represents a variable or proposition *)
-  | G of ltl (* Globally operator *)
-  | F of ltl (* Eventually operator *)
-  | X of ltl (* Next operator *)
-  | NOT of ltl (* Negation operator *)
-  | U of ltl * ltl (* Until operator *)
-  | THEN of ltl * ltl (* Implication operator *)
-  | IFF of ltl * ltl (* If and only if operator *)
-  | AND of ltl * ltl (* Logical AND operator *)
-  | OR of ltl * ltl (* Logical OR operator *)
+  | G of term (* Globally operator *)
+  | F of term (* Eventually operator *)
+  | X of term (* Next operator *)
+  | NOT of term (* Negation operator *)
+  | U of term * term (* Until operator *)
+  | THEN of term * term (* Implication operator *)
+  | IFF of term * term (* If and only if operator *)
+  | AND of term * term (* Logical AND operator *)
+  | OR of term * term (* Logical OR operator *)
 
 (* Function signatures for LTL operations *)
-val existence : ltl -> ltl
-val absence : ltl -> ltl
-val at_least : ltl -> int -> ltl
-val at_most : ltl -> int -> ltl
-val init : ltl -> ltl
-val last : ltl -> ltl
-val responded_existence : ltl -> ltl -> ltl
-val response : ltl -> ltl -> ltl
-val alternate_response : ltl -> ltl -> ltl
-val chain_response : ltl -> ltl -> ltl
-val precedence : ltl -> ltl -> ltl
-val alternate_precedence : ltl -> ltl -> ltl
-val chain_precedence : ltl -> ltl -> ltl
-val succession : ltl -> ltl -> ltl
-val chain_succession : ltl -> ltl -> ltl
-val alternate_succession : ltl -> ltl -> ltl
-val not_responded_existence : ltl -> ltl -> ltl
-val not_response : ltl -> ltl -> ltl
-val not_precedence : ltl -> ltl -> ltl
-val not_chain_response : ltl -> ltl -> ltl
-val not_chain_precedence : ltl -> ltl -> ltl
-val co_existence : ltl -> ltl -> ltl
-val not_co_existence : ltl -> ltl -> ltl
-val choice : ltl -> ltl -> ltl
-val exclusive_choice : ltl -> ltl -> ltl
+val existence : term -> term
+val absence : term -> term
+val at_least : term -> int -> term
+val at_most : term -> int -> term
+val exactly : term -> int -> term
+val init : term -> term
+val last : term -> term
+val responded_existence : term -> term -> term
+val response : term -> term -> term
+val alternate_response : term -> term -> term
+val chain_response : term -> term -> term
+val precedence : term -> term -> term
+val alternate_precedence : term -> term -> term
+val chain_precedence : term -> term -> term
+val succession : term -> term -> term
+val chain_succession : term -> term -> term
+val alternate_succession : term -> term -> term
+val not_responded_existence : term -> term -> term
+val not_response : term -> term -> term
+val not_precedence : term -> term -> term
+val not_chain_response : term -> term -> term
+val not_chain_precedence : term -> term -> term
+val co_existence : term -> term -> term
+val not_co_existence : term -> term -> term
+val choice : term -> term -> term
+val exclusive_choice : term -> term -> term
 
 (* Utility functions for printing LTL formulas *)
-val string_of_ltl : ltl -> string
-val string_of_ltl_list : ltl list -> string
+val string_of_ltl : term -> string
+val string_of_ltl_list : term list -> string
 val print_ltls : unit

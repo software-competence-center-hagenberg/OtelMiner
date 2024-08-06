@@ -1,37 +1,38 @@
-open Ltl
-
 type declare =
-(* existence *)
-| EXACTLY of string * int
-| EXISTENCE of string * int
-| MAX of string * int
-| INIT of string
-| LAST of string
-(* relation *)
-| RESPONDED_EXISTENCE of string * string
-| RESPONSE of string * string
-| ALTERNATE_RESPONSE of string *string
-| CHAIN_RESPONSE of string * string
-| PRECEDENCE of string * string
-| ALTERNATE_PRECEDENCE of string *string
-| CHAIN_PRECEDENCE of string * string
-| SUCCESSION of string * string
-| ALTERNATE_SUCCESSION of string *string
-| CHAIN_SUCCESSION of string * string
-| COEXISTENCE of string * string
-(* negation *)
-| NOT_RESPONDED_EXISTENCE of string * string
-| NOT_RESPONSE of string * string
-| NOT_CHAIN_RESPONSE of string * string
-| NOT_PRECEDENCE of string * string
-| NOT_CHAIN_PRECEDENCE of string * string
-| NOT_EXISTENCE of string * string
-| NOT_COEXISTENCE of string * string
-(* choice *)
-| CHOICE of string * string
-| EXCLUSIVE_CHOICE of string * string
+  (* existence *)
+  | EXISTENCE of Ltl.term
+  | AT_LEAST of Ltl.term * int
+  | AT_MOST of Ltl.term * int
+  | EXACTLY of Ltl.term * int
+  | INIT of Ltl.term
+  | LAST of Ltl.term
+  (* relation *)
+  | RESPONDED_EXISTENCE of Ltl.term * Ltl.term
+  | RESPONSE of Ltl.term * Ltl.term
+  | ALTERNATE_RESPONSE of Ltl.term * Ltl.term
+  | CHAIN_RESPONSE of Ltl.term * Ltl.term
+  | PRECEDENCE of Ltl.term * Ltl.term
+  | ALTERNATE_PRECEDENCE of Ltl.term * Ltl.term
+  | CHAIN_PRECEDENCE of Ltl.term * Ltl.term
+  | SUCCESSION of Ltl.term * Ltl.term
+  | ALTERNATE_SUCCESSION of Ltl.term * Ltl.term
+  | CHAIN_SUCCESSION of Ltl.term * Ltl.term
+  | CO_EXISTENCE of Ltl.term * Ltl.term
+  (* negation *)
+  | NOT_RESPONDED_EXISTENCE of Ltl.term * Ltl.term
+  | NOT_RESPONSE of Ltl.term * Ltl.term
+  | NOT_CHAIN_RESPONSE of Ltl.term * Ltl.term
+  | NOT_PRECEDENCE of Ltl.term * Ltl.term
+  | NOT_CHAIN_PRECEDENCE of Ltl.term * Ltl.term
+  | NOT_COEXISTENCE of Ltl.term * Ltl.term
+  (* choice *)
+  | CHOICE of Ltl.term * Ltl.term
+  | EXCLUSIVE_CHOICE of Ltl.term * Ltl.term
 
-type term = D of declare | L of ltl
+type pd_val = { declare : declare; ltl : Ltl.term }
 
 type prob_declare =
-  | PROB_DECLARE of { crisps : term list; probabilities : float * term list }
+  | PROB_DECLARE of {
+      crisps : pd_val list;
+      probabilities : float * pd_val list;
+    }
