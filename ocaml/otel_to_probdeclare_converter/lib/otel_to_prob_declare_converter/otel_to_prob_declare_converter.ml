@@ -73,8 +73,36 @@ let map_existence (activities : StringSet.t) =
     of_list
       (List.map (fun a -> Declare.EXISTENCE a) (StringSet.to_list activities)))
 
-let map_constraints (_a0 : string) (_a1 : string list) : DeclareSet.t =
-  DeclareSet.empty
+let map_choice (sibling_activities : string list) : DeclareSet.t =
+  let rec map_choice_aux (a : string) (activities : string list)
+      (tmp : string list) (acc : DeclareSet.t) =
+    match activities with
+    | [] ->
+        if tmp = [] then acc
+        else map_choice_aux (List.hd tmp) (List.tl tmp) [] acc
+    | s :: rest ->
+        map_choice_aux (List.hd rest) rest (s :: tmp)
+          DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+  in
+  map_choice_aux
+    (List.hd sibling_activities)
+    (List.tl sibling_activities)
+    [] DeclareSet.empty
+
+let map_response (a0 : string) (a1 : string list) : DeclareSet.t =
+  let rec map_response_aux (a0 : string) (a1 : string list) acc =
+    match a1 with
+    | [] -> acc
+    | a :: rest ->
+        map_response_aux a0 rest
+          DeclareSet.(acc |> add (Declare.CHOICE (a0, a)))
+  in
+  map_response_aux a0 a1 DeclareSet.empty
+
+let map_constraints (a0 : string) (a1 : string list) : DeclareSet.t =
+  let choices = map_choice a1 in
+  let response = map_response a0 a1 in
+  DeclareSet.(union choices response)
 
 let _map_to_declare (root : Span_tree.span_tree_node) : mapping_conf =
   let rec map_children (conf : mapping_conf)
