@@ -1,14 +1,14 @@
 type term =
   | V of string (* Represents a variable or proposition *)
-  | G of term (* Globally operator *)
-  | F of term (* Eventually operator *)
+  | NOT of term (* ¬ *)
   | X of term (* Next operator *)
-  | NOT of term (* Negation operator *)
+  | F of term (* Eventually operator *)
+  | G of term (* Globally operator *)
   | U of term * term (* Until operator *)
-  | THEN of term * term (* Implication operator *)
-  | IFF of term * term (* If and only if operator *)
-  | AND of term * term (* Logical AND operator *)
-  | OR of term * term (* Logical OR operator *)
+  | THEN of term * term (* → *)
+  | IFF of term * term (* ↔ *)
+  | AND of term * term (* ∧ *)
+  | OR of term * term (* ∨ *)
 
 (* Function signatures for LTL operations *)
 val existence : term -> term
@@ -42,3 +42,4 @@ val exclusive_choice : term -> term -> term
 val string_of_ltl : term -> string
 val string_of_ltl_list : term list -> string
 val print_ltls : unit
+val compare : term -> term -> int

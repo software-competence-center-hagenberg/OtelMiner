@@ -8,15 +8,15 @@
  *)
 type term =
   | V of string (* Represents a variable or proposition *)
-  | G of term (* Globally operator *)
-  | F of term (* Eventually operator *)
+  | NOT of term (* ¬ *)
   | X of term (* Next operator *)
-  | NOT of term (* Negation operator *)
+  | F of term (* Eventually operator *)
+  | G of term (* Globally operator *)
   | U of term * term (* Until operator *)
-  | THEN of term * term (* Implication operator *)
-  | IFF of term * term (* If and only if operator *)
-  | AND of term * term (* Logical AND operator *)
-  | OR of term * term (* Logical OR operator *)
+  | THEN of term * term (* → *)
+  | IFF of term * term (* ↔ *)
+  | AND of term * term (* ∧ *)
+  | OR of term * term (* ∨ *)
 
 (* existence(A) = F(A) *)
 let existence a = F a
@@ -49,6 +49,9 @@ let last a = G (THEN (NOT a, F a))
 
 (* respondedExistence(A, B) = F(A) → F(B) *)
 let responded_existence a b = THEN (F a, F b)
+
+(* coExistence(A, B) = F(A) ↔ F(B) *)
+let co_existence a b = IFF (F a, F b)
 
 (* response(A, B) = G(A → F(B)) *)
 let response a b = G (THEN (a, F b))
@@ -97,9 +100,6 @@ let not_chain_response a b = G (THEN (a, NOT (X b)))
 (* notChainPrecedence(A, B) = G(X(B) → ¬A) *)
 let not_chain_precedence a b = G (THEN (X b, NOT a))
 
-(* coExistence(A, B) = F(A) ↔ F(B) *)
-let co_existence a b = IFF (F a, F b)
-
 (* notCoExistence(A, B) = ¬(F(A) ∧ F(B)) *)
 let not_co_existence a b = NOT (AND (F a, F b))
 
@@ -122,6 +122,30 @@ let rec string_of_ltl t =
   | AND (t0, t1) -> "AND(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | OR (t0, t1) -> "OR(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
   | IFF (t0, t1) -> "IFF(" ^ string_of_ltl t0 ^ ", " ^ string_of_ltl t1 ^ ")"
+
+let rec compare t1 t2 =
+  match (t1, t2) with
+  | V s1, V s2 -> String.compare s1 s2
+  | G t1, G t2 -> compare t1 t2
+  | F t1, F t2 -> compare t1 t2
+  | X t1, X t2 -> compare t1 t2
+  | NOT t1, NOT t2 -> compare t1 t2
+  | U (a1, b1), U (a2, b2) ->
+      let c = compare a1 a2 in
+      if c = 0 then compare b1 b2 else c
+  | THEN (a1, b1), THEN (a2, b2) ->
+      let c = compare a1 a2 in
+      if c = 0 then compare b1 b2 else c
+  | IFF (a1, b1), IFF (a2, b2) ->
+      let c = compare a1 a2 in
+      if c = 0 then compare b1 b2 else c
+  | AND (a1, b1), AND (a2, b2) ->
+      let c = compare a1 a2 in
+      if c = 0 then compare b1 b2 else c
+  | OR (a1, b1), OR (a2, b2) ->
+      let c = compare a1 a2 in
+      if c = 0 then compare b1 b2 else c
+  | _ -> String.compare (string_of_ltl t1) (string_of_ltl t2)
 
 let string_of_ltl_list (ltls : term list) : string =
   let rec get_ltl_string_aux ltls acc =
