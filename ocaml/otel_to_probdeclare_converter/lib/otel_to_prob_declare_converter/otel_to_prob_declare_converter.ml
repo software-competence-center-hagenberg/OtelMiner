@@ -58,7 +58,7 @@ module DeclareSet = Set.Make (Declare)
 module StringSet = Set.Make (String)
 
 type mapping_conf = {
-  p : string; (* previous activity *)
+  p : string list; (* previous activities [a(n-1), a(n-2), a(n-3), ..., a0] *)
   a : StringSet.t; (* activities *)
   c : DeclareSet.t; (* list of all constraints *)
 }
@@ -73,38 +73,82 @@ let map_existence (activities : StringSet.t) =
     of_list
       (List.map (fun a -> Declare.EXISTENCE a) (StringSet.to_list activities)))
 
-let map_choice (sibling_activities : string list) : DeclareSet.t =
-  let rec map_choice_aux (a : string) (activities : string list)
-      (tmp : string list) (acc : DeclareSet.t) =
-    match activities with
-    | [] ->
-        if tmp = [] then acc
-        else map_choice_aux (List.hd tmp) (List.tl tmp) [] acc
-    | s :: rest ->
-        map_choice_aux (List.hd rest) rest (s :: tmp)
-          DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
-  in
-  map_choice_aux
-    (List.hd sibling_activities)
-    (List.tl sibling_activities)
-    [] DeclareSet.empty
+let map_choice (parallel : string list) : DeclareSet.t =
+  if parallel = [] then DeclareSet.empty
+  else
+    let rec map_choice_aux (a : string) (activities : string list)
+        (tmp : string list) (acc : DeclareSet.t) =
+      match activities with
+      | [] -> acc
+      | s :: rest ->
+          if rest = [] then map_choice_aux (List.hd tmp) (List.tl tmp) [] acc
+          else
+            map_choice_aux (List.hd rest) (List.tl rest) (s :: tmp)
+              DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+    in
+    map_choice_aux (List.hd parallel) (List.tl parallel) [] DeclareSet.empty
 
-let map_response (a0 : string) (a1 : string list) : DeclareSet.t =
-  let rec map_response_aux (a0 : string) (a1 : string list) acc =
-    match a1 with
+(*
+ * 0 ... no
+ * 1 ... yes
+ * 2 ... alternate
+ * 3 ... chain
+ *)
+type relation_type = {
+  r : int; (* relation *)
+  p : int; (* precedence *)
+  s : int; (* succession *)
+}
+
+let determine_relation (rt : relation_type) (a : string) (prev_a : string) =
+  match rt with
+  | { s = 3; _ } -> Declare.CHAIN_SUCCESSION (a, prev_a)
+  | { s = 2; _ } -> Declare.ALTERNATE_SUCCESSION (a, prev_a)
+  | { s = 1; _ } -> Declare.SUCCESSION (a, prev_a)
+  | { r = 3; _ } -> Declare.CHAIN_RESPONSE (a, prev_a)
+  | { p = 3; _ } -> Declare.CHAIN_PRECEDENCE (a, prev_a)
+  | { r = 2; _ } -> Declare.ALTERNATE_RESPONSE (a, prev_a)
+  | { p = 2; _ } -> Declare.ALTERNATE_PRECEDENCE (a, prev_a)
+  | { r = 1; _ } -> Declare.RESPONSE (a, prev_a)
+  | { p = 1; _ } -> Declare.PRECEDENCE (a, prev_a)
+  | _ -> failwith "!"
+
+let rec is_chain_succession (a : string) (b : string) (past : string list) (cur : string) =
+  match past with
+  | [] -> true
+  | h :: t ->
+    if h = cur then
+      if a = cur then is_chain_succession a b t b
+      else is_chain_succession a b t a
+    else
+      false (* FIXME *)
+
+let check_relation (a : string) (b : string) (past : string list) : Declare.t =
+  let rt = { r = 3; p = 3; s = 3 } in
+  let rec check_relation_aux a b p c rt =
+    match p with
+    | [] -> determine_relation rt a b
+    | ppa :: rest -> check_relation_aux a b p c rt (* FIXME *)
+    (*if ppa = c then determine_relation rt a b else Declare.ABSENCE a*)
+  in
+  check_relation_aux a b past b rt
+
+let map_relation (past : string list) (present : string list) : DeclareSet.t =
+  let rec map_response_aux (past : string list) (present : string list) acc =
+    match present with
     | [] -> acc
-    | a :: rest ->
-        map_response_aux a0 rest
-          DeclareSet.(acc |> add (Declare.CHOICE (a0, a)))
+    | a :: tl ->
+        let relation = check_relation a (List.hd past) (List.tl past) in
+        map_response_aux past tl DeclareSet.(acc |> add relation)
   in
-  map_response_aux a0 a1 DeclareSet.empty
+  map_response_aux past present DeclareSet.empty
 
-let map_constraints (a0 : string) (a1 : string list) : DeclareSet.t =
+let map_constraints (a0 : string list) (a1 : string list) : DeclareSet.t =
   let choices = map_choice a1 in
-  let response = map_response a0 a1 in
+  let response = map_relation a0 a1 in
   DeclareSet.(union choices response)
 
-let _map_to_declare (root : Span_tree.span_tree_node) : mapping_conf =
+let _map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
   let rec map_children (conf : mapping_conf)
       (children : Span_tree.span_tree_node list) =
     let child_activities = extract_activites children in
@@ -113,13 +157,12 @@ let _map_to_declare (root : Span_tree.span_tree_node) : mapping_conf =
     | [] -> { conf with c = DeclareSet.(union conf.c (map_existence conf.a)) }
     | c0 :: rest ->
         let a_c0 = extract_activity c0 in
-        let activities = StringSet.(conf.a |> add a_c0) in
         (* FIXME check if last *)
         let conf_new =
           map_children
             {
-              p = a_c0;
-              a = activities;
+              p = a_c0 :: conf.p;
+              a = StringSet.(conf.a |> add a_c0);
               c = DeclareSet.(union conf.c constraints);
             }
             c0.children
@@ -127,13 +170,16 @@ let _map_to_declare (root : Span_tree.span_tree_node) : mapping_conf =
         if rest = [] then conf_new
         else map_children { conf with a = conf_new.a; c = conf_new.c } rest
   in
-  map_children
-    {
-      p = root.span.name;
-      a = StringSet.(empty |> add root.span.name);
-      c = DeclareSet.(empty |> add (Declare.INIT root.span.name));
-    }
-    root.children
+  let final_conf =
+    map_children
+      {
+        p = [ root.span.name ];
+        a = StringSet.(empty |> add root.span.name);
+        c = DeclareSet.(empty |> add (Declare.INIT root.span.name));
+      }
+      root.children
+  in
+  DeclareSet.to_list final_conf.c
 
 let convert (resource_spans : Trace.resource_spans list) : term list =
   (*map_to_ltl resource_spans*)
