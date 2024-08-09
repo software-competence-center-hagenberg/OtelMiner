@@ -14,7 +14,7 @@ let handler channel probd_result_queue message =
   let converted = convert decoded in
   Log.info "conversion complete";
   Log.info "encoding result as string ...";
-  let ltl_string = Ltl.string_of_ltl_list converted in
+  let ltl_string = Declare.string_of_declare_list_list converted in
   Log.info "encoding complete";
   Queue.publish channel probd_result_queue (Message.make ltl_string)
   >>= fun `Ok ->

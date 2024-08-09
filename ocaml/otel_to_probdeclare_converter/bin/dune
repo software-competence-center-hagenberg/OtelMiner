@@ -1,4 +1,4 @@
 (executable
  (public_name otel_to_probdeclare_converter)
  (name main)
- (libraries amqp-client-async otel_decoder otel_to_prob_declare_converter ltl))
+ (libraries amqp-client-async otel_decoder otel_to_prob_declare_converter declare))

@@ -32,3 +32,4 @@ type t =
 
 val map_declare_to_ltl : t -> Ltl.term
 val compare : t -> t -> int
+val string_of_declare_list_list : t list list -> string

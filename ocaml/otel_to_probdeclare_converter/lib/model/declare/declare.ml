@@ -126,6 +126,22 @@ let string_of_declare d =
   | CHOICE (a, b) -> "CHOICE(" ^ a ^ ", " ^ b ^ ")"
   | EXCLUSIVE_CHOICE (a, b) -> "EXCLUSIVE_CHOICE(" ^ a ^ ", " ^ b ^ ")"
 
+let string_of_declare_list (dl : t list) : string =
+  let rec aux dl acc =
+    match dl with
+    | [] -> acc
+    | h :: t -> aux t (acc ^ ", " ^ string_of_declare h)
+  in
+  aux dl ""
+
+let string_of_declare_list_list (dll : t list list) : string =
+  let rec aux dll acc =
+    match dll with
+    | [] -> acc
+    | h :: t -> aux t (acc ^ "\n " ^ string_of_declare_list h)
+  in
+  aux dll ""
+
 let compare d1 d2 =
   match (d1, d2) with
   | EXISTENCE a, EXISTENCE b -> String.compare a b

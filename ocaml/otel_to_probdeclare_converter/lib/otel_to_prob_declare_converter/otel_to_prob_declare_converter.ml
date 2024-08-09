@@ -6,7 +6,7 @@ open Ltl
 
 let create_val (node : Span_tree.span_tree_node) = V node.span.name
 
-let map_to_ltl (root : Span_tree.span_tree_node) : term =
+let _map_to_ltl (root : Span_tree.span_tree_node) : term =
   (*Log.info (log_mapping_info root);*)
   print_ltls;
   let eventually_parent = F (V root.span.name) in
@@ -44,7 +44,7 @@ let map_to_ltl (root : Span_tree.span_tree_node) : term =
         if rest = [] then ac0c1 else AND (ac0c1, map_children t rest)*)
   in
   map_children activities [existence_root] root.children*)
-
+(*
 let create_ltls (resource_spans : Trace.resource_spans) : term list =
   let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
@@ -53,15 +53,9 @@ let create_ltls (resource_spans : Trace.resource_spans) : term list =
     | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h :: a))
   in
   create_ltls_aux span_trees (fun x -> x)
-
+*)
 module DeclareSet = Set.Make (Declare)
 module StringSet = Set.Make (String)
-
-type mapping_conf = {
-  p : string list; (* previous activities [a(n-1), a(n-2), a(n-3), ..., a0] *)
-  a : StringSet.t; (* activities *)
-  c : DeclareSet.t; (* list of all constraints *)
-}
 
 let extract_activity (node : Span_tree.span_tree_node) = node.span.name
 
@@ -73,7 +67,7 @@ let map_existence (activities : StringSet.t) =
     of_list
       (List.map (fun a -> Declare.EXISTENCE a) (StringSet.to_list activities)))
 
-let map_choice (parallel : string list) : DeclareSet.t =
+let map_choices (parallel : string list) : DeclareSet.t =
   if parallel = [] then DeclareSet.empty
   else
     let rec map_choice_aux (a : string) (activities : string list)
@@ -88,6 +82,7 @@ let map_choice (parallel : string list) : DeclareSet.t =
     in
     map_choice_aux (List.hd parallel) (List.tl parallel) [] DeclareSet.empty
 
+(*
 (*
  * 0 ... no
  * 1 ... yes
@@ -112,80 +107,259 @@ let determine_relation (rt : relation_type) (a : string) (prev_a : string) =
   | { r = 1; _ } -> Declare.RESPONSE (a, prev_a)
   | { p = 1; _ } -> Declare.PRECEDENCE (a, prev_a)
   | _ -> failwith "!"
+ *)
 
-let rec is_chain_succession (a : string) (b : string) (past : string list) (cur : string) =
-  match past with
+let rec find_next a = function
+  | [] -> []
+  | h :: t -> if h = a then h :: t else find_next a t
+
+let rec find_next_a_or_b a b = function
+  | [] -> []
+  | h :: t -> if h = a || h = b then h :: t else find_next_a_or_b a b t
+
+(*
+let rec is_chain_succession a b future cur =
+  match future with
   | [] -> true
   | h :: t ->
-    if h = cur then
-      if a = cur then is_chain_succession a b t b
-      else is_chain_succession a b t a
-    else
-      false (* FIXME *)
+      if h = cur then
+        if a = cur then is_chain_succession a b t b
+        else is_chain_succession a b t a
+      else if cur = a then false
+      else
+        let next = find_next_a_or_b a b t in
+        if next = [] then true
+        else if List.hd next = a then is_chain_succession a b t b
+        else false
+*)
+(*
+let rec is_chain_response a b future cur =
+  match future with
+  | [] -> true
+  | h :: t ->
+      if h = cur then
+        if a = cur then is_chain_response a b t b else is_chain_response a b t a
+      else if cur = b then false
+      else
+        let next = find_next a t in
+        if next = [] then true else is_chain_response a b t b
+*)
 
-let check_relation (a : string) (b : string) (past : string list) : Declare.t =
-  let rt = { r = 3; p = 3; s = 3 } in
-  let rec check_relation_aux a b p c rt =
-    match p with
-    | [] -> determine_relation rt a b
-    | ppa :: rest -> check_relation_aux a b p c rt (* FIXME *)
-    (*if ppa = c then determine_relation rt a b else Declare.ABSENCE a*)
+(*
+let rec is_chain_precedence a b future cur =
+  match future with
+  | [] -> true
+  | h :: t ->
+      if h = cur then
+        if a = cur then is_chain_precedence a b t b
+        else is_chain_precedence a b t a
+      else if cur = a then false
+      else
+        let next = find_next a t in
+        if next = [] then true else is_chain_precedence a b t b
+*)
+
+let is_relation (a : string) (b : string) (activities : string list)
+    abortion_predicate find_next_function continuation_function : bool =
+  let rec is_relation_aux (a : string) (b : string) (future : string list)
+      (cur : string) =
+    match future with
+    | [] -> true
+    | h :: t ->
+        if h = cur then
+          if cur = a then is_relation_aux a b t b else is_relation_aux a b t a
+        else if abortion_predicate cur h t then false
+        else
+          let next = find_next_function t in
+          if next = [] then true
+          else continuation_function next (fun () -> is_relation_aux a b t cur)
   in
-  check_relation_aux a b past b rt
+  is_relation_aux a b activities a
 
-let map_relation (past : string list) (present : string list) : DeclareSet.t =
-  let rec map_response_aux (past : string list) (present : string list) acc =
-    match present with
-    | [] -> acc
-    | a :: tl ->
-        let relation = check_relation a (List.hd past) (List.tl past) in
-        map_response_aux past tl DeclareSet.(acc |> add relation)
+let is_chain_succession (a : string) (b : string) (activities : string list) :
+    bool =
+  is_relation a b activities
+    (fun cur _h _t -> cur = b)
+    (fun t -> find_next_a_or_b a b t)
+    (fun next f -> if List.hd next = a then f () else false)
+
+let is_chain_response (a : string) (b : string) (activities : string list) :
+    bool =
+  is_relation a b activities
+    (fun cur h _t -> cur = b && h != a)
+    (fun t -> find_next a t)
+    (fun _next f -> f ())
+
+let is_chain_precedence (a : string) (b : string) (activities : string list) :
+    bool =
+  is_relation a b activities
+    (fun cur h _t -> cur = a && h != b)
+    (fun t -> find_next a t)
+    (fun _next f -> f ())
+
+let is_alternate_succession (a : string) (b : string) (activities : string list)
+    : bool =
+  is_relation a b activities
+    (fun _cur h _t -> h = a || h = b)
+    (fun t -> find_next_a_or_b a b t)
+    (fun next f -> if List.hd next = a then f () else false)
+
+let is_alternate_response (a : string) (b : string) (activities : string list) :
+    bool =
+  is_relation a b activities
+    (fun cur h t -> cur = b && h = a && List.hd t != b)
+    (fun t -> find_next a t)
+    (fun _next f -> f ())
+
+let is_alternate_precedence (a : string) (b : string) (activities : string list)
+    : bool =
+  is_relation a b activities
+    (fun cur h t -> cur = b && h != a && List.hd t = b)
+    (fun t -> find_next a t)
+    (fun _next f -> f ())
+
+(*
+ * FIXME: check if succession is true per default for all a b in a trace 
+ *        where a < b
+ *)
+let is_succession (a : string) (b : string) (activities : string list) =
+  is_relation a b activities
+    (fun cur h _t -> (cur = b && h = a) || (cur = a && h = b))
+    (fun t -> t)
+    (fun _next f -> f ())
+
+let is_response (a : string) (b : string) (activities : string list) : bool =
+  is_relation a b activities
+    (fun cur _h t -> cur = a && t = [])
+    (fun t -> t)
+    (fun _next f -> f ())
+
+let is_precedence (a : string) (b : string) (activities : string list) : bool =
+  is_relation a b activities
+    (fun cur h _t -> cur = a && h = b)
+    (fun t -> t)
+    (fun _next f -> f ())
+
+let determine_relation (a : string) (b : string) (activities : string list) :
+    Declare.t option =
+  if is_chain_succession a b activities then
+    Some (Declare.CHAIN_SUCCESSION (a, b))
+  else if is_chain_response a b activities then
+    Some (Declare.CHAIN_RESPONSE (a, b))
+  else if is_chain_precedence a b activities then
+    Some (Declare.CHAIN_PRECEDENCE (a, b))
+  else if is_alternate_succession a b activities then
+    Some (Declare.ALTERNATE_SUCCESSION (a, b))
+  else if is_alternate_response a b activities then
+    Some (Declare.ALTERNATE_RESPONSE (a, b))
+  else if is_alternate_precedence a b activities then
+    Some (Declare.ALTERNATE_PRECEDENCE (a, b))
+  else if is_succession a b activities then Some (Declare.SUCCESSION (a, b))
+  else if is_response a b activities then Some (Declare.RESPONSE (a, b))
+  else if is_precedence a b activities then Some (Declare.PRECEDENCE (a, b))
+  else None
+
+let rec get_next_to_check (activities : string list) (checked : StringSet.t) :
+    (string * string list) option =
+  match activities with
+  | [] -> None
+  | h :: t ->
+      if StringSet.(checked |> mem h) then get_next_to_check t checked
+      else Some (h, t)
+
+let map_relations (activities : string list) : DeclareSet.t =
+  let rec map_relations_aux a activities tmp checked acc =
+    match activities with
+    | [] -> (
+        if tmp = [] then acc
+        else
+          let new_to_check = List.rev tmp in
+          match get_next_to_check new_to_check checked with
+          | None -> acc
+          | Some (next_a, next_to_check) ->
+              map_relations_aux next_a next_to_check []
+                StringSet.(checked |> add a)
+                acc)
+    | b :: t -> (
+        if b = a then map_relations_aux a t tmp checked acc
+        else
+          match determine_relation a b activities with
+          | None -> map_relations_aux a t (b :: tmp) checked acc
+          | Some relation ->
+              map_relations_aux a t (b :: tmp) checked
+                DeclareSet.(acc |> add relation))
   in
-  map_response_aux past present DeclareSet.empty
+  map_relations_aux (List.hd activities) activities [] StringSet.empty
+    DeclareSet.empty
 
-let map_constraints (a0 : string list) (a1 : string list) : DeclareSet.t =
-  let choices = map_choice a1 in
-  let response = map_relation a0 a1 in
-  DeclareSet.(union choices response)
+type mapping_conf = {
+  p : string list; (* previous activities [a(n-1), a(n-2), a(n-3), ..., a0] *)
+  a : StringSet.t; (* activities FIXME change to Hashtbl with int counter! *)
+  c : DeclareSet.t; (* Set of all constraints *)
+}
 
-let _map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
+let initialize_conf (root : Span_tree.span_tree_node) : mapping_conf =
+  let choices = map_choices (extract_activites root.children) in
+  {
+    p = [ root.span.name ];
+    a = StringSet.(empty |> add root.span.name);
+    c = DeclareSet.(choices |> add (Declare.INIT root.span.name));
+  }
+
+let add_relations (conf : mapping_conf) : mapping_conf =
+  let activities = List.rev conf.p in
+  let relations = map_relations activities in
+  { conf with c = DeclareSet.(union conf.c relations) }
+
+let add_choices (node : Span_tree.span_tree_node) (conf : mapping_conf) :
+    mapping_conf =
+  let choices = map_choices (extract_activites node.children) in
+  let child_activity = extract_activity node in
+  {
+    p = child_activity :: conf.p;
+    a = StringSet.(conf.a |> add child_activity);
+    c = DeclareSet.(union conf.c choices);
+  }
+
+let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
   let rec map_children (conf : mapping_conf)
       (children : Span_tree.span_tree_node list) =
-    let child_activities = extract_activites children in
-    let constraints = map_constraints conf.p child_activities in
     match children with
-    | [] -> { conf with c = DeclareSet.(union conf.c (map_existence conf.a)) }
-    | c0 :: rest ->
-        let a_c0 = extract_activity c0 in
+    | [] -> add_relations conf
+    | child :: rest ->
         (* FIXME check if last *)
-        let conf_new =
-          map_children
-            {
-              p = a_c0 :: conf.p;
-              a = StringSet.(conf.a |> add a_c0);
-              c = DeclareSet.(union conf.c constraints);
-            }
-            c0.children
-        in
-        if rest = [] then conf_new
-        else map_children { conf with a = conf_new.a; c = conf_new.c } rest
+        let child_conf = map_children (add_choices child conf) child.children in
+        if rest = [] then child_conf
+        else map_children { conf with a = child_conf.a; c = child_conf.c } rest
   in
-  let final_conf =
-    map_children
-      {
-        p = [ root.span.name ];
-        a = StringSet.(empty |> add root.span.name);
-        c = DeclareSet.(empty |> add (Declare.INIT root.span.name));
-      }
-      root.children
-  in
-  DeclareSet.to_list final_conf.c
+  let init_conf = initialize_conf root in
+  let final_conf = map_children init_conf root.children in
+  DeclareSet.to_list
+    DeclareSet.(union final_conf.c (map_existence final_conf.a))
 
-let convert (resource_spans : Trace.resource_spans list) : term list =
+(*let convert (resource_spans : Trace.resource_spans list) : term list =
   (*map_to_ltl resource_spans*)
   let rec convert_aux l k =
     match l with
     | [] -> k []
     | h :: t -> convert_aux t (fun a -> k (create_ltls h :: a))
+  in
+  List.flatten (convert_aux resource_spans (fun x -> x))*)
+let create_declare_constraints (resource_spans : Trace.resource_spans) :
+    Declare.t list list =
+  let span_trees = Span_tree.create_span_trees resource_spans in
+  let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
+    match l with
+    | [] -> f []
+    | h :: t -> create_ltls_aux t (fun a -> f (map_to_declare h :: a))
+  in
+  create_ltls_aux span_trees (fun x -> x)
+
+let convert (resource_spans : Trace.resource_spans list) : Declare.t list list =
+  (*map_to_ltl resource_spans*)
+  let rec convert_aux l k =
+    match l with
+    | [] -> k []
+    | h :: t -> convert_aux t (fun a -> k (create_declare_constraints h :: a))
   in
   List.flatten (convert_aux resource_spans (fun x -> x))
