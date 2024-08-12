@@ -96,7 +96,7 @@ let map_declare_to_ltl d =
   | CHOICE (a, b) -> Ltl.choice (V a) (V b)
   | EXCLUSIVE_CHOICE (a, b) -> Ltl.exclusive_choice (V a) (V b)
 
-let string_of_declare d =
+let to_string d =
   match d with
   | EXISTENCE a -> "EXISTENCE(" ^ a ^ ")"
   | ABSENCE a -> "ABSENCE(" ^ a ^ ")"
@@ -130,7 +130,7 @@ let string_of_declare_list (dl : t list) : string =
   let rec aux dl acc =
     match dl with
     | [] -> acc
-    | h :: t -> aux t (acc ^ ", " ^ string_of_declare h)
+    | h :: t -> aux t (acc ^ ", " ^ to_string h)
   in
   aux dl ""
 
@@ -187,4 +187,4 @@ let compare d1 d2 =
   | CHOICE (a, b), CHOICE (c, d) -> String.compare a c + String.compare b d
   | EXCLUSIVE_CHOICE (a, b), EXCLUSIVE_CHOICE (c, d) ->
       String.compare a c + String.compare b d
-  | _ -> String.compare (string_of_declare d1) (string_of_declare d2)
+  | _ -> String.compare (to_string d1) (to_string d2)

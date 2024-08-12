@@ -1,3 +1,3 @@
 (library
  (name otel_to_prob_declare_converter)
- (libraries opentelemetry span_tree ltl declare prob_declare util))
+ (libraries opentelemetry span_tree ltl declare prob_declare util activity))
