@@ -1,8 +1,6 @@
 open Opentelemetry_proto
-
-(*open Thread*)
+open Util
 open Ltl
-(*open Prob_declare*)
 
 let create_val (node : Span_tree.span_tree_node) = V node.span.name
 
@@ -54,8 +52,6 @@ let create_ltls (resource_spans : Trace.resource_spans) : term list =
   in
   create_ltls_aux span_trees (fun x -> x)
 *)
-module DeclareSet = Set.Make (Declare)
-module StringSet = Set.Make (String)
 
 let extract_activity (node : Span_tree.span_tree_node) = node.span.name
 
@@ -65,7 +61,7 @@ let extract_activites (nodes : Span_tree.span_tree_node list) =
 let map_existence (activities : StringSet.t) =
   DeclareSet.(
     of_list
-      (List.map (fun a -> Declare.EXISTENCE a) (StringSet.to_list activities)))
+      (List.map (fun a -> Declare.EXISTENCE a) (StringSet.elements activities)))
 
 let map_choices (parallel : string list) : DeclareSet.t =
   if parallel = [] then DeclareSet.empty
@@ -311,14 +307,21 @@ let add_relations (conf : mapping_conf) : mapping_conf =
   let relations = map_relations activities in
   { conf with c = DeclareSet.(union conf.c relations) }
 
-let add_choices (node : Span_tree.span_tree_node) (conf : mapping_conf) :
+let add_last (children : Span_tree.span_tree_node list) (activity : string)
+    (constraints : DeclareSet.t) : DeclareSet.t =
+  if children = [] then DeclareSet.(constraints |> add (Declare.LAST activity))
+  else constraints
+
+let configure_child (node : Span_tree.span_tree_node) (conf : mapping_conf) :
     mapping_conf =
-  let choices = map_choices (extract_activites node.children) in
-  let child_activity = extract_activity node in
+  let child_activities = extract_activites node.children in
+  let choices = map_choices child_activities in
+  let activity = extract_activity node in
+  let constraints = add_last node.children activity choices in
   {
-    p = child_activity :: conf.p;
-    a = StringSet.(conf.a |> add child_activity);
-    c = DeclareSet.(union conf.c choices);
+    p = activity :: conf.p;
+    a = StringSet.(conf.a |> add activity);
+    c = DeclareSet.(union conf.c constraints);
   }
 
 let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
@@ -327,15 +330,15 @@ let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
     match children with
     | [] -> add_relations conf
     | child :: rest ->
-        (* FIXME check if last *)
-        let child_conf = map_children (add_choices child conf) child.children in
+        let child_conf = configure_child child conf in
+        let child_conf = map_children child_conf child.children in
         if rest = [] then child_conf
         else map_children { conf with a = child_conf.a; c = child_conf.c } rest
   in
   let init_conf = initialize_conf root in
   let final_conf = map_children init_conf root.children in
-  DeclareSet.to_list
-    DeclareSet.(union final_conf.c (map_existence final_conf.a))
+  DeclareSet.elements
+    DeclareSet.(union final_conf.c (map_existence final_conf.a)) (* FIXME improve map_existence and union*)
 
 (*let convert (resource_spans : Trace.resource_spans list) : term list =
   (*map_to_ltl resource_spans*)
