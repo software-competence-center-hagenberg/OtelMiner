@@ -22,7 +22,7 @@ let test_determine_relation _ =
     (Some (Declare.CHAIN_SUCCESSION ("a", "b")))
     (determine_relation "a" "b" activities);
   assert_equal
-    (Some (Declare.CHAIN_RESPONSE ("a", "c")))
+    (Some (Declare.SUCCESSION ("a", "c")))
     (determine_relation "a" "c" activities);
   assert_equal None (determine_relation "b" "a" activities)
 
@@ -32,10 +32,15 @@ let test_map_relations _ =
     DeclareSet.of_list
       [
         Declare.ALTERNATE_SUCCESSION ("a", "b");
+        Declare.ALTERNATE_SUCCESSION ("a", "c");
         Declare.CHAIN_SUCCESSION ("b", "c");
-        Declare.CHAIN_RESPONSE ("c", "a");
-        Declare.CHAIN_RESPONSE ("a", "d");
         Declare.CHAIN_SUCCESSION ("d", "e");
+        Declare.PRECEDENCE ("a", "d");
+        Declare.PRECEDENCE ("a", "e"); 
+        Declare.SUCCESSION ("b", "d");
+        Declare.SUCCESSION ("b", "e");
+        Declare.SUCCESSION ("c", "d");
+        Declare.SUCCESSION ("c", "e");
       ]
   in
   let result = map_relations activities in

@@ -128,9 +128,7 @@ let to_string d =
 
 let string_of_declare_list (dl : t list) : string =
   let rec aux dl acc =
-    match dl with
-    | [] -> acc
-    | h :: t -> aux t (acc ^ ", " ^ to_string h)
+    match dl with [] -> acc | h :: t -> aux t (acc ^ ", " ^ to_string h)
   in
   aux dl ""
 
@@ -146,45 +144,41 @@ let compare d1 d2 =
   match (d1, d2) with
   | EXISTENCE a, EXISTENCE b -> String.compare a b
   | ABSENCE a, ABSENCE b -> String.compare a b
-  | AT_LEAST (a, n), AT_LEAST (b, m) -> String.compare a b + Int.compare n m
-  | AT_MOST (a, n), AT_MOST (b, m) -> String.compare a b + Int.compare n m
-  | EXACTLY (a, n), EXACTLY (b, m) -> String.compare a b + Int.compare n m
+  | AT_LEAST (a, n), AT_LEAST (b, m) -> String.compare a b * Int.compare n m
+  | AT_MOST (a, n), AT_MOST (b, m) -> String.compare a b * Int.compare n m
+  | EXACTLY (a, n), EXACTLY (b, m) -> String.compare a b * Int.compare n m
   | INIT a, INIT b -> String.compare a b
   | LAST a, LAST b -> String.compare a b
   | RESPONDED_EXISTENCE (a, b), RESPONDED_EXISTENCE (c, d) ->
-      String.compare a c + String.compare b d
-  | CO_EXISTENCE (a, b), CO_EXISTENCE (c, d) ->
-      String.compare a c + String.compare b d
-  | RESPONSE (a, b), RESPONSE (c, d) -> String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
+  | CO_EXISTENCE (a, b), CO_EXISTENCE (c, d) -> String.compare (a ^ b) (c ^ d)
+  | RESPONSE (a, b), RESPONSE (c, d) -> String.compare (a ^ b) (c ^ d)
   | ALTERNATE_RESPONSE (a, b), ALTERNATE_RESPONSE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | CHAIN_RESPONSE (a, b), CHAIN_RESPONSE (c, d) ->
-      String.compare a c + String.compare b d
-  | PRECEDENCE (a, b), PRECEDENCE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
+  | PRECEDENCE (a, b), PRECEDENCE (c, d) -> String.compare (a ^ b) (c ^ d)
   | ALTERNATE_PRECEDENCE (a, b), ALTERNATE_PRECEDENCE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | CHAIN_PRECEDENCE (a, b), CHAIN_PRECEDENCE (c, d) ->
-      String.compare a c + String.compare b d
-  | SUCCESSION (a, b), SUCCESSION (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
+  | SUCCESSION (a, b), SUCCESSION (c, d) -> String.compare (a ^ b) (c ^ d)
   | ALTERNATE_SUCCESSION (a, b), ALTERNATE_SUCCESSION (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | CHAIN_SUCCESSION (a, b), CHAIN_SUCCESSION (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | NOT_RESPONDED_EXISTENCE (a, b), NOT_RESPONDED_EXISTENCE (c, d) ->
-      String.compare a c + String.compare b d
-  | NOT_RESPONSE (a, b), NOT_RESPONSE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
+  | NOT_RESPONSE (a, b), NOT_RESPONSE (c, d) -> String.compare (a ^ b) (c ^ d)
   | NOT_CHAIN_RESPONSE (a, b), NOT_CHAIN_RESPONSE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | NOT_PRECEDENCE (a, b), NOT_PRECEDENCE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | NOT_CHAIN_PRECEDENCE (a, b), NOT_CHAIN_PRECEDENCE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | NOT_COEXISTENCE (a, b), NOT_COEXISTENCE (c, d) ->
-      String.compare a c + String.compare b d
-  | CHOICE (a, b), CHOICE (c, d) -> String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
+  | CHOICE (a, b), CHOICE (c, d) -> String.compare (a ^ b) (c ^ d)
   | EXCLUSIVE_CHOICE (a, b), EXCLUSIVE_CHOICE (c, d) ->
-      String.compare a c + String.compare b d
+      String.compare (a ^ b) (c ^ d)
   | _ -> String.compare (to_string d1) (to_string d2)

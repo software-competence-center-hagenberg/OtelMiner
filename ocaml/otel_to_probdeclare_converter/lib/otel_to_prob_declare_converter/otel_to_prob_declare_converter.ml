@@ -35,11 +35,16 @@ let map_relations (activities : string list) : DeclareSet.t =
                 StringSet.(checked |> add a)
                 acc)
     | b :: t -> (
-        match determine_relation a b activities with
-        | None -> map_relations_aux a t (b :: tmp) checked acc
-        | Some relation ->
-            map_relations_aux a t (b :: tmp) checked
-              DeclareSet.(acc |> add relation))
+        if
+          (* FIXME: for now case a = b not handled -> explicit impl if necessary*)
+          b = a
+        then map_relations_aux a t tmp checked acc
+        else
+          match determine_relation a b activities with
+          | None -> map_relations_aux a t (b :: tmp) checked acc
+          | Some relation ->
+              map_relations_aux a t (b :: tmp) checked
+                DeclareSet.(acc |> add relation))
   in
   map_relations_aux (List.hd activities) activities [] StringSet.empty
     DeclareSet.empty
