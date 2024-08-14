@@ -128,25 +128,34 @@ let to_string d =
 
 let string_of_declare_list (dl : t list) : string =
   let rec aux dl acc =
-    match dl with [] -> acc | h :: t -> aux t (acc ^ ", " ^ to_string h)
+    match dl with
+    | [] -> acc ^ " ]"
+    | h :: t ->
+        if acc = "[ " then aux t (acc ^ to_string h)
+        else aux t (acc ^ ", " ^ to_string h)
   in
-  aux dl ""
+  aux dl "[ "
 
 let string_of_declare_list_list (dll : t list list) : string =
   let rec aux dll acc =
     match dll with
-    | [] -> acc
-    | h :: t -> aux t (acc ^ "\n " ^ string_of_declare_list h)
+    | [] -> acc ^ " ]"
+    | h :: t ->
+        if acc = "[ " then aux t (acc ^ string_of_declare_list h)
+        else aux t (acc ^ ",\n" ^ string_of_declare_list h)
   in
-  aux dll ""
+  aux dll "[ "
 
 let compare d1 d2 =
   match (d1, d2) with
   | EXISTENCE a, EXISTENCE b -> String.compare a b
   | ABSENCE a, ABSENCE b -> String.compare a b
-  | AT_LEAST (a, n), AT_LEAST (b, m) -> String.compare a b * Int.compare n m
-  | AT_MOST (a, n), AT_MOST (b, m) -> String.compare a b * Int.compare n m
-  | EXACTLY (a, n), EXACTLY (b, m) -> String.compare a b * Int.compare n m
+  | AT_LEAST (a, n), AT_LEAST (b, m) ->
+      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
+  | AT_MOST (a, n), AT_MOST (b, m) ->
+      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
+  | EXACTLY (a, n), EXACTLY (b, m) ->
+      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
   | INIT a, INIT b -> String.compare a b
   | LAST a, LAST b -> String.compare a b
   | RESPONDED_EXISTENCE (a, b), RESPONDED_EXISTENCE (c, d) ->

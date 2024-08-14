@@ -28,14 +28,14 @@ let absence a = NOT (existence a)
 let rec at_least a n =
   match n with
   | 1 -> F a
-  | _ when n < 1 -> failwith "at_least n must not be < 1!"
+  | _ when n < 1 -> failwith "at_least: n must not be < 1!"
   | _ -> F (AND (a, X (at_least a (n - 1))))
 
 (* atMost(A, n) = G(¬A ∨ X(atMost(A, n − 1))), atMost(A, 0) = G(¬A) *)
 let rec at_most a n =
   match n with
   | 0 -> G (NOT a)
-  | _ when n < 0 -> failwith "at_most n must not be < 0!"
+  | _ when n < 0 -> failwith "at_most: n must not be < 0!"
   | _ -> G (OR (NOT a, X (at_most a (n - 1))))
 
 (* exactly(A, n) = atLeast(A, n) ∧ atMost(A, n) *)

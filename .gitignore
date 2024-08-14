@@ -60,3 +60,4 @@ replay_pid*
 # ocaml/dune
 **/_build
 **/tmp.json
+**/test/*.json
