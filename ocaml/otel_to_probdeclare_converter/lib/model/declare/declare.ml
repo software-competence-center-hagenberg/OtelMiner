@@ -1,7 +1,5 @@
 (*
  * -----------------------------------------------------------------------------
- * TODO: eval if ltl better than string!
- * -----------------------------------------------------------------------------
  * Definition taken from Table 1 of N. Schützemmeier et al. "Upper-Bounded 
  * Model Checking for Declarative Process Models"
  * -----------------------------------------------------------------------------

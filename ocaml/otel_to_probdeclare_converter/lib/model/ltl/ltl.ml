@@ -1,7 +1,5 @@
 (* 
  * -----------------------------------------------------------------------------
- * TODO eval if differentiation between variable and term is needed!
- * -----------------------------------------------------------------------------
  * Note that there is no weak until -> instead use OR (U(a,b), G(V (a)))
  * BLACK has next operator and X ... FIXME check if X is ok
  * -----------------------------------------------------------------------------

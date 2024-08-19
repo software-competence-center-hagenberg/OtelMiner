@@ -21,6 +21,14 @@ let determine_relation (a : string) (b : string) (activities : string list) :
   else if is_precedence a b activities then Some (Declare.PRECEDENCE (a, b))
   else None
 
+let rec get_next_to_check (activities : string list) (checked : StringSet.t) :
+    (string * string list) option =
+  match activities with
+  | [] -> None
+  | h :: t ->
+      if StringSet.(checked |> mem h) then get_next_to_check t checked
+      else Some (h, t)
+
 let map_relations (activities : string list) : DeclareSet.t =
   let rec map_relations_aux a ax tmp checked acc =
     match ax with

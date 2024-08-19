@@ -2,14 +2,6 @@ open OUnit2
 open Otel_to_prob_declare_converter
 open Util
 
-(*
-type mock_span = { name : string }
-
-(* Mock data and helpers *)
-type mock_span_tree = { span : mock_span; children : mock_span_tree list }
-
-let mock_span_tree_node name children = { span = { name }; children }
-*)
 let assert_declare_set_equal ds1 ds2 =
   assert_equal ~cmp:DeclareSet.equal
     ~printer:(fun ds ->

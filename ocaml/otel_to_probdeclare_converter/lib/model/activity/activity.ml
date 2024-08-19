@@ -1,16 +1,57 @@
 open Util
 
+(* returns the remaining list including a as head, if found, else empty list*)
 let rec find_next a = function
   | [] -> []
   | h :: t -> if h = a then h :: t else find_next a t
 
+(*
+ * returns the remaining list including a or b as head, if found, 
+ * else empty list
+ *)
 let rec find_next_a_or_b a b = function
   | [] -> []
   | h :: t -> if h = a || h = b then h :: t else find_next_a_or_b a b t
 
+(*
+ *------------------------------------------------------------------------------
+ * FIXME check if find_next_function is really necessary or if it is better to traverse the whole list and only apply an abortion and continuation predicate after every miss.
+ *------------------------------------------------------------------------------
+ * Generic function to determine if a and b are in a relation.
+ * General algorithm a and b are occuring the same list and in order to find if
+ * they fulfill a specific relation the list needs to be traversed and apply
+ * checks at certain points that lead to an abortion or a continuation.
+ * Every time the current value is equal to the head of the list to check
+ * traverse, the counter (cnt) is incremented by 1. For every miss (h != cur),
+ * first the abortion_predicate is checked, if it is NOT fulfilled the
+ * find_next_function is applied to retrieve the next starting point of the
+ * list to continue check. Then the continuation_predicate is applied to the
+ * result of the list and if fulfilled the algorithm continous.
+ *------------------------------------------------------------------------------
+ * Input:
+ * a ... activity
+ * b ... activity
+ * activities ... list of activities
+ * abortion_predicate ... 
+ *    a function to determine if the relation determination should be aborted. *    Expects cur, h, and t and applies the logic based on the DECLARE template
+ *    definition of the specific relation
+ * find_next_function ...
+ *    a function to determine the next sub list to continue. Utilizes either
+ *    find_next or find_next_a_or_b
+ * continuation_predicate ...
+ *    a function to determine if the relation determination should be continued
+ *    after the find_next_function is applied. Expects next cur the recursive
+ *    that should be applied in case of continuation wrapped in a function
+ * found_predicate ...
+ *    predicate to determine if the relation is true or false based on the cnt
+ *    value
+ *------------------------------------------------------------------------------
+ *)
 let is_relation (a : string) (b : string) (activities : string list)
-    abortion_predicate find_next_function continuation_predicate found_predicate
-    : bool =
+    (abortion_predicate : string -> string -> string list -> bool)
+    (find_next_function : string list -> string list)
+    (continuation_predicate : string list -> string -> (unit -> bool) -> bool)
+    (found_predicate : int -> bool) : bool =
   let rec is_relation_aux (a : string) (b : string) (activities : string list)
       (cur : string) (cnt : int) : bool =
     match activities with
@@ -29,6 +70,7 @@ let is_relation (a : string) (b : string) (activities : string list)
   in
   is_relation_aux a b activities a 0
 
+(* Checks if a and b are fulfilling the chain succession declare constraint *)
 let is_chain_succession (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
@@ -37,6 +79,7 @@ let is_chain_succession (a : string) (b : string) (activities : string list) :
     (fun next _cur f -> if List.hd next = a then f () else false)
     (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
+(* Checks if a and b are fulfilling the chain response declare constraint *)
 let is_chain_response (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
@@ -45,6 +88,7 @@ let is_chain_response (a : string) (b : string) (activities : string list) :
     (fun next _cur f -> if List.hd next = a then f () else false)
     (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
+(* Checks if a and b are fulfilling the chain precedence declare constraint *)
 let is_chain_precedence (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
@@ -53,6 +97,9 @@ let is_chain_precedence (a : string) (b : string) (activities : string list) :
     (fun next _cur f -> if List.hd next = a then f () else false)
     (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
+(* 
+ * Checks if a and b are fulfilling the alternate succession declare constraint
+ *)
 let is_alternate_succession (a : string) (b : string) (activities : string list)
     : bool =
   is_relation a b activities
@@ -61,6 +108,7 @@ let is_alternate_succession (a : string) (b : string) (activities : string list)
     (fun next cur f -> if List.hd next = cur then f () else false)
     (fun cnt -> cnt > 0 && cnt mod 3 = 0)
 
+(* Checks if a and b are fulfilling the alternate response declare constraint *)
 let is_alternate_response (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
@@ -69,6 +117,9 @@ let is_alternate_response (a : string) (b : string) (activities : string list) :
     (fun next cur f -> if List.hd next = cur then f () else false)
     (fun cnt -> cnt > 0 && cnt mod 3 = 0)
 
+(* 
+ * Checks if a and b are fulfilling the alternate precedence declare constraint
+ *)
 let is_alternate_precedence (a : string) (b : string) (activities : string list)
     : bool =
   is_relation a b activities
@@ -81,6 +132,7 @@ let is_alternate_precedence (a : string) (b : string) (activities : string list)
  * FIXME: check if succession is true per default for all a b in a trace 
  *        where a < b
  *)
+(* Checks if a and b are fulfilling the succession declare constraint *)
 let is_succession (a : string) (b : string) (activities : string list) =
   is_relation a b activities
     (fun cur h _t -> (cur = b && h = a) || (cur = a && h = b))
@@ -88,6 +140,7 @@ let is_succession (a : string) (b : string) (activities : string list) =
     (fun _next _cur f -> f ())
     (fun cnt -> cnt >= 2)
 
+(* Checks if a and b are fulfilling the response declare constraint *)
 let is_response (a : string) (b : string) (activities : string list) : bool =
   is_relation a b activities
     (fun cur h _t -> cur = b && h = a)
@@ -95,6 +148,7 @@ let is_response (a : string) (b : string) (activities : string list) : bool =
     (fun _next _cur f -> f ())
     (fun cnt -> cnt >= 2)
 
+(* Checks if a and b are fulfilling the precedence declare constraint *)
 let is_precedence (a : string) (b : string) (activities : string list) : bool =
   is_relation a b activities
     (fun cur h _t -> cur = a && h = b)
@@ -102,10 +156,3 @@ let is_precedence (a : string) (b : string) (activities : string list) : bool =
     (fun _next _cur f -> f ())
     (fun cnt -> cnt >= 2)
 
-let rec get_next_to_check (activities : string list) (checked : StringSet.t) :
-    (string * string list) option =
-  match activities with
-  | [] -> None
-  | h :: t ->
-      if StringSet.(checked |> mem h) then get_next_to_check t checked
-      else Some (h, t)
