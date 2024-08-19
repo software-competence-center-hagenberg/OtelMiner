@@ -1,5 +1,3 @@
-open Util
-
 (* returns the remaining list including a as head, if found, else empty list*)
 let rec find_next a = function
   | [] -> []

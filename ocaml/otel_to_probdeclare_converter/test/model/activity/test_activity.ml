@@ -96,13 +96,13 @@ let test_is_response _ =
     (is_response "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
   assert_bool "Response should be true" (is_response "a" "b" [ "a"; "c"; "b" ]);
   assert_bool "Response should be false"
-    (not (is_response "a" "b" [ "a"; "c"; "b" ]))
+    (not (is_response "a" "b" [ "d"; "c"; "b" ]))
 
 let test_is_precedence _ =
   assert_bool "Precedence should be true"
     (is_precedence "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
   assert_bool "Precedence should be false"
-    (not (is_precedence "a" "b" [ "a"; "c"; "b" ]));
+    (is_precedence "a" "b" [ "a"; "c"; "b" ]);
   assert_bool "Precedence should be false"
     (not (is_precedence "a" "b" [ "b"; "c"; "a" ]));
   assert_bool "Precedence should be false"
