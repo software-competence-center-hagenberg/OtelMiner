@@ -28,7 +28,7 @@ let test_map_relations _ =
         Declare.CHAIN_SUCCESSION ("b", "c");
         Declare.CHAIN_SUCCESSION ("d", "e");
         Declare.PRECEDENCE ("a", "d");
-        Declare.PRECEDENCE ("a", "e"); 
+        Declare.PRECEDENCE ("a", "e");
         Declare.SUCCESSION ("b", "d");
         Declare.SUCCESSION ("b", "e");
         Declare.SUCCESSION ("c", "d");

@@ -104,16 +104,17 @@ let is_alternate_succession (a : string) (b : string) (activities : string list)
     (fun _cur h _t -> h = a || h = b)
     (fun t -> find_next_a_or_b a b t)
     (fun next cur f -> if List.hd next = cur then f () else false)
-    (fun cnt -> cnt > 0 && cnt mod 3 = 0)
+    (fun cnt -> cnt > 2)
 
 (* Checks if a and b are fulfilling the alternate response declare constraint *)
 let is_alternate_response (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
     (fun cur h _t -> cur = b && h = a)
+     (* FIXME next function should take cur into account for alternate*)
     (fun t -> find_next_a_or_b a b t)
     (fun next cur f -> if List.hd next = cur then f () else false)
-    (fun cnt -> cnt > 0 && cnt mod 3 = 0)
+    (fun cnt -> cnt > 2)
 
 (* 
  * Checks if a and b are fulfilling the alternate precedence declare constraint
@@ -124,7 +125,7 @@ let is_alternate_precedence (a : string) (b : string) (activities : string list)
     (fun cur h _t -> cur = a && h = b)
     (fun t -> find_next_a_or_b a b t)
     (fun next cur f -> if List.hd next = cur then f () else false)
-    (fun cnt -> cnt > 0 && cnt mod 3 = 0)
+    (fun cnt -> cnt > 2)
 
 (*
  * FIXME: check if succession is true per default for all a b in a trace 
@@ -153,4 +154,3 @@ let is_precedence (a : string) (b : string) (activities : string list) : bool =
     (fun t -> t)
     (fun _next _cur f -> f ())
     (fun cnt -> cnt >= 2)
-
