@@ -9,7 +9,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>at.scch.freiseisen.ma</groupId>
   <artifactId>commons</artifactId>
   <name>commons</name>
   <description>Contains shared constants, utility classes, exceptions, POJOs, etc.</description>

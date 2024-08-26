@@ -51,6 +51,7 @@ build/
 *.ear
 *.zip
 *.tar.gz
+!traces.tar.gz
 *.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
@@ -61,3 +62,6 @@ replay_pid*
 **/_build
 **/tmp.json
 **/test/*.json
+
+#test-data
+*.txt

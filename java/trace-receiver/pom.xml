@@ -9,7 +9,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>at.scch.freiseisen.ma</groupId>
     <artifactId>trace-receiver</artifactId>
     <name>trace-collector</name>
     <description>Collects traces received via RabbitMQ</description>
@@ -49,10 +48,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 
