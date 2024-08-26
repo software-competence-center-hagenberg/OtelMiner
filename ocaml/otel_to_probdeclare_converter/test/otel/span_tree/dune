@@ -1,0 +1,4 @@
+(test
+ (name test_span_tree)
+ (modules test_span_tree)
+ (libraries opentelemetry otel_encoder))

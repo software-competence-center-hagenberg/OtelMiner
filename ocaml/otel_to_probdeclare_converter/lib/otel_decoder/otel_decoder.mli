@@ -1,1 +1,0 @@
-val decode : string -> Opentelemetry_proto.Trace.resource_spans list

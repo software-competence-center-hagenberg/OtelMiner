@@ -18,9 +18,30 @@
 (package
  (name otel_to_probdeclare_converter)
  (synopsis "OTEL to ProbDeclare")
- (description "A converter that accepts otel-spans via RabbitMQ and converts them to ProbDeclare clauses.")
- (depends ocaml dune)
+ (description
+  "A converter that accepts otel-spans via RabbitMQ and converts them to ProbDeclare clauses.")
+ (depends
+  ocaml
+  dune
+  (opentelemetry
+   (= 0.9))
+  (base64
+   (= 3.5.1))
+  (yojson
+   (= 2.2.2))
+  (amqp-client-async
+   (= 2.3.0))
+  (ounit2
+   (= 2.2.7)))
  (tags
-  ("process mining", "probabilistic declarative process mining", "LTL", "otel", "ProbDeclare")))
+  ("process mining"
+   ,
+   "probabilistic declarative process mining"
+   ,
+   "LTL"
+   ,
+   "otel"
+   ,
+   "ProbDeclare")))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

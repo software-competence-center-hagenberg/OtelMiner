@@ -1,0 +1,18 @@
+server:
+  port: 8050
+  servlet:
+    context-path: /db-service/
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: db-user
+    password: super-secure-12345
+    driverClassName: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 128MB
+      max-request-size: 128MB
+      enabled: true
