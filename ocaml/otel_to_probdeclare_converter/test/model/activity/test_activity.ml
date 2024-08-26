@@ -100,10 +100,8 @@ let test_is_alternate_response _ =
   assert_bool "Alternate response should be true"
     (is_alternate_response "a" "b"
        [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b"; "a" ]);
-  assert_bool "Alternate response should be false"
-    (not
-       (is_alternate_response "a" "b"
-          [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b" ]));
+  assert_bool "Alternate response should be true"
+    (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b" ]);
   assert_bool "Alternate response should be false"
     (not
        (is_alternate_response "a" "b"

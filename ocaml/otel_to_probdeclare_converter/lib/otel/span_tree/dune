@@ -1,3 +1,4 @@
 (library
  (name span_tree)
- (libraries opentelemetry otel_encoder))
+ (libraries opentelemetry otel_encoder 
+  amqp-client-async))

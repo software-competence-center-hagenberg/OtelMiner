@@ -1,4 +1,6 @@
 open Opentelemetry_proto
+open Amqp_client_async
+open Thread
 
 type span_tree_node = { span : Trace.span; children : span_tree_node list }
 
@@ -64,9 +66,9 @@ let rec build_span_trees nodes n_tmp roots r_tmp =
   | node :: n -> (
       match roots with
       | [] ->
-          failwith
-            ("build_span_trees: could not build tree! orphan: "
-           ^ string_of_span_id node)
+          Log.info "build_span_trees: discarding orphan: %s"
+            (string_of_span_id node);
+          build_span_trees nodes n_tmp r_tmp []
       | root :: r -> (
           match find_span node.span.parent_span_id root with
           | None -> build_span_trees nodes (node :: n_tmp) r (root :: r_tmp)
