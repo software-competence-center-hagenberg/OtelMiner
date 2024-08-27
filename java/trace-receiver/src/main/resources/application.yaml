@@ -1,6 +1,6 @@
 spring:
   application:
-    name: trace-transformer
+    name: trace-receiver
   rabbitmq:
     port: 5672
     host: rabbitmq-server
@@ -19,5 +19,3 @@ otel_to_probd:
 
 server:
   port: 4020
-#  servlet:
-#    context-path: /trace-receiver/
