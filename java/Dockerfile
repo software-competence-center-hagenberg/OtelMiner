@@ -9,8 +9,8 @@ RUN mvn clean install -pl ${ARTIFACT_ID} -am
 
 FROM eclipse-temurin:21-jdk-jammy
 
-ARG JAR_FILE
-COPY --from=build ${JAR_FILE} app.jar
+ARG ARTIFACT_ID
+COPY --from=build /java/${ARTIFACT_ID}/target/${ARTIFACT_ID}*.jar app.jar
 RUN chmod +x app.jar
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]

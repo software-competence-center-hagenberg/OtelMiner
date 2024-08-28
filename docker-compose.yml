@@ -22,6 +22,8 @@ services:
     security_opt:
       - "no-new-privileges=true"
     image: postgres:16.1
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: db-user
       POSTGRES_PASSWORD: super-secure-12345
@@ -39,8 +41,7 @@ services:
       context: java
       dockerfile: ./Dockerfile
       args:
-        JAR_FILE: /java/db-service/target/db-service*.jar
-        ARTIFACT_ID: :db-service
+        ARTIFACT_ID: db-service
     depends_on:
       - database
   trace-receiver:
@@ -53,8 +54,7 @@ services:
       context: java
       dockerfile: ./Dockerfile
       args:
-        JAR_FILE: /java/trace-receiver/target/trace-receiver*.jar
-        ARTIFACT_ID: :trace-receiver
+        ARTIFACT_ID: trace-receiver
     restart: on-failure
     depends_on:
       - rabbitmq-server

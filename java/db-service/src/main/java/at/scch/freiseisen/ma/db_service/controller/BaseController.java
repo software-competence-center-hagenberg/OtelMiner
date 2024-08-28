@@ -8,12 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -25,33 +23,4 @@ public abstract class BaseController<
         T extends Serializable> {
     protected final S service;
 
-    @GetMapping
-    public Page<E> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
-        return service.findAll(page, size, Sort.by(sort));
-    }
-
-    @GetMapping("/{id}")
-    public E retrieveOne(@PathVariable("id") T id) {
-        return service.findById(id);
-    }
-
-    @PostMapping("/one")
-    public void postOne(E entity) {
-        service.save(entity);
-    }
-
-    @PostMapping
-    public void post(List<E> entities) {
-        service.saveAll(entities);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteOne(@PathVariable("id") T id) {
-        service.delete(id);
-    }
-
-    @DeleteMapping
-    public void deleteAllByIdInBatch(List<T> ids) {
-        service.deleteAllByIdInBatch(ids);
-    }
 }

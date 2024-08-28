@@ -1,8 +1,8 @@
 name: master-project-dev
 services:
-  trace-receiver:
+  master-project:
     image: maven:3.9.6-eclipse-temurin-21
-    container_name: "trace-receiver-dev"
+    container_name: "master-project-dev"
     cap_drop:
       - ALL
     security_opt:

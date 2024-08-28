@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -14,18 +15,19 @@ import java.nio.file.Paths;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ArchiveExtractor {
 
-    public void extractTarGz(String filePath, String destinationDirectory) throws IOException {
-        log.info("Extracting tar gz archive from {} to {}", filePath, destinationDirectory);
-        try (InputStream fileInputStream = Files.newInputStream(Paths.get(filePath));
+    public void extractTarGz(Path archive, Path destinationDirectory) throws IOException {
+        log.info("Extracting tar gz archive from {} to {}", archive, destinationDirectory);
+        try (InputStream fileInputStream = Files.newInputStream(archive);
              InputStream gzInput = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarInput = new TarArchiveInputStream(gzInput)) {
 
             TarArchiveEntry entry;
             Path destinationPath;
             while ((entry = tarInput.getNextEntry()) != null) {
-                destinationPath = Paths.get(destinationDirectory, entry.getName());
+                destinationPath = Paths.get(destinationDirectory.toString(), entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(destinationPath);
                 } else {
@@ -36,6 +38,6 @@ public class ArchiveExtractor {
                 }
             }
         }
-        log.info("Finished extracting tar gz archive of {}", filePath);
+        log.info("Finished extracting tar gz archive of {}", archive);
     }
 }

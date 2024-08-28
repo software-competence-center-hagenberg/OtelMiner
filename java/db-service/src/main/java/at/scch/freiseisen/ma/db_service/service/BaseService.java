@@ -29,7 +29,7 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
     }
 
     public void saveAll(List<E> entities) {
-        log.info("persisting entities {}", entities.stream().map(BaseEntity::getId).toList());
+        log.info("persisting {} entities", entities.size());
         repository.saveAllAndFlush(entities);
     }
 

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
-public abstract class BaseEntity<T extends Serializable> {
+public abstract class BaseEntity<T extends Serializable> implements Serializable {
 
     @Id
     private T id;

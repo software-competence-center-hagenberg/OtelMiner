@@ -1,8 +1,7 @@
-package at.scch.freiseisen.ma.db_service.service.span;
+package at.scch.freiseisen.ma.db_service.service;
 
-import at.scch.freiseisen.ma.data_layer.entity.span.Span;
-import at.scch.freiseisen.ma.data_layer.repository.span.SpanRepository;
-import at.scch.freiseisen.ma.db_service.service.BaseService;
+import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
+import at.scch.freiseisen.ma.data_layer.repository.otel.SpanRepository;
 import org.springframework.stereotype.Service;
 
 @Service

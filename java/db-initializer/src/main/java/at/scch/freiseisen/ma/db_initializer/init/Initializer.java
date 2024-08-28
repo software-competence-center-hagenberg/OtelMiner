@@ -5,21 +5,29 @@ import at.scch.freiseisen.ma.db_initializer.source_extraction.FileParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 @RequiredArgsConstructor
 public class Initializer {
+    private final ResourceLoader resourceLoader;
     private final ArchiveExtractor archiveExtractor;
     private final FileParser fileParser;
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws IOException {
-        String extractDir = "src/main/resources/test-data/";
-        archiveExtractor.extractTarGz(extractDir + "traces.tar.gz", extractDir);
-        fileParser.parseFiles(extractDir, ".txt");
+        Resource archiveResource = resourceLoader.getResource("classpath:test-data/traces.tar.gz");
+        Resource extractionDirectoryResource = resourceLoader.getResource("classpath:test-data/");
+        Path archivePath = Paths.get(archiveResource.getURI());
+        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
+        archiveExtractor.extractTarGz(archivePath, extractionDirectory);
+        fileParser.parseFiles(extractionDirectory, ".txt");
     }
 
 }
