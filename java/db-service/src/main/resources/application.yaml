@@ -3,7 +3,7 @@ spring:
     name: db-service
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
   datasource:
     url: jdbc:postgresql://database:5432/postgres
     username: db-user

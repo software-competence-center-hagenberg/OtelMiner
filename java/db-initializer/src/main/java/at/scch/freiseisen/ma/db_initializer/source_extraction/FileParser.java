@@ -9,12 +9,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ public class FileParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HashMap<String, Trace> traces = new HashMap<>();
     private final HashMap<Integer, List<Trace>> tracesByNrNodes = new HashMap<>();
+
+    @Value("${db-service.url}")
+    private String dbServiceUrl;
 
     public void parseFiles(Path directory, String fileType) throws IOException {
         log.info("parsing all '{}' files from {}", fileType, directory);
@@ -47,19 +51,19 @@ public class FileParser {
                 tracesByNrNodes.put(nrNodes, new ArrayList<>(List.of(t)));
             }
         });
-        log.info("########## traces found with mor than 5 nodes: ###########");
+        log.info("########## traces found with n nodes: ###########");
         tracesByNrNodes.entrySet().forEach(entry -> {
             log.info("{} traces with {} nodes found", entry.getValue().size(), entry.getKey());
             if (entry.getKey() >= 5) {
-                restTemplate.postForLocation("http://localhost:4242/v1/traces", entry.getValue());
+                restTemplate.postForLocation(dbServiceUrl + "/v1/traces", entry.getValue());
             }
         });
-        log.info("##########################################################");
+        log.info("#################################################");
     }
 
     private void parseFile(Path path) {
         log.info("parsing {}", path);
-        try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(path)))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 addSpan(path, line);

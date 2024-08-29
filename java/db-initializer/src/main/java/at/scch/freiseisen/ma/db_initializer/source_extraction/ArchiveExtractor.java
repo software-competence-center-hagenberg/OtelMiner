@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,16 +19,17 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class ArchiveExtractor {
 
-    public void extractTarGz(Path archive, Path destinationDirectory) throws IOException {
+    public void extractTarGz(Resource archive, Path destinationDirectory) throws IOException {
         log.info("Extracting tar gz archive from {} to {}", archive, destinationDirectory);
-        try (InputStream fileInputStream = Files.newInputStream(archive);
+        try (InputStream fileInputStream = archive.getInputStream();
              InputStream gzInput = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarInput = new TarArchiveInputStream(gzInput)) {
 
             TarArchiveEntry entry;
             Path destinationPath;
             while ((entry = tarInput.getNextEntry()) != null) {
-                destinationPath = Paths.get(destinationDirectory.toString(), entry.getName());
+                log.info("extracting entry {}", entry.getName());
+                destinationPath = destinationDirectory.resolve(entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(destinationPath);
                 } else {
