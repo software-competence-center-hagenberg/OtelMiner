@@ -25,7 +25,7 @@ let test_generate_nodes _ =
   let decoded = List.map decode_trace_span spans in
   let span_trees = generate_span_trees_from_spans decoded in
   List.iter (pp_span_tree Format.std_formatter) span_trees;
-  assert_bool "" true*)
+  assert_bool "" true*) (* FIXME cycle detected either error in code or cycle in trace*)
 
 let suite =
   "span_tree_test_suite"
