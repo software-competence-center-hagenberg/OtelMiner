@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
+import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.repository.otel.TraceRepository;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
@@ -28,13 +29,18 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
         return service.findById(id);
     }
 
+    @GetMapping("/{id}/spans")
+    public List<String> retrieveSpansAsStringList(@PathVariable("id") String id) {
+        return service.findById(id).getSpans().stream().map(Span::getJson).toList();
+    }
+
     @PostMapping("/one")
     public void postOne(@RequestBody Trace entity) {
         service.save(entity);
     }
 
     @PostMapping
-    public void post(@RequestBody ArrayList<Trace> entities) {
+    public void post(@RequestBody List<Trace> entities) {
         service.saveAll(entities);
     }
 

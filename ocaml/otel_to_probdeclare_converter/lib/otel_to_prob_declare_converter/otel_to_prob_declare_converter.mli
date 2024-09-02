@@ -4,8 +4,10 @@ type mapping_conf = {
   c : Util.DeclareSet.t;
 }
 
-val convert :
+val convert_resource_spans :
   Opentelemetry_proto.Trace.resource_spans list -> Declare.t list list
+val convert_trace_spans :
+  Opentelemetry_proto.Trace.span list -> Declare.t list list
 
 val determine_relation : string -> string -> string list -> Declare.t option
 val map_relations : string list -> Util.DeclareSet.t

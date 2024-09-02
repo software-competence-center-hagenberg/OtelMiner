@@ -77,6 +77,11 @@ let rec build_span_trees nodes n_tmp roots r_tmp =
               let new_root = insert_at target_id node root in
               build_span_trees n n_tmp (new_root :: r) r_tmp))
 
+let generate_span_trees_from_spans (spans : Trace.span list) :
+    span_tree_node list =
+  let roots, nodes = generate_nodes spans in
+  build_span_trees nodes [] roots []
+
 (* 
  * Takes resources_spans object. 
  * Extracts all spans contained in its scope_spans.
@@ -85,8 +90,18 @@ let rec build_span_trees nodes n_tmp roots r_tmp =
  * Fails if an orphan is included!
  * TODO: check if needed for list of span trees!
  *)
-let create_span_trees (resource_spans : Trace.resource_spans) :
-    span_tree_node list =
+let generate_span_trees_from_resource_spans
+    (resource_spans : Trace.resource_spans) : span_tree_node list =
   let spans = extract_spans resource_spans in
-  let roots, nodes = generate_nodes spans in
-  build_span_trees nodes [] roots []
+  generate_span_trees_from_spans spans
+
+let rec pp_span_tree (fmt : Format.formatter) (span_tree : span_tree_node) =
+  let pp_children fmt children =
+    Format.fprintf fmt "[%a]"
+      (Format.pp_print_list
+         ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ")
+         pp_span_tree)
+      children
+  in
+  Format.fprintf fmt "{ span = %a; children = %a }" Otel_encoder.pp_span_custom
+    span_tree.span pp_children span_tree.children

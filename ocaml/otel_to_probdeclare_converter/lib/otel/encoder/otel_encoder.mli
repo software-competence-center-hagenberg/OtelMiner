@@ -1,1 +1,1 @@
-val encode : Opentelemetry_proto.Trace.resource_spans list -> string
+val pp_span_custom : Format.formatter -> Opentelemetry_proto.Trace.span -> unit

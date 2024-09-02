@@ -185,9 +185,8 @@ let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
  * maps each tree to list of DECLARE constraints which reperesent the DECLARE
  * model of that tree 
  *)
-let create_declare_constraints (resource_spans : Trace.resource_spans) :
+let create_declare_constraints (span_trees : Span_tree.span_tree_node list) :
     Declare.t list list =
-  let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_declare_constraints_aux (l : Span_tree.span_tree_node list) f =
     match l with
     | [] -> f []
@@ -200,13 +199,23 @@ let create_declare_constraints (resource_spans : Trace.resource_spans) :
  * Main function for mapping a list of resource spans toi their DECLARE mdoel
  * representations
  *)
-let convert (resource_spans : Trace.resource_spans list) : Declare.t list list =
+let convert_resource_spans (resource_spans : Trace.resource_spans list) :
+    Declare.t list list =
   let rec convert_aux l k =
     match l with
     | [] -> k []
-    | h :: t -> convert_aux t (fun a -> k (create_declare_constraints h :: a))
+    | h :: t ->
+        convert_aux t (fun a ->
+            k
+              (create_declare_constraints
+                 (Span_tree.generate_span_trees_from_resource_spans h)
+              :: a))
   in
   List.flatten (convert_aux resource_spans (fun x -> x))
+
+let convert_trace_spans (trace_spans : Trace.span list) : Declare.t list list =
+  let span_trees = Span_tree.generate_span_trees_from_spans trace_spans in
+  create_declare_constraints span_trees
 
 (*
 open Ltl
