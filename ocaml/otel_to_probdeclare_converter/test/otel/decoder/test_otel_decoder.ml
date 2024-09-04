@@ -11,7 +11,7 @@ let test_decode_trace_string _ =
   match json with
   | `List lst ->
       let decoded = List.map decode_trace_span lst in
-      List.iter (pp_span_custom Format.std_formatter) decoded;
+      List.iter (pp_span_custom_minimal Format.std_formatter) decoded;
       OUnit2.assert_bool "decoding successfull" true
   | _ -> OUnit2.assert_failure "Expected a JSON list"
 

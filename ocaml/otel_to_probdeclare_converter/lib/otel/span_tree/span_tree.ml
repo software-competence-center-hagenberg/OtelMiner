@@ -4,7 +4,26 @@ open Thread
 
 type span_tree_node = { span : Trace.span; children : span_tree_node list }
 
-let string_of_span_id node = String.of_bytes node.span.span_id
+let rec pp_span_tree (fmt : Format.formatter) (span_tree : span_tree_node) =
+  let pp_children fmt children =
+    Format.fprintf fmt "[%a]"
+      (Format.pp_print_list
+         ~pp_sep:(fun fmt () -> Format.fprintf fmt "; ")
+         pp_span_tree)
+      children
+  in
+  Format.fprintf fmt "{\n    span = %a; \n    children = %a \n}\n"
+    Otel_encoder.pp_span_custom_minimal span_tree.span pp_children
+    span_tree.children
+
+let string_of_node node =
+  Format.flush_str_formatter (pp_span_tree Format.str_formatter node)
+
+let string_of_nodes nodes =
+  if nodes = [] then "[]" 
+  else String.concat "; " (List.map (fun n -> string_of_node n) nodes)
+
+(*let string_of_span_id node = String.of_bytes node.span.span_id*)
 let create_span_tree_node span = { span; children = [] }
 
 (*
@@ -35,52 +54,73 @@ let generate_nodes (spans : Trace.span list) =
  * Finds and returns span given span_id in given tree. Returns None if not
  * found.
  *)
-let rec find_span span_id tree =
+(*
+let rec find_span_in_tree span_id tree =
   if tree.span.span_id = span_id then Some tree
   else
     let rec find_in_children = function
       | [] -> None
       | child :: rest ->
-          let span = find_span span_id child in
+          let span = find_span_in_tree span_id child in
           if span = None then find_in_children rest else span
     in
     find_in_children tree.children
-
+*)
 (*
  * Inserts given subtree at node with span_id = ps_id of given tree.
  * ps_id ... parent_span_id
  *)
-let rec insert_at ps_id subtree tree =
-  if tree.span.span_id = ps_id then
-    { tree with children = subtree :: tree.children }
+let rec insert_at ps_id subtrees tree =
+  if tree.span.span_id = ps_id then { tree with children = subtrees }
   else
-    let new_children = List.map (insert_at ps_id subtree) tree.children in
+    let new_children = List.map (insert_at ps_id subtrees) tree.children in
     { tree with children = new_children }
 
+let find_children parent nodes =
+  let rec find_children_aux nodes fc fn =
+    match nodes with
+    | [] -> (fc [], fn [])
+    | n :: t ->
+        if n.span.parent_span_id = parent.span.span_id then
+          find_children_aux t (fun a -> fc (n :: a)) fn
+        else find_children_aux t fc (fun a -> fn (n :: a))
+  in
+  find_children_aux nodes (fun x -> x) (fun x -> x)
+
+let build_tree root nodes =
+  let rec build_tree_aux root node nodes =
+    let rec map_children root children nodes =
+      match children with
+      | [] -> (root, nodes)
+      | c :: t ->
+          let new_root, other = build_tree_aux root c nodes in
+          map_children new_root t other
+    in
+    let children, other = find_children node nodes in
+    let new_root = insert_at node.span.span_id children root in
+    if children = [] then (new_root, other)
+    else map_children new_root children other
+  in
+  build_tree_aux root root nodes
+
 (* Builds all span trees with given roots and nodes. *)
-let rec build_span_trees nodes n_tmp roots r_tmp =
-  match nodes with
-  | [] ->
-      if n_tmp = [] then List.rev_append r_tmp roots
-      else build_span_trees n_tmp [] (List.rev_append r_tmp roots) []
-  | node :: n -> (
-      match roots with
-      | [] ->
-          Log.info "build_span_trees: discarding orphan: %s"
-            (string_of_span_id node);
-          build_span_trees nodes n_tmp r_tmp []
-      | root :: r -> (
-          match find_span node.span.parent_span_id root with
-          | None -> build_span_trees nodes (node :: n_tmp) r (root :: r_tmp)
-          | Some target_parent ->
-              let target_id = target_parent.span.span_id in
-              let new_root = insert_at target_id node root in
-              build_span_trees n n_tmp (new_root :: r) r_tmp))
+let build_span_trees nodes roots =
+  let rec build_span_trees_aux nodes roots acc =
+    match roots with
+    | [] -> 
+      Log.info "orphans remaining:\n";
+      Log.info "%s" (string_of_nodes nodes);
+      acc
+    | root :: r ->
+        let tree, n = build_tree root nodes in
+        build_span_trees_aux n r (tree :: acc)
+  in
+  build_span_trees_aux nodes roots []
 
 let generate_span_trees_from_spans (spans : Trace.span list) :
     span_tree_node list =
   let roots, nodes = generate_nodes spans in
-  build_span_trees nodes [] roots []
+  build_span_trees nodes roots
 
 (* 
  * Takes resources_spans object. 
@@ -94,14 +134,3 @@ let generate_span_trees_from_resource_spans
     (resource_spans : Trace.resource_spans) : span_tree_node list =
   let spans = extract_spans resource_spans in
   generate_span_trees_from_spans spans
-
-let rec pp_span_tree (fmt : Format.formatter) (span_tree : span_tree_node) =
-  let pp_children fmt children =
-    Format.fprintf fmt "[%a]"
-      (Format.pp_print_list
-         ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ")
-         pp_span_tree)
-      children
-  in
-  Format.fprintf fmt "{ span = %a; children = %a }" Otel_encoder.pp_span_custom
-    span_tree.span pp_children span_tree.children
