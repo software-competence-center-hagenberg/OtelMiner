@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -31,4 +32,17 @@ public abstract class BaseEntity<T extends Serializable> implements Serializable
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updateDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseEntity entity = (BaseEntity) o;
+        return id.equals(entity.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

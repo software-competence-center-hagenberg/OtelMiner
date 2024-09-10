@@ -153,7 +153,7 @@ let string_of_ltl_list (ltls : term list) : string =
   in
   get_ltl_string_aux ltls ""
 
-let print_ltls =
+(*let print_ltls =
   let v0 = V "t0" in
   let v1 = V "t1" in
   let v = string_of_ltl v0 in
@@ -231,3 +231,4 @@ let print_ltls =
     (string_of_ltl (not_co_existence v0 v1))
     (string_of_ltl (choice v0 v1))
     (string_of_ltl (exclusive_choice v0 v1))
+*)

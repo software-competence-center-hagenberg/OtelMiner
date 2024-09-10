@@ -1,7 +1,7 @@
 open OUnit2
 open Otel_to_prob_declare_converter
 open Util
-(*open Otel_decoder*)
+open Otel_decoder
 
 let assert_declare_set_equal ds1 ds2 =
   assert_equal ~cmp:DeclareSet.equal
@@ -39,7 +39,7 @@ let test_map_relations _ =
   let result = map_relations activities in
   assert_declare_set_equal expected_relations result
 
-(*let test_convert_trace_spans _ =
+let test_convert_trace_spans _ =
   let json =
     Yojson.Basic.from_file
       (Sys.getcwd ()
@@ -49,7 +49,17 @@ let test_map_relations _ =
   let decoded = List.map decode_trace_span spans in
   let declare = convert_trace_spans decoded in
   Format.print_string (Declare.string_of_declare_list_list declare);
-  assert_bool "" true*)
+  assert_bool "" true;
+  let json =
+    Yojson.Basic.from_file
+      (Sys.getcwd ()
+     ^ "/../../../../test/jaeger_trace.json")
+  in
+  let spans = json |> Yojson.Basic.Util.to_list in
+  let decoded = List.map decode_jaeger_trace_span spans in
+  let declare = convert_trace_spans decoded in
+  Format.print_string (Declare.string_of_declare_list_list declare);
+  assert_bool "" true
 
 (*
 let test_initialize_conf _ =
@@ -85,7 +95,7 @@ let suite =
   >::: [
          "test_determine_relation" >:: test_determine_relation;
          "test_map_relations" >:: test_map_relations;
-         (*"test_convert_trace_spans" >:: test_convert_trace_spans;*)
+         "test_convert_trace_spans" >:: test_convert_trace_spans;
          (*
          "test_initialize_conf" >:: test_initialize_conf;
          "test_map_to_declare" >:: test_map_to_declare;

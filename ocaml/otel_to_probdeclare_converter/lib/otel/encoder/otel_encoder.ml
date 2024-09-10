@@ -42,7 +42,13 @@ let pp_span_custom (fmt : Format.formatter) (span : Trace.span) =
 let pp_span_custom_minimal (fmt : Format.formatter) (span : Trace.span) =
   let trace_id = Bytes.to_string span.trace_id in
   let span_id = Bytes.to_string span.span_id in
+  let name = span.name in
   let parent_span_id = Bytes.to_string span.parent_span_id in
   Format.fprintf fmt
-    "{ \n    trace_id = %s; \n    span_id = %s; \n    parent_span_id = %s \n  }\n"
-    trace_id span_id parent_span_id
+    "{ \n\
+    \    trace_id = %s; \n\
+    \    span_id = %s; \n\
+    \    name = %s; \n\
+    \    parent_span_id = %s \n\
+    \  }\n"
+    trace_id span_id name parent_span_id

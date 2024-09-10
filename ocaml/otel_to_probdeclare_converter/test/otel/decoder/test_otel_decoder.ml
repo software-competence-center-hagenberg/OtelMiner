@@ -11,12 +11,28 @@ let test_decode_trace_string _ =
   match json with
   | `List lst ->
       let decoded = List.map decode_trace_span lst in
+      (*List.iter (pp_span_custom_minimal Format.std_formatter) decoded;*)
+      OUnit2.assert_bool "decoding successfull" (not (decoded = []))
+  | _ -> OUnit2.assert_failure "Expected a JSON list"
+
+let test_decode_jaeger_trace _ =
+  let json =
+    Yojson.Basic.from_file
+      (Sys.getcwd () ^ "/../../../../../test/jaeger_trace.json")
+  in
+  (*let spans = json |> Yojson.Basic.Util.member "data" in*)
+  match json with
+  | `List lst ->
+      let decoded = List.map decode_jaeger_trace_span lst in
       List.iter (pp_span_custom_minimal Format.std_formatter) decoded;
       OUnit2.assert_bool "decoding successfull" true
   | _ -> OUnit2.assert_failure "Expected a JSON list"
 
 let suite =
   "Otel_decoder_test_suite"
-  >::: [ "test_decode_trace_string" >:: test_decode_trace_string ]
+  >::: [
+         "test_decode_trace_string" >:: test_decode_trace_string;
+         "test_decode_jaeger_trace" >:: test_decode_jaeger_trace;
+       ]
 
 let () = run_test_tt_main suite

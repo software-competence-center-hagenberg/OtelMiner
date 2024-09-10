@@ -87,7 +87,10 @@ let map_choices (activities : string list) : DeclareSet.t =
       match activities with
       | [] -> acc
       | s :: rest ->
-          if rest = [] then map_choice_aux (List.hd tmp) (List.tl tmp) [] acc
+          if rest = [] then
+            match tmp with
+            | [] -> acc
+            | h :: t -> map_choice_aux h t [] acc
           else
             map_choice_aux (List.hd rest) (List.tl rest) (s :: tmp)
               DeclareSet.(acc |> add (Declare.CHOICE (a, s)))

@@ -1,4 +1,4 @@
 (test
  (name test_span_tree)
  (modules test_span_tree)
- (libraries ounit2 opentelemetry otel_decoder span_tree yojson))
+ (libraries ounit2 opentelemetry otel_decoder span_tree yojson util))
