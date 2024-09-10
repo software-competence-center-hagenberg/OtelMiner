@@ -14,3 +14,5 @@ val generate_nodes :
   span_tree_node list * span_tree_node list
 
 val pp_span_tree : Format.formatter -> span_tree_node -> unit
+
+val string_of_nodes: span_tree_node list -> string

@@ -24,42 +24,64 @@ let test_map_relations _ =
   let expected_relations =
     DeclareSet.of_list
       [
-        Declare.ALTERNATE_SUCCESSION ("a", "b");
-        Declare.ALTERNATE_SUCCESSION ("a", "c");
-        Declare.CHAIN_SUCCESSION ("b", "c");
-        Declare.CHAIN_SUCCESSION ("d", "e");
-        Declare.PRECEDENCE ("a", "d");
-        Declare.PRECEDENCE ("a", "e");
-        Declare.SUCCESSION ("b", "d");
-        Declare.SUCCESSION ("b", "e");
-        Declare.SUCCESSION ("c", "d");
-        Declare.SUCCESSION ("c", "e");
+        ALTERNATE_SUCCESSION ("a", "b");
+        ALTERNATE_SUCCESSION ("a", "c");
+        CHAIN_SUCCESSION ("b", "c");
+        CHAIN_SUCCESSION ("d", "e");
+        PRECEDENCE ("a", "d");
+        PRECEDENCE ("a", "e");
+        SUCCESSION ("b", "d");
+        SUCCESSION ("b", "e");
+        SUCCESSION ("c", "d");
+        SUCCESSION ("c", "e");
       ]
   in
   let result = map_relations activities in
   assert_declare_set_equal expected_relations result
 
+let ac31d6a4e6fab4b650a501274d48d3c5_model =
+  DeclareSet.of_list
+    [ EXISTENCE "GET /travel/adminQueryAll"; INIT "GET /travel/adminQueryAll" ]
+
+let jaeger_trace_model =
+  DeclareSet.of_list
+    [
+      CHAIN_SUCCESSION
+        ("POST /travel/getTripsByRouteId", "TravelController.getTripsByRouteId");
+      CHAIN_SUCCESSION
+        ("TravelController.getTripsByRouteId", "TripRepository.findByRouteId");
+      CHAIN_SUCCESSION ("TripRepository.findByRouteId", "find ts.trip");
+      EXISTENCE "POST /travel/getTripsByRouteId";
+      EXISTENCE "TravelController.getTripsByRouteId";
+      EXISTENCE "TripRepository.findByRouteId";
+      EXISTENCE "find ts.trip";
+      INIT "POST /travel/getTripsByRouteId";
+      LAST "find ts.trip";
+      SUCCESSION
+        ("POST /travel/getTripsByRouteId", "TripRepository.findByRouteId");
+      SUCCESSION ("POST /travel/getTripsByRouteId", "find ts.trip");
+      SUCCESSION ("TravelController.getTripsByRouteId", "find ts.trip");
+    ]
+
 let test_convert_trace_spans _ =
   let json =
-    Yojson.Basic.from_file
-      (Sys.getcwd ()
-     ^ "/../../../../test/ac31d6a4e6fab4b650a501274d48d3c5.json")
+    Util.load_json_from_file ~prefix:"/../../../../test/"
+      "ac31d6a4e6fab4b650a501274d48d3c5.json"
   in
   let spans = json |> Yojson.Basic.Util.to_list in
   let decoded = List.map decode_trace_span spans in
   let declare = convert_trace_spans decoded in
-  Format.print_string (Declare.string_of_declare_list_list declare);
-  assert_bool "" true;
+  (*Format.print_string (Declare.string_of_declare_list_list declare);*)
+  assert_equal ac31d6a4e6fab4b650a501274d48d3c5_model
+    (DeclareSet.of_list (List.flatten declare));
   let json =
-    Yojson.Basic.from_file
-      (Sys.getcwd ()
-     ^ "/../../../../test/jaeger_trace.json")
+    Util.load_json_from_file ~prefix:"/../../../../test/" "jaeger_trace.json"
   in
   let spans = json |> Yojson.Basic.Util.to_list in
   let decoded = List.map decode_jaeger_trace_span spans in
   let declare = convert_trace_spans decoded in
-  Format.print_string (Declare.string_of_declare_list_list declare);
-  assert_bool "" true
+  (*Format.print_string (Declare.string_of_declare_list_list declare);*)
+  assert_equal jaeger_trace_model (DeclareSet.of_list (List.flatten declare))
 
 (*
 let test_initialize_conf _ =

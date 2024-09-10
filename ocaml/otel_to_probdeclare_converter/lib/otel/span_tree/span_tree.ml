@@ -13,7 +13,7 @@ let rec pp_span_tree (fmt : Format.formatter) (span_tree : span_tree_node) =
       children
   in
   Format.fprintf fmt "{\n    span = %a; \n    children = %a \n}\n"
-    Otel_encoder.pp_span_custom_minimal span_tree.span pp_children
+    Otel_encoder.pp_span_custom span_tree.span pp_children
     span_tree.children
 
 let string_of_node node =
