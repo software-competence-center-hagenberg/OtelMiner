@@ -145,47 +145,48 @@ let string_of_declare_list_list (dll : t list list) : string =
   aux dll "[ "
 
 let compare d1 d2 =
+  let compare_pairs (a1, b1) (a2, b2) =
+    let cmp1 = String.compare a1 a2 in
+    if cmp1 <> 0 then cmp1 else String.compare b1 b2
+  in
   match (d1, d2) with
   | EXISTENCE a, EXISTENCE b -> String.compare a b
   | ABSENCE a, ABSENCE b -> String.compare a b
   | AT_LEAST (a, n), AT_LEAST (b, m) ->
-      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
+      compare_pairs (a, string_of_int n) (b, string_of_int m)
   | AT_MOST (a, n), AT_MOST (b, m) ->
-      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
+      compare_pairs (a, string_of_int n) (b, string_of_int m)
   | EXACTLY (a, n), EXACTLY (b, m) ->
-      String.compare (a ^ string_of_int n) (b ^ string_of_int m)
+      compare_pairs (a, string_of_int n) (b, string_of_int m)
   | INIT a, INIT b -> String.compare a b
   | LAST a, LAST b -> String.compare a b
   | RESPONDED_EXISTENCE (a, b), RESPONDED_EXISTENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | CO_EXISTENCE (a, b), CO_EXISTENCE (c, d) -> String.compare (a ^ b) (c ^ d)
-  | RESPONSE (a, b), RESPONSE (c, d) -> String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | CO_EXISTENCE (a, b), CO_EXISTENCE (c, d) -> compare_pairs (a, b) (c, d)
+  | RESPONSE (a, b), RESPONSE (c, d) -> compare_pairs (a, b) (c, d)
   | ALTERNATE_RESPONSE (a, b), ALTERNATE_RESPONSE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | CHAIN_RESPONSE (a, b), CHAIN_RESPONSE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | PRECEDENCE (a, b), PRECEDENCE (c, d) -> String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | CHAIN_RESPONSE (a, b), CHAIN_RESPONSE (c, d) -> compare_pairs (a, b) (c, d)
+  | PRECEDENCE (a, b), PRECEDENCE (c, d) -> compare_pairs (a, b) (c, d)
   | ALTERNATE_PRECEDENCE (a, b), ALTERNATE_PRECEDENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
   | CHAIN_PRECEDENCE (a, b), CHAIN_PRECEDENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | SUCCESSION (a, b), SUCCESSION (c, d) -> String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | SUCCESSION (a, b), SUCCESSION (c, d) -> compare_pairs (a, b) (c, d)
   | ALTERNATE_SUCCESSION (a, b), ALTERNATE_SUCCESSION (c, d) ->
-      String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
   | CHAIN_SUCCESSION (a, b), CHAIN_SUCCESSION (c, d) ->
-      String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
   | NOT_RESPONDED_EXISTENCE (a, b), NOT_RESPONDED_EXISTENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | NOT_RESPONSE (a, b), NOT_RESPONSE (c, d) -> String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | NOT_RESPONSE (a, b), NOT_RESPONSE (c, d) -> compare_pairs (a, b) (c, d)
   | NOT_CHAIN_RESPONSE (a, b), NOT_CHAIN_RESPONSE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | NOT_PRECEDENCE (a, b), NOT_PRECEDENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | NOT_PRECEDENCE (a, b), NOT_PRECEDENCE (c, d) -> compare_pairs (a, b) (c, d)
   | NOT_CHAIN_PRECEDENCE (a, b), NOT_CHAIN_PRECEDENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | NOT_COEXISTENCE (a, b), NOT_COEXISTENCE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
-  | CHOICE (a, b), CHOICE (c, d) -> String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
+  | NOT_COEXISTENCE (a, b), NOT_COEXISTENCE (c, d) -> compare_pairs (a, b) (c, d)
+  | CHOICE (a, b), CHOICE (c, d) -> compare_pairs (a, b) (c, d)
   | EXCLUSIVE_CHOICE (a, b), EXCLUSIVE_CHOICE (c, d) ->
-      String.compare (a ^ b) (c ^ d)
+      compare_pairs (a, b) (c, d)
   | _ -> String.compare (to_string d1) (to_string d2)

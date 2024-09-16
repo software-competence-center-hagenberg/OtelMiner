@@ -84,16 +84,17 @@ let map_choices (activities : string list) : DeclareSet.t =
   else
     let rec map_choice_aux (a : string) (activities : string list)
         (tmp : string list) (acc : DeclareSet.t) =
+      let add_choice a s acc =
+        if a = s then acc else DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+      in
       match activities with
       | [] -> acc
       | s :: rest ->
           if rest = [] then
             match tmp with
-            | [] -> acc
-            | h :: t -> map_choice_aux h t [] acc
-          else
-            map_choice_aux (List.hd rest) (List.tl rest) (s :: tmp)
-              DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+            | [] -> add_choice a s acc
+            | h :: t -> map_choice_aux h (t @ [s]) [] (add_choice a s acc)
+          else map_choice_aux a rest (tmp @ [s]) (add_choice a s acc)
     in
     map_choice_aux (List.hd activities) (List.tl activities) [] DeclareSet.empty
 
