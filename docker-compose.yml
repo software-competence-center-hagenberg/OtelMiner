@@ -9,6 +9,7 @@ services:
     security_opt:
       - "no-new-privileges"
     image: rabbitmq:3-management-alpine
+    restart: no
   database:
     # must be run as root. But can be stripped of some capabilities
     cap_drop:
@@ -39,6 +40,7 @@ services:
       - "no-new-privileges=true"
     ports:
       - "4242:4242"
+    restart: no
     build:
       context: java
       dockerfile: ./Dockerfile
@@ -57,7 +59,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         ARTIFACT_ID: trace-receiver
-    restart: on-failure
+    restart: no #on-failure
     depends_on:
       - rabbitmq-server
   otel-to-probdeclare-converter:
@@ -71,7 +73,7 @@ services:
   otel-generator:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
     command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318 --traces 1" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
-    restart: on-failure
+    restart: no #on-failure
     depends_on:
       - otelcol
   #      - otel-collector

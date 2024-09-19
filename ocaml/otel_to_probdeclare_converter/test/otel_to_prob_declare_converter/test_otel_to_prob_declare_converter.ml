@@ -72,7 +72,7 @@ let m2 =
       CHAIN_SUCCESSION ("TravelController.create", "TripRepository.save");
       CHAIN_SUCCESSION ("TripRepository.findByTripId", "find ts.trip");
       CHAIN_SUCCESSION ("TripRepository.save", "update ts.trip");
-      CHOICE ("TravelController.create", "BasicErrorController.error");
+      CHOICE ("BasicErrorController.error", "TravelController.create");
       CHOICE ("TripRepository.findByTripId", "TripRepository.save");
       EXISTENCE "BasicErrorController.error";
       EXISTENCE "POST /travel/create";
@@ -124,11 +124,13 @@ let test_map_choices _ =
     let elements = DeclareSet.elements set in
     "[" ^ String.concat "; " (List.map Declare.to_string elements) ^ "]"
   in
-  let test_aux expected actual = 
+  let test_aux expected actual =
     (* FIXME find out why sets need to be sorted that way in order to evaluate correctly *)
     let e = List.sort Declare.compare (DeclareSet.elements expected) in
     let a = List.sort Declare.compare (DeclareSet.elements actual) in
-    assert_equal ~printer (DeclareSet.of_list e) (DeclareSet.of_list a) in
+    assert_equal ~printer (DeclareSet.of_list e) (DeclareSet.of_list a)
+    (* assert_equal ~printer expected actual *)
+  in
   test_aux (DeclareSet.of_list [ CHOICE ("a", "b") ]) (map_choices [ "a"; "b" ]);
   test_aux
     (DeclareSet.of_list
@@ -144,7 +146,37 @@ let test_map_choices _ =
          CHOICE ("b", "d");
          CHOICE ("c", "d");
        ])
-    (map_choices [ "a"; "b"; "c"; "d" ])
+    (map_choices [ "a"; "b"; "c"; "d" ]);
+  test_aux
+    (DeclareSet.of_list
+       [
+         CHOICE ("a", "b");
+         CHOICE ("a", "c");
+         CHOICE ("a", "d");
+         CHOICE ("a", "e");
+         CHOICE ("b", "c");
+         CHOICE ("b", "d");
+         CHOICE ("b", "e");
+         CHOICE ("c", "d");
+         CHOICE ("c", "e");
+         CHOICE ("d", "e");
+       ])
+    (map_choices [ "a"; "b"; "c"; "d"; "e" ]);
+  test_aux
+    (DeclareSet.of_list
+       [
+         CHOICE ("a", "b");
+         CHOICE ("a", "d");
+         CHOICE ("a", "e");
+         CHOICE ("b", "d");
+         CHOICE ("b", "e");
+         CHOICE ("d", "e");
+       ])
+    (map_choices [ "a"; "b"; "b"; "d"; "e" ]);
+  test_aux
+    (DeclareSet.of_list [ CHOICE ("a", "b") ])
+    (map_choices [ "a"; "b"; "b"; "a"; "a" ]);
+  test_aux DeclareSet.empty (map_choices [ "a"; "a"; "a"; "a"; "a" ])
 
 let suite =
   "OtelToProbDeclareConverterTestSuite"

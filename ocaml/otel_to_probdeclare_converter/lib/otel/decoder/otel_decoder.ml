@@ -171,7 +171,7 @@ let decode_resources_spans_string json_string : Trace.resource_spans list =
   let rs = json |> member "resourceSpans" |> to_list in
   List.map decode_resource_spans rs
 
-(* Decode the JSON string into a Jaeger_trace obj́ect *)
+(* Decode the JSON string into an otel trace obj́ect *)
 let decode_trace_string json_string : Trace.span list =
   let json = Yojson.Basic.from_string json_string in
   let trace_spans = json |> to_list in
@@ -240,7 +240,14 @@ let decode_jaeger_trace json =
   let jaeger_trace_spans = json |> member "spans" |> to_list in
   List.map decode_jaeger_trace_span jaeger_trace_spans
 
+(* Decode the JSON string into a Jaeger_trace obj́ect *)
 let decode_jaeger_trace_string json_string : Trace.span list =
   let json = Yojson.Basic.from_string json_string in
   let jaeger_traces = json |> member "data" |> to_list in
   List.flatten (List.map decode_jaeger_trace jaeger_traces)
+
+(* decodes a string containing a list of Jaeger trace spans *)
+let decode_jaeger_spans_list_string json_string : Trace.span list =
+  let json = Yojson.Basic.from_string json_string in
+  let trace_spans = json |> to_list in
+  List.map decode_jaeger_trace_span trace_spans
