@@ -19,3 +19,14 @@ otel_to_probd:
 
 server:
   port: 4020
+
+db-service:
+  base-url: http://db-service:4242/v1
+  traces:
+    url: /traces
+    endpoints:
+      data-overview: /data-overview
+  spans:
+    endpoints:
+    url: /spans
+

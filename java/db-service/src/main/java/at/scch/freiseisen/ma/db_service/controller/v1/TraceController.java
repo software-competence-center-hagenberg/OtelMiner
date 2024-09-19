@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
+import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.repository.otel.TraceRepository;
@@ -16,8 +17,16 @@ import java.util.List;
 @RequestMapping("v1/traces")
 @RestController
 public class TraceController extends BaseController<TraceService, TraceRepository, Trace, String> {
-    public TraceController(TraceService service) {
+    private final TraceService traceService;
+
+    public TraceController(TraceService service, TraceService traceService) {
         super(service);
+        this.traceService = traceService;
+    }
+
+    @GetMapping("/data-overview")
+    public List<DataOverview> retrieveDataOverview() {
+        return traceService.findDataOverview();
     }
 
     public Page<Trace> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
