@@ -1,0 +1,18 @@
+name: db-init
+services:
+  db-initializer:
+#    user: "1000:1000"
+#    cap_drop:
+#      - ALL
+#    security_opt:
+#      - "no-new-privileges=true"
+    build:
+      context: java
+      dockerfile: ./Dockerfile
+      args:
+        ARTIFACT_ID: db-initializer
+    restart: on-failure
+networks:
+  default:
+    name: "master-project-network"
+    external: true

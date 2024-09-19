@@ -33,15 +33,21 @@ and decode_any_value json : Common.any_value =
   | `Assoc a -> Kvlist_value (decode_key_value_list (`Assoc a))
   | _ -> failwith "Unsupported JSON value for any_value"
 
-(* Decode a KeyValue from JSON *)
-let decode_attribute json =
+(* Decode a attributes to keyValue list from JSON *)
+let decode_attributes json =
+  json |> to_assoc
+  |> List.map (fun (k, v) ->
+         Common.make_key_value ~key:k ~value:(Some (decode_any_value v)) ())
+
+(* Decode a resource spans attribute to keyValue from JSON *)
+let decode_resource_spans_attribute json =
   Common.make_key_value
     ~key:(json |> member "key" |> to_string)
     ~value:
       (Some (decode_any_value (json |> member "value" |> member "stringValue")))
     ()
 
-let decode_span_kind sk : Trace.span_span_kind =
+let decode_span_kind_from_int sk : Trace.span_span_kind =
   match sk with
   | 1 -> Span_kind_internal
   | 2 -> Span_kind_server
@@ -49,12 +55,15 @@ let decode_span_kind sk : Trace.span_span_kind =
   | 4 -> Span_kind_producer
   | 5 -> Span_kind_consumer
   | _ -> Span_kind_unspecified
-(*| "SPAN_KIND_INTERNAL" -> Span_kind_internal
-  | "SPAN_KIND_SERVER" -> Span_kind_server
-  | "SPAN_KIND_CLIENT" -> Span_kind_client
-  | "SPAN_KIND_PRODUCER" -> Span_kind_producer
-  | "SPAN_KIND_CONSUMER" -> Span_kind_consumer
-  | _ -> Span_kind_unspecified*)
+
+let decode_span_kind sk : Trace.span_span_kind =
+  match sk with
+  | "INTERNAL" -> Span_kind_internal
+  | "SERVER" -> Span_kind_server
+  | "CLIENT" -> Span_kind_client
+  | "PRODUCER" -> Span_kind_producer
+  | "CONSUMER" -> Span_kind_consumer
+  | _ -> Span_kind_unspecified
 
 (*let decode_status_code s : Trace.status_status_code=
   match s with
@@ -70,8 +79,8 @@ let decode_span_kind sk : Trace.span_span_kind =
     ()
   )*)
 
-(* Decode a Span from JSON *)
-let decode_span json : Trace.span =
+(* Decode a Scope Span from JSON *)
+let decode_scope_span json : Trace.span =
   Trace.default_span
     ~trace_id:(Bytes.of_string (json |> member "traceId" |> to_string))
     ~span_id:(Bytes.of_string (json |> member "spanId" |> to_string))
@@ -79,15 +88,46 @@ let decode_span json : Trace.span =
       (Bytes.of_string (json |> member "parentSpanId" |> to_string))
       (*~flags: (json |> member "flags" |> to_int)*)
     ~name:(json |> member "name" |> to_string)
-    ~kind:(json |> member "kind" |> to_int |> decode_span_kind)
+    ~kind:(json |> member "kind" |> to_int |> decode_span_kind_from_int)
     ~start_time_unix_nano:
       (Int64.of_string (json |> member "startTimeUnixNano" |> to_string))
     ~end_time_unix_nano:
       (Int64.of_string (json |> member "endTimeUnixNano" |> to_string))
     ~attributes:
-      (json |> member "attributes" |> to_list |> List.map decode_attribute)
+      (json |> member "attributes" |> to_list
+      |> List.map decode_resource_spans_attribute)
       (*~status: (decode_status (json |> member "status" |> to_string) "")*)
     ~events:[] ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
+    ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
+    ()
+
+let decode_trace_span json =
+  let trace_id = json |> member "traceId" |> to_string in
+  let span_id = json |> member "spanId" |> to_string in
+  let parent_span_id =
+    json |> member "parentSpanId" |> to_string_option
+    |> Option.value ~default:""
+  in
+  let name = json |> member "name" |> to_string in
+  let kind =
+    json |> member "kind" |> to_string_option
+    |> Option.map decode_span_kind
+    |> Option.value ~default:Trace.Span_kind_unspecified
+  in
+  let start_time_unix_nano =
+    json |> member "start" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let end_time_unix_nano =
+    json |> member "end" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let attributes = json |> member "attributes" |> decode_attributes in
+  Trace.default_span ~trace_id:(Bytes.of_string trace_id)
+    ~span_id:(Bytes.of_string span_id)
+    ~parent_span_id:(Bytes.of_string parent_span_id)
+    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano ~attributes ~events:[]
+    ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
 
@@ -104,7 +144,7 @@ let decode_scope json =
 let decode_scope_spans json =
   Trace.make_scope_spans
     ~scope:(json |> member "scope" |> decode_scope)
-    ~spans:(json |> member "spans" |> to_list |> List.map decode_span)
+    ~spans:(json |> member "spans" |> to_list |> List.map decode_scope_span)
     ~schema_url:"" (* Optional: Add if schema URL is needed *) ()
 
 (* Decode a Resource from JSON *)
@@ -112,7 +152,8 @@ let decode_resource json =
   Some
     (Resource.make_resource
        ~attributes:
-         (json |> member "attributes" |> to_list |> List.map decode_attribute)
+         (json |> member "attributes" |> to_list
+         |> List.map decode_resource_spans_attribute)
        ~dropped_attributes_count:(Int32.of_int 0) ())
 
 (* Decode a ResourceSpans from JSON *)
@@ -125,7 +166,88 @@ let decode_resource_spans json =
     ()
 
 (* Decode the JSON string into a ResourceSpans object *)
-let decode json_string =
+let decode_resources_spans_string json_string : Trace.resource_spans list =
   let json = Yojson.Basic.from_string json_string in
   let rs = json |> member "resourceSpans" |> to_list in
   List.map decode_resource_spans rs
+
+(* Decode the JSON string into an otel trace obj́ect *)
+let decode_trace_string json_string : Trace.span list =
+  let json = Yojson.Basic.from_string json_string in
+  let trace_spans = json |> to_list in
+  List.map decode_trace_span trace_spans
+
+let extract_parent_span_id json =
+  match json |> member "references" with
+  | `Null -> ""
+  | refs -> (
+      let refs_list = refs |> to_list in
+      let child_of_ref =
+        List.find_opt
+          (fun ref -> ref |> member "refType" |> to_string = "CHILD_OF")
+          refs_list
+      in
+      match child_of_ref with
+      | Some ref -> ref |> member "spanID" |> to_string
+      | None -> "")
+
+(*
+let extract_parent_span_id json =
+  let references = json |> member "references" in
+  match references with
+  | 'List lst ->
+    match lst with
+    | h :: t -> h |> member "refType" |> // FIXME!
+    | _ -> ""
+  | 'Null -> ""
+  let references = json |> member "references" |> to_option |> Option.value ~default:[] in
+  if references = [] then "" 
+  else *)
+
+let decode_jaeger_trace_span json =
+  let trace_id = json |> member "traceID" |> to_string in
+  let span_id = json |> member "spanID" |> to_string in
+  let parent_span_id =
+    (*json |> member "parentSpanID" |> to_string_option
+      |> Option.value ~default:""*)
+    extract_parent_span_id json
+  in
+  let name = json |> member "operationName" |> to_string in
+  let kind =
+    json |> member "kind" |> to_string_option
+    |> Option.map decode_span_kind
+    |> Option.value ~default:Trace.Span_kind_unspecified
+  in
+  let start_time_unix_nano =
+    json |> member "startTime" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let duration =
+    json |> member "duration" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let end_time_unix_nano = Int64.add start_time_unix_nano duration in
+  (*let attributes = json |> member "attributes" |> decode_attributes in*)
+  Trace.default_span ~trace_id:(Bytes.of_string trace_id)
+    ~span_id:(Bytes.of_string span_id)
+    ~parent_span_id:(Bytes.of_string parent_span_id)
+    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano (*~attributes*)
+    ~events:[] ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
+    ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
+    ()
+
+let decode_jaeger_trace json =
+  let jaeger_trace_spans = json |> member "spans" |> to_list in
+  List.map decode_jaeger_trace_span jaeger_trace_spans
+
+(* Decode the JSON string into a Jaeger_trace obj́ect *)
+let decode_jaeger_trace_string json_string : Trace.span list =
+  let json = Yojson.Basic.from_string json_string in
+  let jaeger_traces = json |> member "data" |> to_list in
+  List.flatten (List.map decode_jaeger_trace jaeger_traces)
+
+(* decodes a string containing a list of Jaeger trace spans *)
+let decode_jaeger_spans_list_string json_string : Trace.span list =
+  let json = Yojson.Basic.from_string json_string in
+  let trace_spans = json |> to_list in
+  List.map decode_jaeger_trace_span trace_spans

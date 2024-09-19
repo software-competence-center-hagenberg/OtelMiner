@@ -41,5 +41,5 @@ val exclusive_choice : term -> term -> term
 (* Utility functions for printing LTL formulas *)
 val string_of_ltl : term -> string
 val string_of_ltl_list : term list -> string
-val print_ltls : unit
+(*val print_ltls : unit*)
 val compare : term -> term -> int

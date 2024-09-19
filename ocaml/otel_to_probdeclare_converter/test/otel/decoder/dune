@@ -1,4 +1,4 @@
 (test
  (name test_otel_decoder)
  (modules test_otel_decoder)
- (libraries base64 yojson opentelemetry))
+ (libraries yojson ounit2 otel_decoder otel_encoder opentelemetry util))

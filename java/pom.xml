@@ -43,6 +43,7 @@
         <module>data-layer</module>
         <module>db-service</module>
         <module>trace-receiver</module>
+        <module>db-initializer</module>
     </modules>
 
     <dependencies>

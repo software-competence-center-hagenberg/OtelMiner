@@ -9,26 +9,87 @@ services:
     security_opt:
       - "no-new-privileges"
     image: rabbitmq:3-management-alpine
+    restart: no
+  database:
+    # must be run as root. But can be stripped of some capabilities
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_READ_SEARCH
+      - FOWNER
+      - SETGID
+      - SETUID
+    security_opt:
+      - "no-new-privileges=true"
+    image: postgres:16.1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: db-user
+      POSTGRES_PASSWORD: super-secure-12345
+      POSTGRES_HOST: postgres
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    restart: no
+  db-service:
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges=true"
+    ports:
+      - "4242:4242"
+    restart: no
+    build:
+      context: java
+      dockerfile: ./Dockerfile
+      args:
+        ARTIFACT_ID: db-service
+    depends_on:
+      - database
+  trace-receiver:
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges=true"
+    build:
+      context: java
+      dockerfile: ./Dockerfile
+      args:
+        ARTIFACT_ID: trace-receiver
+    restart: no #on-failure
+    depends_on:
+      - rabbitmq-server
+  otel-to-probdeclare-converter:
+    # runs as non-root user opam
+    build:
+      context: ocaml
+      dockerfile: ./Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbitmq-server
   otel-generator:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
     command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318 --traces 1" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
-    restart: on-failure
+    restart: no #on-failure
     depends_on:
       - otelcol
-#      - otel-collector
-##########################custom otel collector##########################
-# custom otel collector that exports to RabbitMQ, probably the nicer solution
-# NOTE for the future: If there is enough time then,
-# TODO find out how to get AMQP message body as otlp_json instead of otlp_proto
-# TODO OR how to properly convert olpt_proto to JSON
-#  otel-collector:
-#    build:
-#      context: ocaml/custom
-#      dockerfile: Dockerfile
-#    restart: on-failure
-#    depends_on:
-#      - rabbitmq-server
-#      - trace-receiver
+  #      - otel-collector
+  ##########################custom otel collector##########################
+  # custom otel collector that exports to RabbitMQ, probably the nicer solution
+  # NOTE for the future: If there is enough time then,
+  # TODO find out how to get AMQP message body as otlp_json instead of otlp_proto
+  # TODO OR how to properly convert olpt_proto to JSON
+  #  otel-collector:
+  #    build:
+  #      context: ocaml/custom
+  #      dockerfile: Dockerfile
+  #    restart: on-failure
+  #    depends_on:
+  #      - rabbitmq-server
+  #      - trace-receiver
   #######################standard otel collector##########################
   otelcol:
     image: otel/opentelemetry-collector
@@ -45,29 +106,8 @@ services:
       - 4318:4318 # OTLP http receiver
       - 55679:55679 # zpages extension
 #########################################################################
-  trace-receiver:
-    user: "1000:1000"
-    cap_drop:
-      - ALL
-    security_opt:
-      - "no-new-privileges=true"
-    build:
-      context: java
-      dockerfile: ./trace-receiver/Dockerfile
-      args:
-        JAR_FILE: /java/trace-receiver/target/trace-receiver*.jar
-        ARTIFACT_ID: :trace-receiver
-    restart: on-failure
-    depends_on:
-      - rabbitmq-server
-  otel-to-probdeclare-converter:
-    # runs as non-root user opam
-    build:
-      context: ocaml
-      dockerfile: ./Dockerfile
-    restart: on-failure
-    depends_on:
-      - rabbitmq-server
+volumes:
+  db-volume:
 networks:
   default:
     name: "master-project-network"

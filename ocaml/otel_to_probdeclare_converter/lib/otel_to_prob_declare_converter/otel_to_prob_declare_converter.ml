@@ -84,13 +84,20 @@ let map_choices (activities : string list) : DeclareSet.t =
   else
     let rec map_choice_aux (a : string) (activities : string list)
         (tmp : string list) (acc : DeclareSet.t) =
+      let add_choice a s acc =
+        if a = s then acc
+        else if compare a s < 0 then
+          DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+        else DeclareSet.(acc |> add (Declare.CHOICE (s, a)))
+      in
       match activities with
       | [] -> acc
       | s :: rest ->
-          if rest = [] then map_choice_aux (List.hd tmp) (List.tl tmp) [] acc
-          else
-            map_choice_aux (List.hd rest) (List.tl rest) (s :: tmp)
-              DeclareSet.(acc |> add (Declare.CHOICE (a, s)))
+          if rest = [] then
+            match tmp with
+            | [] -> add_choice a s acc
+            | h :: t -> map_choice_aux h (t @ [ s ]) [] (add_choice a s acc)
+          else map_choice_aux a rest (tmp @ [ s ]) (add_choice a s acc)
     in
     map_choice_aux (List.hd activities) (List.tl activities) [] DeclareSet.empty
 
@@ -185,9 +192,8 @@ let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
  * maps each tree to list of DECLARE constraints which reperesent the DECLARE
  * model of that tree 
  *)
-let create_declare_constraints (resource_spans : Trace.resource_spans) :
+let create_declare_constraints (span_trees : Span_tree.span_tree_node list) :
     Declare.t list list =
-  let span_trees = Span_tree.create_span_trees resource_spans in
   let rec create_declare_constraints_aux (l : Span_tree.span_tree_node list) f =
     match l with
     | [] -> f []
@@ -200,13 +206,23 @@ let create_declare_constraints (resource_spans : Trace.resource_spans) :
  * Main function for mapping a list of resource spans toi their DECLARE mdoel
  * representations
  *)
-let convert (resource_spans : Trace.resource_spans list) : Declare.t list list =
+let convert_resource_spans (resource_spans : Trace.resource_spans list) :
+    Declare.t list list =
   let rec convert_aux l k =
     match l with
     | [] -> k []
-    | h :: t -> convert_aux t (fun a -> k (create_declare_constraints h :: a))
+    | h :: t ->
+        convert_aux t (fun a ->
+            k
+              (create_declare_constraints
+                 (Span_tree.generate_span_trees_from_resource_spans h)
+              :: a))
   in
   List.flatten (convert_aux resource_spans (fun x -> x))
+
+let convert_trace_spans (trace_spans : Trace.span list) : Declare.t list list =
+  let span_trees = Span_tree.generate_span_trees_from_spans trace_spans in
+  create_declare_constraints span_trees
 
 (*
 open Ltl
