@@ -14,7 +14,11 @@ open_telemetry:
 
 otel_to_probd:
   routing_key:
-    out: otel-to-probd-queue
+    out:
+      resource_spans_queue: resource-spans-queue
+      trace_spans_queue: trace-spans-queue
+      jaeger-trace-queue: jaeger-trace-queue
+      jaeger_trace_spans_list_queue: jaeger-trace-spans-list-queue
     in: probd-result-queue
 
 server:

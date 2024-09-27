@@ -32,6 +32,11 @@ public class DataController {
 
     @PostMapping("/generate-model")
     public String generateModel(@RequestBody TraceData traceDetails) {
-        return "TODO: implement";
+        return dataService.generateModel(traceDetails);
+    }
+
+    @GetMapping("/model/{id}")
+    public String checkModel(@PathVariable("id") String id) {
+        return dataService.checkModel(id);
     }
 }

@@ -1,7 +1,9 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
+import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.util.Objects;
 public class DataService {
     private final RestConfig restConfig;
     private final RestTemplate restTemplate;
+    private final CollectorService collectorService;
 
     public List<DataOverview> getDataOverview() {
         return Arrays.asList(Objects.requireNonNull(restTemplate.getForObject(restConfig.dataOverviewUrl, DataOverview[].class)));
@@ -39,5 +42,14 @@ public class DataService {
                 new ParameterizedTypeReference<>() {
                 });
         return Objects.requireNonNull(response.getBody());
+    }
+
+    public String generateModel(TraceData traceDetails) {
+        collectorService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
+        return traceDetails.getTraceId();
+    }
+
+    public String checkModel(String traceId) {
+        return collectorService.retrieveModel(traceId);
     }
 }

@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.trace_collector.rest;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.trace_collector.service.CollectorService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,6 +30,6 @@ public class CollectorController {
     @PostMapping("/traces")
     public void receiveTraces(@RequestBody String trace) {
         log.info("trace:\n{}", trace);
-        collectorService.transformAndPipe(trace);
+        collectorService.transformAndPipe(trace, TraceDataType.RESOURCE_SPANS);
     }
 }

@@ -153,13 +153,30 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         if (!selectedRow) {
             return;
         }
+        this.setState((prevState) => ({
+            sourceDetails: {...prevState.sourceDetails},
+            selectedRow: {...prevState.selectedRow},
+            selectedRowModel: null,
+            loading: true
+        }));
         restService.post("/generate-model", selectedRow)
-            .then((response) => this.updateSelectedRowModel(response.data))
+            .then((response) => this.pollModel(response.data, ""))
             .catch((error) => this.handleError("Error generating model: ", error));
     }
 
+    private pollModel = (traceId: string, model: string) => {
+        const {restService} = this.props;
+        if (model === "") { // FIXME quick and dirty solution
+            restService.get("/model/" + traceId)
+                .then((response)  => this.pollModel(traceId, response.data))
+                .catch((error) => this.handleError("Error generating model: ", error));
+        } else {
+            this.updateSelectedRowModel(model);
+        }
+    }
+
     private updateSelectedRowModel = (model: string | null) => {
-        if ("model") {
+        if (model) {
             this.handleError("error: empty model!");
         }
         this.setState((prevState) => ({
