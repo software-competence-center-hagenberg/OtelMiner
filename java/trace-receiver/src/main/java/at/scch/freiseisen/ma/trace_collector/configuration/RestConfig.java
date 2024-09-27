@@ -14,15 +14,18 @@ import org.springframework.web.client.RestTemplate;
 public class RestConfig {
 
     public final String dataOverviewUrl;
-    public final String spansUrl;
+    public final String spansUrl; // TODO usage?
+    public final String sourceDetailsUrl;
 
     public RestConfig(
             @Value("${db-service.base-url}") String dbServiceBaseUrl,
             @Value("${db-service.traces.url}") String tracesUrl,
             @Value("${db-service.traces.endpoints.data-overview}") String dataOverview,
-            @Value("${db-service.spans.url}") String spansUrl) {
+            @Value("${db-service.spans.url}") String spansUrl,
+            @Value("${db-service.spans.endpoints.sourceDetails}") String sourceDetails) {
         this.dataOverviewUrl = dbServiceBaseUrl + tracesUrl + dataOverview;
         this.spansUrl = dbServiceBaseUrl + spansUrl;
+        this.sourceDetailsUrl = dbServiceBaseUrl + tracesUrl + sourceDetails;
     }
 
     @Bean

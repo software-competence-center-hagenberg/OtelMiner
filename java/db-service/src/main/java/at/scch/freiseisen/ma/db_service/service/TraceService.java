@@ -1,15 +1,18 @@
 package at.scch.freiseisen.ma.db_service.service;
 
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
+import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
+import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.repository.otel.TraceRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -21,5 +24,20 @@ public class TraceService extends BaseService<TraceRepository, Trace, String> {
 
     public List<DataOverview> findDataOverview() {
         return repository.findDataOverview();
+    }
+
+    public SourceDetails findSourceDetails(SourceDetails sourceDetails) {
+        Pageable pageable = PageRequest.of(
+                sourceDetails.getPage(),
+                sourceDetails.getSize(),
+                Sort.by(sourceDetails.getSort()));
+        Page<Trace> tracesForSourceFile = repository.findTracesBySourceFile(pageable, sourceDetails.getSourceFile());
+        List<TraceData> traces = tracesForSourceFile.getContent()
+                .stream()
+                .map(t -> new TraceData(t.getId(), t.getNrNodes(), t.getSpansAsJson()))
+                .toList();
+        sourceDetails.setTraces(traces);
+        sourceDetails.setTotalPages(tracesForSourceFile.getTotalPages());
+        return sourceDetails;
     }
 }

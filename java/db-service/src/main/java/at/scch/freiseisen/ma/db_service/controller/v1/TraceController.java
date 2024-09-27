@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
+import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.repository.otel.TraceRepository;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("v1/traces")
@@ -22,6 +22,11 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
     public TraceController(TraceService service, TraceService traceService) {
         super(service);
         this.traceService = traceService;
+    }
+
+    @PostMapping("/source-details")
+    public SourceDetails retrieveSourceDetails(@RequestBody SourceDetails sourceDetails) {
+        return traceService.findSourceDetails(sourceDetails);
     }
 
     @GetMapping("/data-overview")

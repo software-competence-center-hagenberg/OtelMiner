@@ -27,6 +27,7 @@ db-service:
     endpoints:
       data-overview: /data-overview
   spans:
-    endpoints:
     url: /spans
+    endpoints:
+      sourceDetails: /source-details
 

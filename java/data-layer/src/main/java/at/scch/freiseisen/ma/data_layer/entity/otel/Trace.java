@@ -48,4 +48,9 @@ public class Trace extends BaseEntity<String> {
     @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Span> spans;
 
+    public List<String> getSpansAsJson() {
+        return spans.stream()
+                .map(Span::getJson)
+                .toList();
+    }
 }
