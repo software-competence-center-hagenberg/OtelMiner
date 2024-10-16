@@ -3,8 +3,9 @@ import axios, {AxiosResponse} from 'axios';
 class RestService {
     private readonly baseUrl: string;
 
-    constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
+    constructor() {
+        this.baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
+        console.log(this.baseUrl);
     }
 
     public async get(endpoint: string): Promise<AxiosResponse<any>> {

@@ -13,9 +13,10 @@ import {
     TableRow
 } from "@mui/material";
 import RestService from "@/app/lib/RestService";
-import JsonViewer from "@/app/ui/JsonViewer";
+import JsonView from "@/app/ui/json/JsonView";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import DeclareView from "@/app/ui/DeclareView";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -74,7 +75,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
 
     componentDidUpdate = (prevProps: TraceDetailsTableProps, prevState: TraceDetailsTableState) => {
         if (prevProps.sourceFile !== this.props.sourceFile) {
-            this.setState(() => this.initState, this.updateData);
+            this.setState(() => this.initState(), this.updateData);
         } else if (prevState.sourceDetails.page !== this.state.sourceDetails.page
             || prevState.sourceDetails.size !== this.state.sourceDetails.size) {
             this.updateData();
@@ -144,7 +145,10 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
     }
 
     private handleRowClick = (selectedRow: TraceDetails) => {
-        this.setState((prevState) => ({sourceDetails: {...prevState.sourceDetails}, selectedRow: selectedRow}));
+        this.setState((prevState) => ({
+            sourceDetails: {...prevState.sourceDetails},
+            selectedRow: selectedRow
+        }));
     }
 
     private onClickGenerateModel = () => {
@@ -166,7 +170,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
 
     private pollModel = (traceId: string, model: string) => {
         const {restService} = this.props;
-        if (model === "") { // FIXME quick and dirty solution
+        if (!model || model === "") { // FIXME quick and dirty solution
             restService.get("/model/" + traceId)
                 .then((response)  => this.pollModel(traceId, response.data))
                 .catch((error) => this.handleError("Error generating model: ", error));
@@ -176,8 +180,9 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
     }
 
     private updateSelectedRowModel = (model: string | null) => {
-        if (model) {
+        if (!model) {
             this.handleError("error: empty model!");
+            return;
         }
         this.setState((prevState) => ({
             sourceDetails: {...prevState.sourceDetails},
@@ -214,26 +219,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {sourceDetails.traces
-                                        .map((row) => {
-                                            return (
-                                                <TableRow
-                                                    onClick={() => this.handleRowClick(row)}
-                                                    tabIndex={-1}
-                                                    key={row.traceId}>
-                                                    {columns.map((column) => {
-                                                        const value = row[column.id];
-                                                        return (
-                                                            <TableCell key={column.id} align={column.align}>
-                                                                {column.format && typeof value === 'number'
-                                                                    ? column.format(value)
-                                                                    : value}
-                                                            </TableCell>
-                                                        );
-                                                    })}
-                                                </TableRow>
-                                            );
-                                        })}
+                                    {sourceDetails.traces.map((row) => this.renderTableRow(row))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -248,20 +234,11 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
                         />
                         {selectedRow && (
                             <Grid2 container spacing={2}>
-                                <Grid2 size={6} columns={6}>
-                                    <Box>
-                                        <Button
-                                            variant={"contained"}
-                                            onClick={this.onClickGenerateModel}
-                                        >
-                                            generate Model
-                                        </Button>
-                                        {selectedRow.spans && (<JsonViewer data={selectedRow.spans.map(s => JSON.parse(s.toString()))}/>)}
-                                    </Box>
-                                </Grid2>
+                                {this.renderJsonView(selectedRow)}
                                 {selectedRowModel && (
                                     <Grid2 size={6} columns={6}>
-                                        <JsonViewer data={selectedRowModel}/>
+                                        {/*<DeclareView rawData={selectedRowModel}/>*/}
+                                        <JsonView data={selectedRowModel} />
                                     </Grid2>
                                 )}
                             </Grid2>
@@ -272,6 +249,38 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         );
     }
 
+    private renderTableRow(row: TraceDetails) {
+        return (
+            <TableRow
+                onClick={() => this.handleRowClick(row)}
+                tabIndex={-1}
+                key={row.traceId}>
+                {columns.map((column) => {
+                    const value = row[column.id];
+                    return (
+                        <TableCell key={column.id} align={column.align}>
+                            {column.format && typeof value === 'number'
+                                ? column.format(value)
+                                : value}
+                        </TableCell>
+                    );
+                })}
+            </TableRow>
+        );
+    }
+
+    private renderJsonView(selectedRow: TraceDetails) {
+        return <Grid2 size={6} columns={6}>
+            <Box>
+                <Button variant={"contained"} onClick={this.onClickGenerateModel}>
+                    generate Model
+                </Button>
+                {selectedRow.spans && (
+                    <JsonView data={selectedRow.spans.map(s => JSON.parse(s.toString()))}/>
+                )}
+            </Box>
+        </Grid2>;
+    }
 }
 
 export default TraceDetailsView;

@@ -20,12 +20,12 @@ import java.util.List;
         name = "Trace.findDataOverview",
         query = """
                     SELECT
-                        tr.source_file AS sourceFile,
-                        COUNT(DISTINCT tr.id) AS nrTraces,
-                        ARRAY_AGG(DISTINCT tr.nr_nodes) AS nrNodes
-                    FROM public.trace tr
-                             JOIN public.span t ON tr.id = t.trace_id
-                    GROUP BY tr.source_file
+                        t.source_file AS sourceFile,
+                        COUNT(DISTINCT t.id) AS nrTraces,
+                        ARRAY_AGG(DISTINCT t.nr_nodes) AS nrNodes
+                    FROM public.trace t
+                             JOIN public.span s ON t.id = s.trace_id
+                    GROUP BY t.source_file
                 """,
         resultSetMapping = "DataOverviewMapping"
 )

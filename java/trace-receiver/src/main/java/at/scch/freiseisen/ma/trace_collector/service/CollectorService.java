@@ -60,7 +60,7 @@ public class CollectorService {
         String routingKey = determineRoutingKey(traceDataType);
         //traceModels.put(traceId, "");
         traceModels.put("CHANGEME", "");
-        rabbitTemplate.convertAndSend(routingKey, trace);
+        rabbitTemplate.convertAndSend(routingKey, "[" + String.join(",", trace) + "]");
     }
 
     public void transformAndPipe(String trace, TraceDataType traceDataType) {
