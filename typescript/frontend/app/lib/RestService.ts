@@ -1,34 +1,53 @@
-import axios, {AxiosResponse} from 'axios';
+import axios, { AxiosResponse } from 'axios';
+
+class FetchError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'FetchError';
+    }
+}
 
 class RestService {
-    private readonly baseUrl: string;
+    private readonly baseUrl: string | undefined;
+    private readonly proxyUrl: string;
 
     constructor() {
-        this.baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
+        this.baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL; //FIXME remove, not needed here
+        if (!this.baseUrl) {
+            throw new Error('Backend base URL is not set!');
+        }
+        this.proxyUrl = '/api/proxy/';
         console.log(this.baseUrl);
     }
 
-    public async get(endpoint: string): Promise<AxiosResponse<any>> {
+    private getProxyUrl(endpoint: string): string {
+        return `${this.proxyUrl}${endpoint}`;
+    }
+
+    public async get<R>(endpoint: string): Promise<AxiosResponse<R>> {
         try {
-            return await axios.get(`${this.baseUrl}${endpoint}`);
+            const proxyUrl = this.getProxyUrl(endpoint);
+            return await axios.get(proxyUrl);
         } catch (error) {
-            throw new Error(`GET request failed: ${error}`);
+            throw new FetchError(`GET request failed: ${error}`);
         }
     }
 
-    public async post(endpoint: string, data: any): Promise<AxiosResponse<any>> {
+    public async post<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
-            return await axios.post(`${this.baseUrl}${endpoint}`, data);
+            const proxyUrl = this.getProxyUrl(endpoint);
+            return await axios.post(proxyUrl, data);
         } catch (error) {
-            throw new Error(`POST request failed: ${error}`);
+            throw new FetchError(`POST request failed: ${error}`);
         }
     }
 
-    public async put(endpoint: string, data: any): Promise<AxiosResponse<any>> {
+    public async put<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
-            return await axios.put(`${this.baseUrl}${endpoint}`, data);
+            const proxyUrl = this.getProxyUrl(endpoint);
+            return await axios.put(proxyUrl, data);
         } catch (error) {
-            throw new Error(`PUT request failed: ${error}`);
+            throw new FetchError(`PUT request failed: ${error}`);
         }
     }
 }

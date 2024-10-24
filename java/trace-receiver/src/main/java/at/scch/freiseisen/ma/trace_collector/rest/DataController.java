@@ -5,9 +5,7 @@ import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.service.DataService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/data")
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin({"http://localhost:3000", "http://frontend:3000"})
 public class DataController {
     private final DataService dataService;
 

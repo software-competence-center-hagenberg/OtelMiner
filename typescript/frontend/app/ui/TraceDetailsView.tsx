@@ -16,7 +16,6 @@ import RestService from "@/app/lib/RestService";
 import JsonView from "@/app/ui/json/JsonView";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DeclareView from "@/app/ui/DeclareView";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -60,7 +59,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         this.state = this.initState();
     }
 
-    private initState = () => {
+    private readonly initState = () => {
         return {
             sourceDetails: this.buildSourceDetails(this.props.sourceFile),
             selectedRow: null,
@@ -82,7 +81,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         }
     }
 
-    private buildSourceDetails = (sourceFile: string) => {
+    private readonly buildSourceDetails = (sourceFile: string) => {
         return {
             sourceFile: sourceFile,
             traces: [],
@@ -93,16 +92,16 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         }
     }
 
-    private updateData = () => {
+    private readonly updateData = () => {
         const {restService} = this.props;
         const {sourceDetails} = this.state;
         this.setState({loading: true});
-        restService.post('/details', sourceDetails)
+        restService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
             .then((response) => this.updateState(response.data))
             .catch((error) => this.handleError(error, 'Error fetching trace details:'));
     }
 
-    private updateState = (sd: SourceDetails) => {
+    private readonly updateState = (sd: SourceDetails) => {
         this.setState((prevState) => ({
             sourceDetails: {
                 ...prevState.sourceDetails,
@@ -117,12 +116,12 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         }));
     }
 
-    private handleError = (errorMessage: string, error?: any) => {
+    private readonly handleError = (errorMessage: string, error?: any) => {
         console.error(errorMessage, error);
         this.setState({loading: false});
     }
 
-    private handlePageChange = (_event: unknown, newPage: number) => {
+    private readonly handlePageChange = (_event: unknown, newPage: number) => {
         this.setState(
             (prevState) => ({
                 sourceDetails: {...prevState.sourceDetails, page: newPage},
@@ -133,7 +132,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         );
     }
 
-    private handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    private readonly handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState(
             (prevState) => ({
                 sourceDetails: {...prevState.sourceDetails, size: +event.target.value, page: 0},
@@ -144,14 +143,14 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         );
     }
 
-    private handleRowClick = (selectedRow: TraceDetails) => {
+    private readonly handleRowClick = (selectedRow: TraceDetails) => {
         this.setState((prevState) => ({
             sourceDetails: {...prevState.sourceDetails},
             selectedRow: selectedRow
         }));
     }
 
-    private onClickGenerateModel = () => {
+    private readonly onClickGenerateModel = () => {
         const {restService} = this.props;
         const {selectedRow} = this.state;
         if (!selectedRow) {
@@ -163,15 +162,15 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
             selectedRowModel: null,
             loading: true
         }));
-        restService.post("/generate-model", selectedRow)
+        restService.post<TraceDetails, string>("/generate-model", selectedRow)
             .then((response) => this.pollModel(response.data, ""))
             .catch((error) => this.handleError("Error generating model: ", error));
     }
 
-    private pollModel = (traceId: string, model: string) => {
+    private readonly pollModel = (traceId: string, model: string) => {
         const {restService} = this.props;
         if (!model || model === "") { // FIXME quick and dirty solution
-            restService.get("/model/" + traceId)
+            restService.get<string>("/model/" + traceId)
                 .then((response)  => this.pollModel(traceId, response.data))
                 .catch((error) => this.handleError("Error generating model: ", error));
         } else {
@@ -179,7 +178,7 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
         }
     }
 
-    private updateSelectedRowModel = (model: string | null) => {
+    private readonly updateSelectedRowModel = (model: string | null) => {
         if (!model) {
             this.handleError("error: empty model!");
             return;

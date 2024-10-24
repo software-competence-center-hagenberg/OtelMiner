@@ -41,7 +41,7 @@ class DataOverview extends Component<{}, DataOverviewState> {
     }
 
     componentDidMount() {
-        restService.get('/overview')
+        restService.get<DataOverviewProps[]>('/overview')
             .then((response: { data: DataOverviewProps[]; }) => this.setState({
                 sourceFile: null,
                 data: response.data, loading: false

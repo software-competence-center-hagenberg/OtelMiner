@@ -6,8 +6,8 @@ RUN npm install -g pnpm
 
 COPY frontend .
 
-RUN npx next telemetry disable && pnpm install && pnpm build
+RUN pnpm install && pnpm build && npx next telemetry disable
 
 FROM build
 
-CMD ["sh", "-c", "DOTENV_CONFIG_PATH=.env.production pnpm start"]
+CMD DOTENV_CONFIG_PATH=.env.production pnpm start

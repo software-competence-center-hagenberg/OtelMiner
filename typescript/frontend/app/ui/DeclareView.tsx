@@ -26,7 +26,7 @@ class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
         this.state = this.initState();
     }
 
-    private initState = () => {
+    private readonly initState = () => {
         const {rawData} = this.props;
         const model: Declare[][] = this.parseRawData(rawData).map((rd) => this.mapStringArrayToDeclareArray(rd));
 
@@ -49,7 +49,7 @@ class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
             .map((innerArray) => innerArray.split(", ")); // FIXME parsing error constraints with 2 args are also splitted!
     }
 
-    private mapStringArrayToDeclareArray = (rd: string[]): Declare[] => {
+    private readonly mapStringArrayToDeclareArray = (rd: string[]): Declare[] => {
         const declare: HashMap = {};
 
         rd.forEach((rawConstraint) => this.insertRawConstraintIntoHashMap(rawConstraint, declare));
@@ -67,7 +67,7 @@ class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
      * @param rawConstraint
      * @param hashMap
      */
-    private insertRawConstraintIntoHashMap = (rawConstraint: string, hashMap: HashMap) => {
+    private readonly insertRawConstraintIntoHashMap = (rawConstraint: string, hashMap: HashMap) => {
         const regexConstraint = /([a-zA-Z_])*/;
         const regexValues = /\((.)*\)/;
         const matchConstraint = regexConstraint.exec(rawConstraint);
