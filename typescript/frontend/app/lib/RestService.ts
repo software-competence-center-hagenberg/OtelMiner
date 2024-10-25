@@ -8,25 +8,19 @@ class FetchError extends Error {
 }
 
 class RestService {
-    private readonly baseUrl: string | undefined;
-    private readonly proxyUrl: string;
+    private readonly baseProxyUrl: string;
 
     constructor() {
-        this.baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL; //FIXME remove, not needed here
-        if (!this.baseUrl) {
-            throw new Error('Backend base URL is not set!');
-        }
-        this.proxyUrl = '/api/proxy/';
-        console.log(this.baseUrl);
+        this.baseProxyUrl = '/api/proxy/';
     }
 
-    private getProxyUrl(endpoint: string): string {
-        return `${this.proxyUrl}${endpoint}`;
+    private buildProxyUrl(endpoint: string): string {
+        return `${this.baseProxyUrl}${endpoint}`;
     }
 
     public async get<R>(endpoint: string): Promise<AxiosResponse<R>> {
         try {
-            const proxyUrl = this.getProxyUrl(endpoint);
+            const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.get(proxyUrl);
         } catch (error) {
             throw new FetchError(`GET request failed: ${error}`);
@@ -35,7 +29,7 @@ class RestService {
 
     public async post<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
-            const proxyUrl = this.getProxyUrl(endpoint);
+            const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.post(proxyUrl, data);
         } catch (error) {
             throw new FetchError(`POST request failed: ${error}`);
@@ -44,7 +38,7 @@ class RestService {
 
     public async put<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
-            const proxyUrl = this.getProxyUrl(endpoint);
+            const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.put(proxyUrl, data);
         } catch (error) {
             throw new FetchError(`PUT request failed: ${error}`);

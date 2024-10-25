@@ -1,11 +1,7 @@
 import {Component} from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Grid2} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Grid2, List, ListItem} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-interface HashMap {
-    [key: string]: string[]
-}
 
 interface Declare {
     constraint: string,
@@ -17,7 +13,7 @@ interface DeclareViewProps {
 }
 
 interface DeclareViewState {
-    model: Declare[][];
+    model: Map<string, string[]>;
 }
 
 class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
@@ -28,7 +24,7 @@ class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
 
     private readonly initState = () => {
         const {rawData} = this.props;
-        const model: Declare[][] = this.parseRawData(rawData).map((rd) => this.mapStringArrayToDeclareArray(rd));
+        const model: Map<string, string[]> = this.parseRawData(rawData);
 
         return {
             model: model,
@@ -43,72 +39,50 @@ class DeclareView extends Component<DeclareViewProps, DeclareViewState> {
      * </pre>
      * @param rawData string representation if DECLARE Constraint set
      */
-    parseRawData = (rawData: string): string[][] => {
-        return rawData.slice(3, -3)
-            .split("], [")
-            .map((innerArray) => innerArray.split(", ")); // FIXME parsing error constraints with 2 args are also splitted!
-    }
+    parseRawData = (rawData: string): Map<string, string[]> => {
+        const model = new Map<string, string[]>();
+        const regex = /([A-Z_])*\([a-zA-Z ,\/\.]*\)/gm;
+        const matches = rawData.match(regex);
 
-    private readonly mapStringArrayToDeclareArray = (rd: string[]): Declare[] => {
-        const declare: HashMap = {};
+        if (matches) {
+            matches.forEach((match) => {
+                const [key, value] = match.split('(');
+                const valueWithoutParenthesis = value.slice(0, -1);
 
-        rd.forEach((rawConstraint) => this.insertRawConstraintIntoHashMap(rawConstraint, declare));
-
-        return Object.entries(declare).map(([constraint, values]) => ({
-            constraint,
-            values,
-        }));
-    }
-
-    /**
-     * <pre>
-     *
-     * </pre>
-     * @param rawConstraint
-     * @param hashMap
-     */
-    private readonly insertRawConstraintIntoHashMap = (rawConstraint: string, hashMap: HashMap) => {
-        const regexConstraint = /([a-zA-Z_])*/;
-        const regexValues = /\((.)*\)/;
-        const matchConstraint = regexConstraint.exec(rawConstraint);
-        const matchValues = regexValues.exec(rawConstraint); //FIXME
-
-        if (matchConstraint && matchValues) {
-            const constraint = matchConstraint[0];
-            //const values = matchConstraint[2].split(',').map(value => `(${value.trim()})`);
-            const values = [matchValues[0]];
-
-            if (hashMap[constraint]) {
-                hashMap[constraint] = Array.from(new Set([...hashMap[constraint], ...values]));
-            } else {
-                hashMap[constraint] = values;
-            }
+                if (model.has(key)) {
+                    model.get(key)?.push(valueWithoutParenthesis);
+                } else {
+                    model.set(key, [valueWithoutParenthesis]);
+                }
+            });
         }
-    }
 
+        return model;
+    }
 
     render = () => {
-        const {model} = this.state;
+        const { model } = this.state;
 
         return (
             <Grid2>
-                {model.map((declareArray) => (
-                    declareArray.map((declare) => (
-                        <Accordion key={declare.constraint}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography variant="h6">{declare.constraint}</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Typography>
-                                    {declare.values.join(', ')}
-                                </Typography>
-                            </AccordionDetails>
-                        </Accordion>
-                    ))
+                {Array.from(model.entries()).map(([key, values]) => (
+                    <Accordion key={key}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="h6">{key}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <List>
+                                {values.map((value, index) => (
+                                    <ListItem key={`${key}-${index}-${value}`}>{value}</ListItem>
+                                ))}
+                            </List>
+                        </AccordionDetails>
+                    </Accordion>
                 ))}
             </Grid2>
         );
-    }
+    };
+
 }
 
 export default DeclareView;

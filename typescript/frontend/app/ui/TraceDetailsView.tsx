@@ -16,6 +16,7 @@ import RestService from "@/app/lib/RestService";
 import JsonView from "@/app/ui/json/JsonView";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import DeclareView from "@/app/ui/DeclareView";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -236,8 +237,8 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
                                 {this.renderJsonView(selectedRow)}
                                 {selectedRowModel && (
                                     <Grid2 size={6} columns={6}>
-                                        {/*<DeclareView rawData={selectedRowModel}/>*/}
-                                        <JsonView data={selectedRowModel} />
+                                        <DeclareView rawData={selectedRowModel}/>
+                                        {/*<JsonView data={selectedRowModel} />*/}
                                     </Grid2>
                                 )}
                             </Grid2>
