@@ -8,17 +8,13 @@ class FetchError extends Error {
 }
 
 class RestService {
-    private readonly baseProxyUrl: string;
+    private static readonly baseProxyUrl: string = '/api/proxy/';
 
-    constructor() {
-        this.baseProxyUrl = '/api/proxy/';
-    }
-
-    private buildProxyUrl(endpoint: string): string {
+    private static buildProxyUrl(endpoint: string): string {
         return `${this.baseProxyUrl}${endpoint}`;
     }
 
-    public async get<R>(endpoint: string): Promise<AxiosResponse<R>> {
+    public static async get<R>(endpoint: string): Promise<AxiosResponse<R>> {
         try {
             const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.get(proxyUrl);
@@ -27,7 +23,7 @@ class RestService {
         }
     }
 
-    public async post<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
+    public static async post<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
             const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.post(proxyUrl, data);
@@ -36,7 +32,7 @@ class RestService {
         }
     }
 
-    public async put<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
+    public static async put<T, R>(endpoint: string, data: T): Promise<AxiosResponse<R>> {
         try {
             const proxyUrl = this.buildProxyUrl(endpoint);
             return await axios.put(proxyUrl, data);
