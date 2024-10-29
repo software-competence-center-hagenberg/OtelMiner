@@ -6,8 +6,8 @@ interface JsonViewProps {
     data: any;
 }
 
-class JsonView extends Component<JsonViewProps> {
-    renderJsonData = (obj: any, indent: number = 0) => {
+const JsonView = ({ data }: JsonViewProps) => {
+    const renderJsonData = (obj: any, indent: number = 0) => {
         if (typeof obj === 'object' && obj !== null) {
             return (
                 <Box className={`indent-${indent}`}>
@@ -16,7 +16,7 @@ class JsonView extends Component<JsonViewProps> {
                             <Typography variant="body2" component="span" fontWeight="bold">
                                 {key}:
                             </Typography>{' '}
-                            {this.renderJsonData(value, indent + 1)}
+                            {renderJsonData(value, indent + 1)}
                         </Box>
                     ))}
                 </Box>
@@ -30,16 +30,13 @@ class JsonView extends Component<JsonViewProps> {
         }
     }
 
-    render = () => {
-        const { data } = this.props;
         return (
 
             <Box className="json-viewer">
                 <Typography variant="h6">JSON Data</Typography>
-                {this.renderJsonData(data)}
+                {renderJsonData(data)}
             </Box>
         );
-    }
 }
 
 export default JsonView;

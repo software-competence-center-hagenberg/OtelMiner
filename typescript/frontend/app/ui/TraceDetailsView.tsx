@@ -1,5 +1,4 @@
-'use client';
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Button,
     CircularProgress,
@@ -13,10 +12,10 @@ import {
     TableRow
 } from "@mui/material";
 import RestService from "@/app/lib/RestService";
-import JsonView from "@/app/ui/json/JsonView";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DeclareView from "@/app/ui/DeclareView";
+import JsonView from "@/app/ui/json/JsonView";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -44,215 +43,83 @@ interface SourceDetails {
 
 interface TraceDetailsTableProps {
     sourceFile: string;
-    restService: RestService;
 }
 
-interface TraceDetailsTableState {
-    sourceDetails: SourceDetails;
-    selectedRow: TraceDetails | null;
-    selectedRowModel: string | null; // FIXME evaluate, probably better to integrate in TraceDetails
-    loading: boolean;
+function defaultSourceDetails(sourceFile: string) {
+    return {
+        sourceFile: sourceFile,
+        traces: [],
+        page: 1,
+        size: 10,
+        totalPages: 1,
+        sort: "sourceFile"
+    }
 }
 
-class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTableState> {
-    constructor(props: TraceDetailsTableProps) {
-        super(props);
-        this.state = this.initState();
-    }
+const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
+    const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
+    const [selectedRow, setSelectedRow] = useState<TraceDetails>(); // FIXME check if better with useRef
+    const [selectedRowModel, setSelectedRowModel] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    private readonly initState = () => {
-        return {
-            sourceDetails: this.buildSourceDetails(this.props.sourceFile),
-            selectedRow: null,
-            selectedRowModel: null,
-            loading: true,
+    useEffect(() => {
+        fetchSourceDetails(sourceDetails);
+    }, [sourceFile]);
+
+    const handlePageChange = (_event: unknown, newPage: number) => {
+        const sd = sourceDetails;
+        sd.page = newPage;
+        fetchSourceDetails(sd);
+    };
+
+    const fetchSourceDetails = (sourceDetails: SourceDetails) => {
+        RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
+            .then((response) => setSourceDetails(response.data))
+            .catch((error) => console.error('Error fetching source details:', error))
+            .finally(() => setLoading(false));
+    };
+
+    const handlePageSizeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const sd = sourceDetails;
+        sd.size = +event.target.value;
+        fetchSourceDetails(sd);
+    };
+
+    const handleRowClick = (selectedRow: TraceDetails) => {
+        setSelectedRow(selectedRow);
+    };
+
+    const onClickGenerateModel = async () => {
+        try {
+            setLoading(true);
+            const response = await RestService.post<TraceDetails, string>("/generate-model", selectedRow!);
+            const model = await pollModel(response.data);
+            setSelectedRowModel(model);
+        } catch (error) {
+            console.error('Error generating model:', error);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
-    componentDidMount = () => {
-        this.updateData();
-    }
-
-    componentDidUpdate = (prevProps: TraceDetailsTableProps, prevState: TraceDetailsTableState) => {
-        if (prevProps.sourceFile !== this.props.sourceFile) {
-            this.setState(() => this.initState(), this.updateData);
-        } else if (prevState.sourceDetails.page !== this.state.sourceDetails.page
-            || prevState.sourceDetails.size !== this.state.sourceDetails.size) {
-            this.updateData();
+    const pollModel = async (traceId: string): Promise<string> => {
+        try {
+            const response = await RestService.get<string>("/model/" + traceId);
+            if (response.data !== '') {
+                return response.data;
+            } else {
+                return await pollModel(traceId);
+            }
+        } catch (error) {
+            console.error('Error polling model:', error);
+            throw error;
         }
-    }
+    };
 
-    private readonly buildSourceDetails = (sourceFile: string) => {
-        return {
-            sourceFile: sourceFile,
-            traces: [],
-            page: 1,
-            size: 10,
-            totalPages: 1,
-            sort: "sourceFile"
-        }
-    }
-
-    private readonly updateData = () => {
-        const {restService} = this.props;
-        const {sourceDetails} = this.state;
-        this.setState({loading: true});
-        restService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
-            .then((response) => this.updateState(response.data))
-            .catch((error) => this.handleError(error, 'Error fetching trace details:'));
-    }
-
-    private readonly updateState = (sd: SourceDetails) => {
-        this.setState((prevState) => ({
-            sourceDetails: {
-                ...prevState.sourceDetails,
-                traces: sd.traces,
-                totalPages: sd.totalPages,
-                size: sd.size,
-                page: sd.page
-            },
-            selectedRow: null,
-            selectedRowModel: null,
-            loading: false,
-        }));
-    }
-
-    private readonly handleError = (errorMessage: string, error?: any) => {
-        console.error(errorMessage, error);
-        this.setState({loading: false});
-    }
-
-    private readonly handlePageChange = (_event: unknown, newPage: number) => {
-        this.setState(
-            (prevState) => ({
-                sourceDetails: {...prevState.sourceDetails, page: newPage},
-                selectedRow: null,
-                selectedRowModel: null
-            }),
-            this.updateData
-        );
-    }
-
-    private readonly handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState(
-            (prevState) => ({
-                sourceDetails: {...prevState.sourceDetails, size: +event.target.value, page: 0},
-                selectedRow: null,
-                selectedRowModel: null
-            }),
-            this.updateData
-        );
-    }
-
-    private readonly handleRowClick = (selectedRow: TraceDetails) => {
-        this.setState((prevState) => ({
-            sourceDetails: {...prevState.sourceDetails},
-            selectedRow: selectedRow
-        }));
-    }
-
-    private readonly onClickGenerateModel = () => {
-        const {restService} = this.props;
-        const {selectedRow} = this.state;
-        if (!selectedRow) {
-            return;
-        }
-        this.setState((prevState) => ({
-            sourceDetails: {...prevState.sourceDetails},
-            selectedRow: {...prevState.selectedRow},
-            selectedRowModel: null,
-            loading: true
-        }));
-        restService.post<TraceDetails, string>("/generate-model", selectedRow)
-            .then((response) => this.pollModel(response.data, ""))
-            .catch((error) => this.handleError("Error generating model: ", error));
-    }
-
-    private readonly pollModel = (traceId: string, model: string) => {
-        const {restService} = this.props;
-        if (!model || model === "") { // FIXME quick and dirty solution
-            restService.get<string>("/model/" + traceId)
-                .then((response)  => this.pollModel(traceId, response.data))
-                .catch((error) => this.handleError("Error generating model: ", error));
-        } else {
-            this.updateSelectedRowModel(model);
-        }
-    }
-
-    private readonly updateSelectedRowModel = (model: string | null) => {
-        if (!model) {
-            this.handleError("error: empty model!");
-            return;
-        }
-        this.setState((prevState) => ({
-            sourceDetails: {...prevState.sourceDetails},
-            selectedRow: {...prevState.selectedRow},
-            selectedRowModel: model,
-            loading: false
-        }));
-    }
-
-    render = () => {
-        const {sourceDetails, loading, selectedRow, selectedRowModel} = this.state;
-        return (
-            <Box>
-                <Typography variant="h4">Trace Details</Typography>
-                {loading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                        <CircularProgress/>
-                    </Box>
-                ) : (
-                    <Grid2 container>
-                        <TableContainer sx={{maxHeight: 440}}>
-                            <Table stickyHeader aria-label="trace-details">
-                                <TableHead>
-                                    <TableRow>
-                                        {columns.map((column) => (
-                                            <TableCell
-                                                key={column.id}
-                                                align={column.align}
-                                                style={{minWidth: column.minWidth}}
-                                            >
-                                                {column.label}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {sourceDetails.traces.map((row) => this.renderTableRow(row))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[10, 25, 100]}
-                            component="div"
-                            count={sourceDetails.totalPages}
-                            rowsPerPage={sourceDetails.size}
-                            page={sourceDetails.page}
-                            onPageChange={this.handlePageChange}
-                            onRowsPerPageChange={this.handlePageSizeChange}
-                        />
-                        {selectedRow && (
-                            <Grid2 container spacing={2}>
-                                {this.renderJsonView(selectedRow)}
-                                {selectedRowModel && (
-                                    <Grid2 size={6} columns={6}>
-                                        <DeclareView rawData={selectedRowModel}/>
-                                        {/*<JsonView data={selectedRowModel} />*/}
-                                    </Grid2>
-                                )}
-                            </Grid2>
-                        )}
-                    </Grid2>
-                )}
-            </Box>
-        );
-    }
-
-    private renderTableRow(row: TraceDetails) {
+    const renderTableRow = (row: TraceDetails) => {
         return (
             <TableRow
-                onClick={() => this.handleRowClick(row)}
+                onClick={() => handleRowClick(row)}
                 tabIndex={-1}
                 key={row.traceId}>
                 {columns.map((column) => {
@@ -268,11 +135,10 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
             </TableRow>
         );
     }
-
-    private renderJsonView(selectedRow: TraceDetails) {
+    const renderJsonView = (selectedRow: TraceDetails) => {
         return <Grid2 size={6} columns={6}>
             <Box>
-                <Button variant={"contained"} onClick={this.onClickGenerateModel}>
+                <Button variant={"contained"} onClick={onClickGenerateModel}>
                     generate Model
                 </Button>
                 {selectedRow.spans && (
@@ -281,6 +147,65 @@ class TraceDetailsView extends Component<TraceDetailsTableProps, TraceDetailsTab
             </Box>
         </Grid2>;
     }
-}
+
+    const renderTable = () => {
+        return (
+            <Grid2 container>
+                <TableContainer sx={{maxHeight: 440}}>
+                    <Table stickyHeader aria-label="trace-details">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{minWidth: column.minWidth}}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {sourceDetails.traces.map((row) => renderTableRow(row))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={sourceDetails.totalPages}
+                    rowsPerPage={sourceDetails.size}
+                    page={sourceDetails.page}
+                    onPageChange={handlePageChange}
+                    onRowsPerPageChange={handlePageSizeChange}
+                />
+                {selectedRow && (
+                    <Grid2 container spacing={2}>
+                        {renderJsonView(selectedRow)}
+                        {selectedRowModel && (
+                            <Grid2 size={6} columns={6}>
+                                <DeclareView rawData={selectedRowModel}/>
+                            </Grid2>
+                        )}
+                    </Grid2>
+                )}
+            </Grid2>
+        );
+    }
+
+    return (
+        <Box>
+            <Typography variant="h4">Trace Details</Typography>
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <CircularProgress/>
+                </Box>
+            ) : (
+                renderTable()
+            )}
+        </Box>
+    );
+};
 
 export default TraceDetailsView;
