@@ -73,6 +73,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const fetchSourceDetails = (sourceDetails: SourceDetails) => {
+        setLoading(true);
         RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
             .then((response) => setSourceDetails(response.data))
             .catch((error) => console.error('Error fetching source details:', error))
