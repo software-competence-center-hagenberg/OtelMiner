@@ -34,3 +34,4 @@ val map_declare_to_ltl : t -> Ltl.term
 val compare : t -> t -> int
 val to_string : t -> string
 val string_of_declare_list_list : t list list -> string
+val to_json_string : t list list -> string

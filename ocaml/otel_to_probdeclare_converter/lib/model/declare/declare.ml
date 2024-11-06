@@ -144,6 +144,23 @@ let string_of_declare_list_list (dll : t list list) : string =
   in
   aux dll "[ "
 
+let map_to_json_string (l : t list) : Yojson.Basic.t list =
+  let rec map_to_string_aux (l : t list) k =
+    match l with
+    | [] -> k []
+    | h :: t -> map_to_string_aux t (fun a -> k ((`String (to_string h)) :: a))
+  in map_to_string_aux l (fun x -> x)
+
+let to_json_string (dll : t list list) : string =
+  let rec map_to_json_list l k =
+    match l with
+    | [] -> k []
+    | h :: t -> map_to_json_list t (fun a -> k ((`List (map_to_json_string h)) :: a))
+  in 
+  let json_list_list = `List (map_to_json_list dll (fun x -> x)) in
+  Yojson.Basic.pretty_to_string json_list_list
+
+
 let compare d1 d2 =
   let compare_pairs (a1, b1) (a2, b2) =
     let cmp1 = String.compare a1 a2 in

@@ -29,9 +29,10 @@ let handler (span : trace_string_type) channel probd_result_queue message =
   let converted = convert span data in
   Log.info "conversion complete";
   Log.info "encoding result as string ...";
-  let ltl_string = Declare.string_of_declare_list_list converted in
+  (*let constraints = Declare.string_of_declare_list_list converted in*)
+  let constraints = Declare.to_json_string converted in
   Log.info "encoding complete";
-  Queue.publish channel probd_result_queue (Message.make ltl_string)
+  Queue.publish channel probd_result_queue (Message.make constraints)
   >>= fun `Ok ->
   Log.info "Sent result to trace-receiver";
   return ()
