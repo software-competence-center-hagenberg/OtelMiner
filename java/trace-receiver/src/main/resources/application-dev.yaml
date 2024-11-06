@@ -1,3 +1,6 @@
 spring:
   rabbitmq:
     host: localhost
+
+db-service:
+  base-url: http://localhost:4242/v1

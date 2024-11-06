@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.error.MergeJsonNodeToResourceSpansBuilderException;
 import at.scch.freiseisen.ma.trace_collector.error.TraceStringConversionException;
@@ -17,7 +18,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -25,6 +28,7 @@ import java.util.List;
 public class CollectorService {
     private final RabbitTemplate rabbitTemplate;
     private final OtelToProbdeclareConfiguration otelToProbdeclareConfiguration;
+    private final Map<String, String> traceModels = new HashMap<>();
 
     /**
      * FIXME ignore for now and find way to convert otlp_proto to correct ResourceSpans or to receive otlp_json instead
@@ -40,13 +44,37 @@ public class CollectorService {
 
     @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
     public void receiveProbDeclare(Message msg) {
-        log.info("received probdeclare result: {}", new String(msg.getBody()));
+        String model = new String(msg.getBody());
+        log.info("received probdeclare result: {}", model);
+        traceModels.put("CHANGEME", model);
     }
 
-    public void transformAndPipe(String trace) {
-//        List<ResourceSpans> resourceSpansList = transformTraceToResourceSpans(trace);
-        rabbitTemplate.convertAndSend(otelToProbdeclareConfiguration.getOtelToProbdeclareRoutingKey()
-                , trace);
+
+
+    public String retrieveModel(String traceId) {
+        log.info("retrieving model for trace: {}", traceId);
+        return traceModels.get("CHANGEME");
+    }
+
+    public void transformAndPipe(String traceId, List<String> trace, TraceDataType traceDataType) {
+        String routingKey = determineRoutingKey(traceDataType);
+        //traceModels.put(traceId, "");
+        traceModels.put("CHANGEME", "");
+        rabbitTemplate.convertAndSend(routingKey, "[" + String.join(",", trace) + "]");
+    }
+
+    public void transformAndPipe(String trace, TraceDataType traceDataType) {
+        String routingKey = determineRoutingKey(traceDataType);
+        rabbitTemplate.convertAndSend(routingKey, trace);
+    }
+
+    private String determineRoutingKey(TraceDataType traceDataType) {
+        return switch (traceDataType) {
+            case JAEGER_TRACE -> otelToProbdeclareConfiguration.getJaegerTraceQueue();
+            case JAEGER_SPANS_LIST -> otelToProbdeclareConfiguration.getJaegerTraceSpansListQueue();
+            case OTEL_SPANS_LIST -> otelToProbdeclareConfiguration.getTraceSpansQueue();
+            case RESOURCE_SPANS -> otelToProbdeclareConfiguration.getResourceSpansQueue();
+        };
     }
 
     private List<ResourceSpans> transformTraceToResourceSpans(String trace) {

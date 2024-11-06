@@ -1,11 +1,9 @@
 package at.scch.freiseisen.ma.data_layer.entity.otel;
 
+import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +16,30 @@ import java.util.List;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@NamedNativeQuery(
+        name = "Trace.findDataOverview",
+        query = """
+                    SELECT
+                        t.source_file AS sourceFile,
+                        COUNT(DISTINCT t.id) AS nrTraces,
+                        ARRAY_AGG(DISTINCT t.nr_nodes) AS nrNodes
+                    FROM public.trace t
+                             JOIN public.span s ON t.id = s.trace_id
+                    GROUP BY t.source_file
+                """,
+        resultSetMapping = "DataOverviewMapping"
+)
+@SqlResultSetMapping(
+        name = "DataOverviewMapping",
+        classes = @ConstructorResult(
+                targetClass = DataOverview.class,
+                columns = {
+                        @ColumnResult(name = "sourceFile", type = String.class),
+                        @ColumnResult(name = "nrTraces", type = Integer.class),
+                        @ColumnResult(name = "nrNodes", type = Integer[].class)
+                }
+        )
+)
 public class Trace extends BaseEntity<String> {
     private Integer nrNodes;
     private String sourceFile;
@@ -26,4 +48,9 @@ public class Trace extends BaseEntity<String> {
     @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Span> spans;
 
+    public List<String> getSpansAsJson() {
+        return spans.stream()
+                .map(Span::getJson)
+                .toList();
+    }
 }
