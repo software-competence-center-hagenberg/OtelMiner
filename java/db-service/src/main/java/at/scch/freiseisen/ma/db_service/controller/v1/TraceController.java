@@ -14,26 +14,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("v1/traces")
 @RestController
+@RequestMapping("v1/traces")
 public class TraceController extends BaseController<TraceService, TraceRepository, Trace, String> {
-    private final TraceService traceService;
 
-    public TraceController(TraceService service, TraceService traceService) {
+    public TraceController(TraceService service) {
         super(service);
-        this.traceService = traceService;
     }
 
     @PostMapping("/source-details")
     public SourceDetails retrieveSourceDetails(@RequestBody SourceDetails sourceDetails) {
-        return traceService.findSourceDetails(sourceDetails);
+        return service.findSourceDetails(sourceDetails);
     }
 
     @GetMapping("/data-overview")
     public List<DataOverview> retrieveDataOverview() {
-        return traceService.findDataOverview();
+        return service.findDataOverview();
     }
 
+    @GetMapping
     public Page<Trace> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
         return service.findAll(page, size, Sort.by(sort));
     }

@@ -7,8 +7,8 @@ import at.scch.freiseisen.ma.db_service.service.SpanService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("v1/spans")
 @RestController
+@RequestMapping("v1/spans")
 public class SpanController extends BaseController<SpanService, SpanRepository, Span, String> {
     public SpanController(SpanService service) {
         super(service);
