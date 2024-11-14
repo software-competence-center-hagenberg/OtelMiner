@@ -1,10 +1,9 @@
-package at.scch.freiseisen.ma.data_layer.entity.otel;
+package at.scch.freiseisen.ma.data_layer.entity.process_mining;
 
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +15,14 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class Span extends BaseEntity<String> {
-    private String parentId;
-    @Lob
-    private String json;
+public class ProbDeclareToTrace extends BaseEntity<String> {
+
+    @ManyToOne
+    @JoinColumn(name = "prob_declare_id")
+    private ProbDeclare probDeclare;
 
     @ManyToOne
     @JoinColumn(name = "trace_id")
-    @JsonBackReference
     private Trace trace;
+
 }
