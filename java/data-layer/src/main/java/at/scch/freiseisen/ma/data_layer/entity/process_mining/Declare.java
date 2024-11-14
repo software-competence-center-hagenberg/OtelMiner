@@ -18,7 +18,8 @@ public class Declare extends BaseEntity<String> {
 
     private String constraint;
 
-    @OneToOne(mappedBy = "span", fetch = FetchType.EAGER)
+    @OneToOne
+    @JoinColumn(name = "span_id")
     private Span span;
 
     @ManyToOne

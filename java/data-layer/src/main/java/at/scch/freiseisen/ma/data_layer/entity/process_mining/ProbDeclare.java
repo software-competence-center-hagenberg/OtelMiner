@@ -21,10 +21,10 @@ import java.util.List;
 public class ProbDeclare extends BaseEntity<String> {
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "prob_declare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ProbDeclareToTrace> traces;
 }
