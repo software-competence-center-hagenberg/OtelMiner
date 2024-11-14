@@ -18,31 +18,37 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
         super(service);
     }
 
+    @Override
     @GetMapping
     public Page<ProbDeclare> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
         return service.findAll(page, size, Sort.by(sort));
     }
 
+    @Override
     @GetMapping("/{id}")
     public ProbDeclare retrieveOne(@PathVariable("id") String id) {
         return service.findById(id);
     }
 
+    @Override
     @PostMapping("/one")
     public void postOne(@RequestBody ProbDeclare entity) {
         service.save(entity);
     }
 
+    @Override
     @PostMapping
     public void post(@RequestBody List<ProbDeclare> entities) {
         service.saveAll(entities);
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public void deleteOne(@PathVariable("id") String id) {
         service.delete(id);
     }
 
+    @Override
     @DeleteMapping
     public void deleteAllByIdInBatch(@RequestBody String[] ids) {
         service.deleteAllByIdInBatch(List.of(ids));

@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.db_service.controller;
 
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
+import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
 import at.scch.freiseisen.ma.data_layer.repository.BaseRepository;
 import at.scch.freiseisen.ma.db_service.service.BaseService;
 import lombok.RequiredArgsConstructor;
@@ -23,4 +24,15 @@ public abstract class BaseController<
         T extends Serializable> {
     protected final S service;
 
+    public abstract Page<E> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort);
+
+    public abstract E retrieveOne(@PathVariable("id") String id);
+
+    public abstract void postOne(@RequestBody E entity);
+
+    public abstract void post(@RequestBody List<E> entities);
+
+    public abstract void deleteOne(@PathVariable("id") T id);
+
+    public abstract void deleteAllByIdInBatch(@RequestBody T[] ids);
 }
