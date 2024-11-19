@@ -23,21 +23,21 @@ import java.util.Objects;
 public abstract class BaseEntity<T extends Serializable> implements Serializable {
 
     @Id
-    private T id;
+    protected T id;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime insertDate;
+    protected LocalDateTime insertDate;
 
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updateDate;
+    protected LocalDateTime updateDate;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BaseEntity entity = (BaseEntity) o;
+        BaseEntity<T> entity = (BaseEntity<T>) o;
         return id.equals(entity.id);
     }
 

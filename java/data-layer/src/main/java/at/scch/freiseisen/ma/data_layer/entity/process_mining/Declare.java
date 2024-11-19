@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class Declare extends BaseEntity<String> {
 
     private String constraint;
+    private Float probability;
 
     @OneToOne
     @JoinColumn(name = "span_id")

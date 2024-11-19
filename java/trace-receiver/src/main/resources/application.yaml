@@ -30,8 +30,11 @@ db-service:
     url: /traces
     endpoints:
       data-overview: /data-overview
+      source: /source
   spans:
     url: /spans
     endpoints:
       sourceDetails: /source-details
+  prob-declare:
+    url: /prob-declare
 

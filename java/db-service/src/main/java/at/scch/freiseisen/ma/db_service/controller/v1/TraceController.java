@@ -32,6 +32,11 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
         return service.findDataOverview();
     }
 
+    @PostMapping("/source")
+    public Page<Trace> retrieveBySourceFile(@RequestBody SourceDetails sourceDetails) {
+        return service.findBySourceFile(sourceDetails);
+    }
+
     @Override
     @GetMapping
     public Page<Trace> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {

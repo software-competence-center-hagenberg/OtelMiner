@@ -24,6 +24,14 @@ public class ProbDeclare extends BaseEntity<String> {
     @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
 
+    public List<Declare> getCrispConstraints() {
+        return declareList.stream().filter(d -> d.getProbability() == 1).toList();
+    }
+
+    public List<Declare> getProbabilityConstraints() {
+        return declareList.stream().filter(d -> d.getProbability() != 1).toList();
+    }
+
     @JsonManagedReference
     @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ProbDeclareToTrace> traces;

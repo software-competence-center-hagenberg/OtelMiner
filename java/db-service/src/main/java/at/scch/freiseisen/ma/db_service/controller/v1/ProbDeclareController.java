@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/prob_declare")
+@RequestMapping("v1/prob-declare")
 public class ProbDeclareController extends BaseController<ProbDeclareService, ProbDeclareRepository, ProbDeclare, String> {
     public ProbDeclareController(ProbDeclareService service) {
         super(service);

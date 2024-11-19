@@ -28,13 +28,19 @@ public class DataController {
         return dataService.getDetails(sourceDetails);
     }
 
+    @PostMapping("/generate-prob-declare-model")
+    public String generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
+        return dataService.generateProbDeclareModel(sourceDetails);
+    }
+
+    // FIXME change to declare-model
     @PostMapping("/generate-model")
     public String generateModel(@RequestBody TraceData traceDetails) {
-        return dataService.generateModel(traceDetails);
+        return dataService.generateTraceModel(traceDetails);
     }
 
     @GetMapping("/model/{id}")
     public String checkModel(@PathVariable("id") String id) {
-        return dataService.checkModel(id);
+        return dataService.checkTraceModel(id);
     }
 }

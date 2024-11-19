@@ -6,6 +6,7 @@ RUN npm install -g pnpm
 
 COPY frontend .
 
+#FIXME build fails due to linter errors
 RUN pnpm install && pnpm build && npx next telemetry disable
 
 FROM build

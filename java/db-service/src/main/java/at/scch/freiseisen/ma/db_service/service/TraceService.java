@@ -27,11 +27,7 @@ public class TraceService extends BaseService<TraceRepository, Trace, String> {
     }
 
     public SourceDetails findSourceDetails(SourceDetails sourceDetails) {
-        Pageable pageable = PageRequest.of(
-                sourceDetails.getPage(),
-                sourceDetails.getSize(),
-                Sort.by(sourceDetails.getSort()));
-        Page<Trace> tracesForSourceFile = repository.findTracesBySourceFile(pageable, sourceDetails.getSourceFile());
+        Page<Trace> tracesForSourceFile = buildPageableAndRequestBySourceFile(sourceDetails);
         List<TraceData> traces = tracesForSourceFile.getContent()
                 .stream()
                 .map(t -> new TraceData(t.getId(), t.getNrNodes(), t.getSpansAsJson()))
@@ -39,5 +35,18 @@ public class TraceService extends BaseService<TraceRepository, Trace, String> {
         sourceDetails.setTraces(traces);
         sourceDetails.setTotalPages(tracesForSourceFile.getTotalPages());
         return sourceDetails;
+    }
+
+    public Page<Trace> findBySourceFile(SourceDetails sourceDetails) {
+        return buildPageableAndRequestBySourceFile(sourceDetails);
+    }
+
+    private Page<Trace> buildPageableAndRequestBySourceFile(SourceDetails sourceDetails) {
+        Pageable pageable = PageRequest.of(
+                sourceDetails.getPage(),
+                sourceDetails.getSize(),
+                Sort.by(sourceDetails.getSort())
+        );
+        return repository.findBySourceFile(pageable, sourceDetails.getSourceFile());
     }
 }

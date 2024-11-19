@@ -1,7 +1,6 @@
 package at.scch.freiseisen.ma.data_layer.dto;
 
 import lombok.*;
-import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 

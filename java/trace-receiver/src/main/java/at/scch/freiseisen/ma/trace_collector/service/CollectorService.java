@@ -42,6 +42,7 @@ public class CollectorService {
         log.info("content as resource span:\n{}", resourceSpans);
     }
 
+    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
     public void receiveProbDeclare(Message msg) {
         String model = new String(msg.getBody());
@@ -49,13 +50,13 @@ public class CollectorService {
         traceModels.put("CHANGEME", model);
     }
 
-
-
+    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     public String retrieveModel(String traceId) {
         log.info("retrieving model for trace: {}", traceId);
         return traceModels.get("CHANGEME");
     }
 
+    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     public void transformAndPipe(String traceId, List<String> trace, TraceDataType traceDataType) {
         String routingKey = determineRoutingKey(traceDataType);
         //traceModels.put(traceId, "");
@@ -63,11 +64,13 @@ public class CollectorService {
         rabbitTemplate.convertAndSend(routingKey, "[" + String.join(",", trace) + "]");
     }
 
+    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     public void transformAndPipe(String trace, TraceDataType traceDataType) {
         String routingKey = determineRoutingKey(traceDataType);
         rabbitTemplate.convertAndSend(routingKey, trace);
     }
 
+    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     private String determineRoutingKey(TraceDataType traceDataType) {
         return switch (traceDataType) {
             case JAEGER_TRACE -> otelToProbdeclareConfiguration.getJaegerTraceQueue();

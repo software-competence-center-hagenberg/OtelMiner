@@ -20,5 +20,5 @@ public interface TraceRepository extends BaseRepository<Trace, String> {
 
     @Transactional
     @Query("SELECT t FROM Trace t WHERE t.sourceFile = :sourceFile")
-    Page<Trace> findTracesBySourceFile(Pageable pageable, @Param("sourceFile") String sourceFile);
+    Page<Trace> findBySourceFile(Pageable pageable, @Param("sourceFile") String sourceFile);
 }
