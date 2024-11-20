@@ -1,38 +1,19 @@
 open Amqp_client_async
 open Thread
-open Otel_to_prob_declare_converter
 open Util
 
 let host = Sys.argv.(1)
 
-let convert (span : trace_string_type) (data : string) =
-  match span with
-  | JAEGER_TRACE ->
-      let decoded = Otel_decoder.decode_jaeger_trace_string data in
-      convert_trace_spans decoded
-  | JAEGER_SPANS_LIST ->
-      let decoded = Otel_decoder.decode_jaeger_spans_list_string data in
-      convert_trace_spans decoded
-  | OTEL_SPANS_LIST ->
-      let decoded = Otel_decoder.decode_trace_string data in
-      convert_trace_spans decoded
-  | RESOURCE_SPANS ->
-      let decoded = Otel_decoder.decode_resources_spans_string data in
-      Log.info "decoding complete";
-      Log.info "converting ...";
-      convert_resource_spans decoded
-
 let handler (span : trace_string_type) channel probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  Log.info "decoding ...";
-  let converted = convert span data in
-  Log.info "conversion complete";
+  let processed = Message_processor.process span data in
   Log.info "encoding result as string ...";
   (*let constraints = Declare.string_of_declare_list_list converted in*)
-  let constraints = Declare.to_json_string converted in
-  Log.info "encoding complete";
-  Queue.publish channel probd_result_queue (Message.make constraints)
+  let result = Message_processor.result_to_json_string processed in
+  Log.info "result: %s" result;
+  Queue.publish channel probd_result_queue 
+    (Message.make result)
   >>= fun `Ok ->
   Log.info "Sent result to trace-receiver";
   return ()

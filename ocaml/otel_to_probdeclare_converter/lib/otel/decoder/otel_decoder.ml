@@ -1,5 +1,6 @@
 open Yojson.Basic.Util
 open Opentelemetry_proto
+open Util
 
 (* Decode an array_value from JSON *)
 let rec decode_array_value json =
@@ -157,7 +158,7 @@ let decode_resource json =
        ~dropped_attributes_count:(Int32.of_int 0) ())
 
 (* Decode a ResourceSpans from JSON *)
-let decode_resource_spans json =
+let decode_resource_span json =
   Trace.make_resource_spans
     ~resource:(json |> member "resource" |> decode_resource)
     ~scope_spans:
@@ -165,11 +166,14 @@ let decode_resource_spans json =
     ~schema_url:(json |> member "schemaUrl" |> to_string)
     ()
 
+let decode_resource_spans (json : Yojson.Basic.t) : Trace.resource_spans list =
+  let rs = json |> member "resourceSpans" |> to_list in
+  List.map decode_resource_span rs
+
 (* Decode the JSON string into a ResourceSpans object *)
 let decode_resources_spans_string json_string : Trace.resource_spans list =
   let json = Yojson.Basic.from_string json_string in
-  let rs = json |> member "resourceSpans" |> to_list in
-  List.map decode_resource_spans rs
+  decode_resource_spans json
 
 (* Decode the JSON string into an otel trace obj́ect *)
 let decode_trace_string json_string : Trace.span list =
@@ -251,3 +255,19 @@ let decode_jaeger_spans_list_string json_string : Trace.span list =
   let json = Yojson.Basic.from_string json_string in
   let trace_spans = json |> to_list in
   List.map decode_jaeger_trace_span trace_spans
+
+let decode (span : trace_string_type) (json : Yojson.Basic.t) : Trace.span list
+    =
+  match span with
+  | JAEGER_TRACE ->
+      let jaeger_traces = json |> member "data" |> to_list in
+      List.flatten (List.map decode_jaeger_trace jaeger_traces)
+  | JAEGER_SPANS_LIST ->
+      let trace_spans = json |> to_list in
+      List.map decode_jaeger_trace_span trace_spans
+  | OTEL_SPANS_LIST ->
+      let trace_spans = json |> to_list in
+      List.map decode_trace_span trace_spans
+  | _ ->
+      let type_string = trace_string_type_to_string span in
+      failwith (Printf.sprintf "decode: Type %s not supported" type_string)

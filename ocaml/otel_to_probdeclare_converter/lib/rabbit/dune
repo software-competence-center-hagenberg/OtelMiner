@@ -1,0 +1,8 @@
+(library
+ (name message_processor)
+ (libraries
+  yojson
+  otel_decoder
+  util
+  otel_to_prob_declare_converter
+  amqp-client-async))
