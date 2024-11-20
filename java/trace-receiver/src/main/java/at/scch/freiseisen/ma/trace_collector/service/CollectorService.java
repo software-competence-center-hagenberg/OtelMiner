@@ -58,7 +58,7 @@ public class CollectorService {
 
     @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     public void transformAndPipe(String traceId, List<String> trace, TraceDataType traceDataType) {
-        String routingKey = determineRoutingKey(traceDataType);
+        String routingKey = otelToProbdeclareConfiguration.determineRoutingKey(traceDataType);
         //traceModels.put(traceId, "");
         traceModels.put("CHANGEME", "");
         rabbitTemplate.convertAndSend(routingKey, "[" + String.join(",", trace) + "]");
@@ -66,18 +66,8 @@ public class CollectorService {
 
     @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
     public void transformAndPipe(String trace, TraceDataType traceDataType) {
-        String routingKey = determineRoutingKey(traceDataType);
+        String routingKey = otelToProbdeclareConfiguration.determineRoutingKey(traceDataType);
         rabbitTemplate.convertAndSend(routingKey, trace);
-    }
-
-    @Deprecated(forRemoval = true) // FIXME marker for moving rabbit methods methods to ProbDeclareManagerService
-    private String determineRoutingKey(TraceDataType traceDataType) {
-        return switch (traceDataType) {
-            case JAEGER_TRACE -> otelToProbdeclareConfiguration.getJaegerTraceQueue();
-            case JAEGER_SPANS_LIST -> otelToProbdeclareConfiguration.getJaegerTraceSpansListQueue();
-            case OTEL_SPANS_LIST -> otelToProbdeclareConfiguration.getTraceSpansQueue();
-            case RESOURCE_SPANS -> otelToProbdeclareConfiguration.getResourceSpansQueue();
-        };
     }
 
     private List<ResourceSpans> transformTraceToResourceSpans(String trace) {

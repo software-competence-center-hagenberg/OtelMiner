@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -35,4 +36,11 @@ public class ProbDeclare extends BaseEntity<String> {
     @JsonManagedReference
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ProbDeclareToTrace> traces;
+
+    public ProbDeclare(String id) {
+        this.id = id;
+        // TODO check
+//        this.insertDate = LocalDateTime.now();
+//        this.updateDate = LocalDateTime.now();
+    }
 }

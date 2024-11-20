@@ -35,6 +35,10 @@ db-service:
     url: /spans
     endpoints:
       sourceDetails: /source-details
+  declare:
+    url: /declare
   prob-declare:
     url: /prob-declare
+  prob-declare-to-trace:
+    url: /prob-declare-to-trace
 
