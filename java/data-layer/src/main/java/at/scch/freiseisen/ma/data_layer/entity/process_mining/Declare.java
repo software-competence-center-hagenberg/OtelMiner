@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Declare extends BaseEntity<String> {
 
-    private String constraint;
+    private String constraintTemplate;
     private Float probability;
 
     @OneToOne

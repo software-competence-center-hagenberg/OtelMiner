@@ -21,7 +21,7 @@ import java.util.List;
 public class ProbDeclare extends BaseEntity<String> {
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
 
     public List<Declare> getCrispConstraints() {
@@ -33,6 +33,6 @@ public class ProbDeclare extends BaseEntity<String> {
     }
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "prob_declare_id", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ProbDeclareToTrace> traces;
 }
