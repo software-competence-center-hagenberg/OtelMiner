@@ -2,9 +2,20 @@
 import React, {useEffect, useState} from 'react';
 import TraceDetailsView from './TraceDetailsView';
 import RestService from "@/app/lib/RestService";
-import {CircularProgress, Grid2, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {
+    Button,
+    CircularProgress,
+    Grid2,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import ProbDeclareView from "@/app/ui/ProbDeclareView";
 
 interface DataOverviewProps {
     nrNodes: number[];
@@ -27,6 +38,7 @@ const DataOverview: React.FC = () => {
     const [sourceFile, setSourceFile] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<unknown | null>(null);
+    const [generatingProbDeclare, setGeneratingProbDeclare] = useState<boolean>(false);
 
     useEffect(() => {
         RestService.get<DataOverviewProps[]>('/overview')
@@ -83,7 +95,7 @@ const DataOverview: React.FC = () => {
         );
     };
 
-    const content = () => {
+    const renderDataOverview = () => {
         if (loading) {
             return (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -98,18 +110,35 @@ const DataOverview: React.FC = () => {
                 </Box>
             );
         }
-        return renderTable();
+        return <Box>
+            {renderTable()}
+            <Button
+                variant={"contained"}
+                onClick={() => setGeneratingProbDeclare(true)}
+                disabled={!sourceFile || generatingProbDeclare}
+            >
+                generate PB Model
+            </Button>
+            <Button
+                variant={'contained'}
+                onClick={() => setGeneratingProbDeclare(false)}
+                disabled={!sourceFile || !generatingProbDeclare}
+            >
+                abort
+            </Button>
+        </Box>
     }
 
     return (
         <Grid2 container spacing={2} columns={12}>
             <Grid2 size={3}>
                 <Typography variant="h3">Overview</Typography>
-                {content()}
+                {renderDataOverview()}
             </Grid2>
             <Grid2 size={"grow"}>
                 <Box height="100%">
-                    {sourceFile && <TraceDetailsView sourceFile={sourceFile}/>}
+                    {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
+                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile}/>}
                 </Box>
             </Grid2>
         </Grid2>
