@@ -23,14 +23,14 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
         return repository.findAll(PageRequest.of(page, size, sort));
     }
 
-    public void save(E entity) {
+    public E save(E entity) {
         log.info("persisting entity {}", entity.getId());
-        repository.saveAndFlush(entity);
+        return repository.saveAndFlush(entity);
     }
 
-    public void saveAll(List<E> entities) {
+    public List<E> saveAll(List<E> entities) {
         log.info("persisting {} entities", entities.size());
-        repository.saveAllAndFlush(entities);
+        return repository.saveAllAndFlush(entities);
     }
 
     public void delete(T id) {
@@ -46,6 +46,11 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
     public E findById(T id) {
         log.info("retrieving entry with id {}", id);
         return repository.findById(id).orElse(null);
+    }
+
+    public E safeFindById(T id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " not found"));
     }
 }
 

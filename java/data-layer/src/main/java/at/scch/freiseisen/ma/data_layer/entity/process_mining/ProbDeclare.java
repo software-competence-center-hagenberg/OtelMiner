@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,17 +20,11 @@ import java.util.List;
 @NoArgsConstructor
 public class ProbDeclare extends BaseEntity<String> {
 
+    private boolean generating;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
-
-    public List<Declare> getCrispConstraints() {
-        return declareList.stream().filter(d -> d.getProbability() == 1).toList();
-    }
-
-    public List<Declare> getProbabilityConstraints() {
-        return declareList.stream().filter(d -> d.getProbability() != 1).toList();
-    }
 
     @JsonManagedReference
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
@@ -39,8 +32,17 @@ public class ProbDeclare extends BaseEntity<String> {
 
     public ProbDeclare(String id) {
         this.id = id;
+        this.generating = true;
         // TODO check
 //        this.insertDate = LocalDateTime.now();
 //        this.updateDate = LocalDateTime.now();
+    }
+
+    public List<Declare> getCrispConstraints() {
+        return declareList.stream().filter(d -> d.getProbability() == 1).toList();
+    }
+
+    public List<Declare> getProbabilityConstraints() {
+        return declareList.stream().filter(d -> d.getProbability() != 1).toList();
     }
 }

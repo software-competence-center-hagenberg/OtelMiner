@@ -1,6 +1,5 @@
 package at.scch.freiseisen.ma.trace_collector.configuration;
 
-import at.scch.freiseisen.ma.commons.TraceDataType;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

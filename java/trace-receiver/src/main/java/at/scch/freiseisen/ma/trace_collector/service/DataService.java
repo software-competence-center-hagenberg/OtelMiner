@@ -2,6 +2,7 @@ package at.scch.freiseisen.ma.trace_collector.service;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
@@ -56,5 +57,9 @@ public class DataService {
 
     public String generateProbDeclareModel(SourceDetails sourceDetails) {
         return probDeclareManagerService.generate(sourceDetails);
+    }
+
+    public ProbDeclareModel getProbDeclareModel(String id) {
+        return probDeclareManagerService.getProbDeclareModel(id);
     }
 }

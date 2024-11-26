@@ -1,5 +1,7 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
+import at.scch.freiseisen.ma.data_layer.dto.DeclareConstraint;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.ProbDeclareRepository;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
@@ -30,16 +32,32 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
         return service.findById(id);
     }
 
+    @GetMapping("/model/{id}")
+    public ProbDeclareModel retrieveModel(@PathVariable("id") String id) {
+        ProbDeclare probDeclare = service.findById(id);
+        List<DeclareConstraint> constraints = probDeclare.getDeclareList().stream()
+                .map(d -> new DeclareConstraint(d.getProbability(), d.getConstraintTemplate()))
+                .toList();
+        return new ProbDeclareModel(probDeclare.getId(), constraints, probDeclare.isGenerating());
+    }
+
+    @DeleteMapping("/stop-generation/{id}")
+    public void stopGeneration(@PathVariable("id") String id) {
+        ProbDeclare probDeclare = service.findById(id);
+        probDeclare.setGenerating(false);
+        service.save(probDeclare);
+    }
+
     @Override
     @PostMapping("/one")
-    public void postOne(@RequestBody ProbDeclare entity) {
-        service.save(entity);
+    public ProbDeclare postOne(@RequestBody ProbDeclare entity) {
+        return service.save(entity);
     }
 
     @Override
     @PostMapping
-    public void post(@RequestBody List<ProbDeclare> entities) {
-        service.saveAll(entities);
+    public List<ProbDeclare> post(@RequestBody List<ProbDeclare> entities) {
+        return service.saveAll(entities);
     }
 
     @Override

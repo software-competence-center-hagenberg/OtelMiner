@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {CircularProgress, Grid2} from "@mui/material";
+import {CircularProgress} from "@mui/material";
 import RestService from "@/app/lib/RestService";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DeclareView from "@/app/ui/DeclareView";
+import JsonView from "@/app/ui/json/JsonView";
+import {AxiosResponse} from "axios";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
@@ -16,45 +17,45 @@ interface DeclareConstraint {
 
 interface ProbDeclare {
     id: string;
-    constraints: DeclareConstraint[];
     generating: boolean;
+    constraints: DeclareConstraint[];
+    traces: String[];
 }
 
 const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState(true);
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
 
-    useEffect(() => {
-        fetchSourceDetails();
-    }, [sourceFile]);
+    const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
+        const probDeclare: ProbDeclare = response.data;
+        setProbDeclare(probDeclare);
+        if (probDeclare.generating) {
+            setTimeout(updateModel, 500);
+        }
+    }
 
-    const fetchSourceDetails = () => {
+    const initModelGeneration = () => {
         setLoading(true);
-        RestService.post<string, ProbDeclare>("/generate-prob-declare-model", sourceFile!)
-            .then((response) => {
-                const probDeclare: ProbDeclare = response.data;
-                setProbDeclare(probDeclare);
-                if (probDeclare.generating) {
-                    setTimeout(fetchSourceDetails, 500);
-                }
-            })
+        RestService.post<string, ProbDeclare>("/generate-prob-declare-model", sourceFile)
+            .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoading(false));
     };
 
-    const pollModel = async (traceId: string): Promise<string> => {
+    const fetchModel = async  () => {
         try {
-            const response = await RestService.get<string>("/model/" + traceId);
-            if (response.data !== '') {
-                return response.data;
-            } else {
-                return await pollModel(traceId);
-            }
+            const response = await RestService.get<ProbDeclare>("/prob-declare/" + probDeclare!.id);
+            handleProbDeclareResponse(response);
         } catch (error) {
-            console.error('Error polling model:', error);
-            throw error;
+            console.error('Error fetching prob declare model', error);
         }
-    };
+    }
+
+    const updateModel = () => {
+        probDeclare ? fetchModel() : initModelGeneration();
+    }
+
+    useEffect(updateModel, [sourceFile]);
 
     return (
         <Box>
@@ -65,18 +66,19 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
                 </Box>
             ) : (
                 probDeclare && (
-                    <Grid2 size={6} columns={6}>
-                        <DeclareView rawData={
-                            probDeclare.constraints
-                                .filter(c => c.probability === 1)
-                                .map(c => c.template)
-                        }/>
-                        <DeclareView rawData={
-                            probDeclare.constraints
-                                .filter(c => c.probability < 1)
-                                .map(c => c.template)
-                        }/>
-                    </Grid2>
+                    <JsonView data={probDeclare}/>
+                    // <Grid2 size={6} columns={6}>
+                    //     <DeclareView rawData={
+                    //         probDeclare.constraints
+                    //             .filter(c => c.probability === 1)
+                    //             .map(c => c.template)
+                    //     }/>
+                    //     <DeclareView rawData={
+                    //         probDeclare.constraints
+                    //             .filter(c => c.probability < 1)
+                    //             .map(c => c.template)
+                    //     }/>
+                    // </Grid2>
                 )
                 /*
 

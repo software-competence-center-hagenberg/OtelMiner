@@ -32,14 +32,14 @@ public class SpanController extends BaseController<SpanService, SpanRepository, 
 
     @Override
     @PostMapping("/one")
-    public void postOne(@RequestBody Span entity) {
-        service.save(entity);
+    public Span postOne(@RequestBody Span entity) {
+        return service.save(entity);
     }
 
     @Override
     @PostMapping
-    public void post(@RequestBody List<Span> entities) {
-        service.saveAll(entities);
+    public List<Span> post(@RequestBody List<Span> entities) {
+        return service.saveAll(entities);
     }
 
     @Override

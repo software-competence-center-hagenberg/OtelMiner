@@ -40,7 +40,7 @@ const DataOverview: React.FC = () => {
     const [error, setError] = useState<unknown | null>(null);
     const [generatingProbDeclare, setGeneratingProbDeclare] = useState<boolean>(false);
 
-    useEffect(() => {
+    const fetchDataOverview = () => {
         RestService.get<DataOverviewProps[]>('/overview')
             .then((response) => {
                 setData(response.data);
@@ -50,7 +50,9 @@ const DataOverview: React.FC = () => {
                 setError(error);
                 setLoading(false);
             });
-    }, []);
+    }
+
+    useEffect(fetchDataOverview, []);
 
     const handleRowClick = (sourceFile: string) => {
         if (sourceFile) {

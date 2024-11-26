@@ -32,5 +32,10 @@ public class ProbDeclareToTraceService {
         log.info("retrieving entry with id {}", id);
         return repository.findById(id).orElse(null);
     }
+
+    public ProbDeclareToTrace safeFindById(ProbDeclareToTraceId id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " not found"));
+    }
 }
 

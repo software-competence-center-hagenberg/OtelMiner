@@ -1,15 +1,47 @@
 package at.scch.freiseisen.ma.db_service.service;
 
+import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
+import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
+import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
+import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTraceId;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.DeclareRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Slf4j
 @Service
 public class DeclareService extends BaseService<DeclareRepository, Declare, String> {
+    private final ProbDeclareService probDeclareService;
+    private final ProbDeclareToTraceService probDeclareToTraceService;
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public DeclareService(DeclareRepository repository) {
+    public DeclareService(
+            DeclareRepository repository,
+            ProbDeclareService probDeclareService,
+            ProbDeclareToTraceService probDeclareToTraceService) {
         super(repository);
+        this.probDeclareService = probDeclareService;
+        this.probDeclareToTraceService = probDeclareToTraceService;
+    }
+
+    public List<Declare> findAllByConstraintTemplateInAndProbDeclare(List<String> constraintTemplates, String probDeclareId) {
+        ProbDeclare probDeclare = probDeclareService.safeFindById(probDeclareId);
+        return repository.findAllByConstraintTemplateInAndProbDeclare(constraintTemplates, probDeclare);
+    }
+
+    public List<Declare> addNewlyConverted(ConversionResponse response, String probDeclareId) {
+        log.info("retrieving prob declare with id {}", probDeclareId);
+
+        ProbDeclareToTraceId probDeclareToTraceId = new ProbDeclareToTraceId(probDeclareId, response.traceId());
+        ProbDeclareToTrace probDeclareToTrace = probDeclareToTraceService.safeFindById(probDeclareToTraceId);
+
+        List<Declare> entities = Arrays.stream(response.constraints())
+                .map(c -> new Declare(probDeclareToTrace, c))
+                .toList();
+
+        return saveAll(entities);
     }
 }

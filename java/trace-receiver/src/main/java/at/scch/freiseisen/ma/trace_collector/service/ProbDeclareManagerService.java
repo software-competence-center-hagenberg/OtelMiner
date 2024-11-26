@@ -2,13 +2,13 @@ package at.scch.freiseisen.ma.trace_collector.service;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.SpansListConversionRequest;
+import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
-import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
-import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTraceId;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import at.scch.freiseisen.ma.trace_collector.error.ModelGenerationException;
@@ -28,11 +28,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
@@ -43,10 +40,13 @@ public class ProbDeclareManagerService {
     private final RestConfig restConfig;
     private final RabbitTemplate rabbitTemplate;
     private final OtelToProbdeclareConfiguration otelToProbdeclareConfiguration;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor(); // TODO evaluate if and how many threads
-    private final Map<UUID, CompletableFuture<ConversionResponse>> generating = new HashMap<>();
+    private final ExecutorService declareConstraintGenerationExecutor = Executors.newSingleThreadExecutor(); // TODO evaluate if and how many threads
+    private final ExecutorService modelUpdateExecutor = Executors.newSingleThreadExecutor();
+    private final Map<UUID, CompletableFuture<ConversionResponse>> generating = new ConcurrentHashMap<>();
     private final CollectorService collectorService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, Float> probabilityConstraints = new ConcurrentHashMap<>();
+    private final List<String> crispConstraints = new CopyOnWriteArrayList<>();
 
     private void persist(ProbDeclare probDeclare) {
         restTemplate.postForLocation(restConfig.probDeclareUrl, probDeclare);
@@ -56,13 +56,13 @@ public class ProbDeclareManagerService {
         String id = UUID.randomUUID().toString();
         ProbDeclare probDeclare = new ProbDeclare(id);
         persist(probDeclare);
-        executorService.submit(() -> generateDeclareConstraints(probDeclare, sourceDetails));
+        declareConstraintGenerationExecutor.submit(() -> generateDeclareConstraints(probDeclare.getId(), sourceDetails));
 
         return id;
     }
 
     private void generateDeclareConstraints(
-            @NonNull ProbDeclare probDeclare,
+            @NonNull String probDeclareId,
             @NonNull SourceDetails sourceDetails
     ) {
         HttpEntity<SourceDetails> requestEntity = new HttpEntity<>(sourceDetails);
@@ -76,30 +76,30 @@ public class ProbDeclareManagerService {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Page<Trace> page = Objects.requireNonNull(response.getBody());
-            executorService.submit(() -> scheduleDeclareGeneration(probDeclare, page.getContent()));
+            declareConstraintGenerationExecutor.submit(() -> scheduleDeclareGeneration(probDeclareId, page.getContent()));
 
             if (page.getNumber() < page.getTotalPages()) {
                 sourceDetails.setPage(page.getNumber() + 1);
-                generateDeclareConstraints(probDeclare, sourceDetails);
+                generateDeclareConstraints(probDeclareId, sourceDetails);
             }
             return;
         }
 
         throw new ModelGenerationException(
-                String.format("error fetching traces for model (%s) generation", probDeclare.getId())
+                String.format("error fetching traces for model (%s) generation", probDeclareId)
         );
     }
 
     private void scheduleDeclareGeneration(
-            @NonNull ProbDeclare probDeclare,
+            @NonNull String probDeclareId,
             @NonNull List<Trace> traces
     ) {
-        createAndPersistProbDeclareToTrace(probDeclare, traces);
+        createAndPersistProbDeclareToTrace(probDeclareId, traces);
         traces.forEach(
                 trace -> {
-                    CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclare);
+                    CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclareId);
                     generating.put(UUID.fromString(trace.getId()), future);
-                    executorService.submit(
+                    declareConstraintGenerationExecutor.submit(
                             () -> transformAndPipe(
                                     trace.getId(),
                                     trace.getSpansAsJson(),
@@ -110,17 +110,13 @@ public class ProbDeclareManagerService {
         );
     }
 
-    private void createAndPersistProbDeclareToTrace(ProbDeclare probDeclare, List<Trace> traces) {
-        List<ProbDeclareToTrace> probDeclareToTraces = traces.stream()
-                .map(trace -> new ProbDeclareToTrace(probDeclare, trace))
-                .toList();
-        restTemplate.postForLocation(restConfig.probDeclareToTraceUrl, probDeclareToTraces);
+    private void createAndPersistProbDeclareToTrace(String probDeclareId, List<Trace> traces) {
+        restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
     }
 
-    private CompletableFuture<ConversionResponse> planResponseProcessing(ProbDeclare probDeclare) {
+    private CompletableFuture<ConversionResponse> planResponseProcessing(String probDeclareId) {
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenApplyAsync(response -> processResponse(response, probDeclare.getId()))
-                .thenApplyAsync(this::updateModel);
+        future.thenAcceptAsync(response -> processResponse(response, probDeclareId));
         return future;
     }
 
@@ -142,43 +138,61 @@ public class ProbDeclareManagerService {
         UUID traceId = UUID.fromString(response.traceId());
         if (generating.containsKey(traceId)) {
             generating.get(traceId).complete(response);
+            generating.remove(traceId);
         } else {
             throw new ModelGenerationException("traceId " + traceId + " not found");
         }
     }
 
-    private List<Declare> processResponse(ConversionResponse response, String probDeclareId) {
-        List<Declare> constraints = new ArrayList<>();
-        ProbDeclareToTraceId probDeclareToTraceId = new ProbDeclareToTraceId(probDeclareId, response.traceId());
-        ProbDeclareToTrace probDeclareToTrace = restTemplate.getForEntity(
-                restConfig.probDeclareToTraceUrl,
-                ProbDeclareToTrace.class,
-                probDeclareToTraceId
-        ).getBody();
+    private void processResponse(ConversionResponse conversionResponse, String probDeclareId) {
+        HttpEntity<ConversionResponse> requestEntity = new HttpEntity<>(conversionResponse);
+        ResponseEntity<List<Declare>> response = postExchange(
+                restConfig.declareUrl + "/by-constraint-template" + probDeclareId,
+                requestEntity
+        );
+        List<Declare> existingDeclare = Objects.requireNonNull(response.getBody());
+        List<String> existingConstraints = existingDeclare.stream().map(Declare::getConstraintTemplate).toList();
+        String[] newConstraintTemplates = Arrays.stream(conversionResponse.constraints())
+                .filter(c -> !existingConstraints.contains(c))
+                .toArray(String[]::new);
+        requestEntity = new HttpEntity<>(new ConversionResponse(conversionResponse.traceId(), newConstraintTemplates));
+        response = postExchange(
+                restConfig.declareUrl + "/add-constraints" + probDeclareId,
+                requestEntity
+        );
 
-        assert probDeclareToTrace != null;
-        for (String constraint : response.constraints()) {
-            UUID id = UUID.randomUUID();
-            Declare declare = Declare.builder()
-                    .id(id.toString())
-                    .probability(1f)
-                    .constraintTemplate(constraint)
-                    .probDeclare(probDeclareToTrace.getProbDeclare())
-                    .trace(probDeclareToTrace.getTrace())
-                    .updateDate(LocalDateTime.now())
-                    .insertDate(LocalDateTime.now())
-                    .build();
-            constraints.add(declare);
-        }
-
-        return constraints;
+        existingDeclare.addAll(Objects.requireNonNull(response.getBody()));
+        modelUpdateExecutor.submit(() -> updateModel(existingDeclare));
     }
 
-    private ProbDeclare updateModel(List<Declare> declareList) {
+    private void updateModel(List<Declare> declareList) {
+        //List<String>
         // TODO implement
         // TODO fetch crisp and probability constraints compare probability and update weight
         restTemplate.postForLocation(restConfig.declareUrl, declareList);
         // TODO fetch updated prob declare
-        return declareList.getFirst().getProbDeclare(); // FIXME
+    }
+
+    private <S extends BaseEntity<String>> ResponseEntity<List<S>> postExchange(String url, HttpEntity<?> requestEntity) {
+        return restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
+    }
+
+    // TODO check if necessary or if better done directly in data service
+    public ProbDeclareModel getProbDeclareModel(String id) {
+        return restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
+    }
+
+    private boolean checkIfGenerationFinished(String probDeclareId) {
+        if (generating.isEmpty()) {
+            restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + probDeclareId);
+            return true;
+        }
+
+        return false;
     }
 }

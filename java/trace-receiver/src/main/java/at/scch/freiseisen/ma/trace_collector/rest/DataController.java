@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.trace_collector.rest;
 
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.service.DataService;
@@ -33,12 +34,18 @@ public class DataController {
         return dataService.generateProbDeclareModel(sourceDetails);
     }
 
+    @GetMapping("/prob-declare/{id}")
+    public ProbDeclareModel getProbDeclareModel(@PathVariable("id") String id) {
+        return dataService.getProbDeclareModel(id);
+    }
+
     // FIXME change to declare-model
     @PostMapping("/generate-model")
     public String generateModel(@RequestBody TraceData traceDetails) {
         return dataService.generateTraceModel(traceDetails);
     }
 
+    // FIXME change to declare-model
     @GetMapping("/model/{id}")
     public String checkModel(@PathVariable("id") String id) {
         return dataService.checkTraceModel(id);

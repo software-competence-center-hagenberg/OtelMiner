@@ -1,7 +1,6 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
-import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
-import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
+import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.DeclareRepository;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
@@ -16,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/declare")
 public class DeclareController extends BaseController<DeclareService, DeclareRepository, Declare, String> {
+
     public DeclareController(DeclareService service) {
         super(service);
     }
@@ -34,14 +34,14 @@ public class DeclareController extends BaseController<DeclareService, DeclareRep
 
     @Override
     @PostMapping("/one")
-    public void postOne(@RequestBody Declare entity) {
-        service.save(entity);
+    public Declare postOne(@RequestBody Declare entity) {
+        return service.save(entity);
     }
 
     @Override
     @PostMapping
-    public void post(@RequestBody List<Declare> entities) {
-        service.saveAll(entities);
+    public List<Declare> post(@RequestBody List<Declare> entities) {
+        return service.saveAll(entities);
     }
 
     @Override
@@ -54,5 +54,21 @@ public class DeclareController extends BaseController<DeclareService, DeclareRep
     @DeleteMapping
     public void deleteAllByIdInBatch(@RequestBody String[] ids) {
         service.deleteAllByIdInBatch(List.of(ids));
+    }
+
+    @PostMapping("/by-constraint-template/{prob-declare-id}")
+    public List<Declare> postByConstraintTemplate(
+            @RequestBody List<String> constraintTemplates,
+            @PathVariable("prob-declare-id") String probDeclareId
+    ) {
+        return service.findAllByConstraintTemplateInAndProbDeclare(constraintTemplates, probDeclareId);
+    }
+
+    @PostMapping("/add-constraints/{prob-declare-id}")
+    public List<Declare> postAddConstraints(
+            @RequestBody ConversionResponse conversionResponse,
+            @PathVariable("prob-declare-id") String probDeclareId
+    ){
+        return service.addNewlyConverted(conversionResponse, probDeclareId);
     }
 }

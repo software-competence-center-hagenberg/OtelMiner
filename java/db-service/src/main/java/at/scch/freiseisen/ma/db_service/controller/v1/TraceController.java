@@ -56,14 +56,14 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
 
     @Override
     @PostMapping("/one")
-    public void postOne(@RequestBody Trace entity) {
-        service.save(entity);
+    public Trace postOne(@RequestBody Trace entity) {
+        return service.save(entity);
     }
 
     @Override
     @PostMapping
-    public void post(@RequestBody List<Trace> entities) {
-        service.saveAll(entities);
+    public List<Trace> post(@RequestBody List<Trace> entities) {
+        return service.saveAll(entities);
     }
 
     @Override

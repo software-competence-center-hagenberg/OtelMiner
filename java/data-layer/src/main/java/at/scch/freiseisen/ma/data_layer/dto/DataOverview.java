@@ -2,8 +2,6 @@ package at.scch.freiseisen.ma.data_layer.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder

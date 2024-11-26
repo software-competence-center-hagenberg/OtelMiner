@@ -4,7 +4,6 @@ import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 
 @FunctionalInterface
 public interface FileParser {

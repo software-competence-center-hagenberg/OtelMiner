@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Accordion, AccordionDetails, AccordionSummary, Grid2, List, ListItem } from "@mui/material";
+import React, {useEffect, useState} from 'react';
+import {Accordion, AccordionDetails, AccordionSummary, List, ListItem} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
@@ -25,6 +25,7 @@ function parseRawData (rawData: string): Map<string, string[]> {
     }
     return model;
 }
+
 // FIXME rewrite or create new component to handle DeclareConstraint[]!
 const DeclareView = ({ rawData }: DeclareViewProps) => {
     const [model, setModel] = useState<Map<string, string[]>>(new Map<string, string[]>());

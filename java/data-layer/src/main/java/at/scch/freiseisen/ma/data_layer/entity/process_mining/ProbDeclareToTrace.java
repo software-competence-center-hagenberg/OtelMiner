@@ -17,11 +17,14 @@ import java.time.LocalDateTime;
 public class ProbDeclareToTrace {
 
     @Id
+    private String probDeclareId;
+    @Id
+    private String traceId;
+
     @ManyToOne
     @JoinColumn(name = "prob_declare_id", nullable = false)
     private ProbDeclare probDeclare;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "trace_id", nullable = false)
     private Trace trace;
