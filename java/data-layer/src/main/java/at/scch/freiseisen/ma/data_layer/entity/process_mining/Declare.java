@@ -27,7 +27,7 @@ public class Declare extends BaseEntity<String> {
 
     @OneToOne
     @JoinColumn(name = "trace_id")
-    private Trace trace;
+    private Trace trace; // FIXME change to one to many
 
     @ManyToOne
     @JoinColumn(name = "prob_declare_id")

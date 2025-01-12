@@ -21,7 +21,6 @@ import java.util.List;
 public class ProbDeclare extends BaseEntity<String> {
 
     private boolean generating;
-
     @JsonManagedReference
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
