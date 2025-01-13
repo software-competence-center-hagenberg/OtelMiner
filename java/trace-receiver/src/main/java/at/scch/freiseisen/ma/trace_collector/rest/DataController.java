@@ -1,10 +1,12 @@
 package at.scch.freiseisen.ma.trace_collector.rest;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.service.DataService;
+import at.scch.freiseisen.ma.trace_collector.service.ProbDeclareManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.List;
 @CrossOrigin({"http://localhost:3000", "http://frontend:3000"})
 public class DataController {
     private final DataService dataService;
+    private final ProbDeclareManagerService probDeclareManagerService;
 
     @GetMapping("/overview")
     public List<DataOverview> getDataOverview() {
@@ -49,5 +52,12 @@ public class DataController {
     @GetMapping("/model/{id}")
     public String checkModel(@PathVariable("id") String id) {
         return dataService.checkTraceModel(id);
+    }
+
+    @PostMapping("/generate-span-trees")
+    public String generateSpanTrees(@RequestBody TraceData traceDetails) {
+        probDeclareManagerService.transformAndPipe(
+                traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
+        return traceDetails.getTraceId();
     }
 }

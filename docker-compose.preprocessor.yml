@@ -1,0 +1,20 @@
+name: preprocessor
+services:
+  frontend-preprocessor:
+    #user: "1000:1000"
+    ports:
+      - "3000:3000"
+    build:
+      context: typescript
+      dockerfile: ./preprocessor.Dockerfile
+    restart: no
+  otel-preprocessor:
+    # runs as non-root user opam
+    build:
+      context: ocaml
+      dockerfile: ./preprocessor.Dockerfile
+    restart: on-failure
+networks:
+  default:
+    name: "master-project-network"
+    external: true

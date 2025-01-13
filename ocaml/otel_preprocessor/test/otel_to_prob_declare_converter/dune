@@ -1,0 +1,10 @@
+(test
+ (name test_otel_to_prob_declare_converter)
+ (modules test_otel_to_prob_declare_converter)
+ (libraries
+  ounit2
+  otel_to_prob_declare_converter
+  util
+  declare
+  yojson
+  otel_decoder))
