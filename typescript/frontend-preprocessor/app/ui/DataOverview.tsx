@@ -52,15 +52,10 @@ const DataOverview: React.FC = () => {
     }
 
     useEffect(fetchDataOverview, []);
-    useEffect(() => {
-        console.log("TraceDetailsView received sourceFile:", sourceFile);
-    }, [sourceFile]);
 
-
-    const handleRowClick = (sourceFile: string) => {
-        if (sourceFile) {
-            setSourceFile(sourceFile);
-        }
+    const handleRowClick = (row: DataOverviewProps) => {
+        console.log(row);
+        setSourceFile(_prevSourceFile => row.sourceFile);
     };
 
     const renderTable = () => {
@@ -83,7 +78,7 @@ const DataOverview: React.FC = () => {
                     <TableBody>
                         {data.map((row) => (
                             <TableRow
-                                onClick={() => handleRowClick(row.sourceFile)}
+                                onClick={() => handleRowClick(row)}
                                 tabIndex={-1}
                                 key={row.sourceFile}
                             >
@@ -128,7 +123,7 @@ const DataOverview: React.FC = () => {
             </Grid2>
             <Grid2 size={"grow"}>
                 <Box height="100%">
-                    {sourceFile && <TraceDetailsView sourceFile={sourceFile}/>}
+                    {sourceFile && <TraceDetailsView sourceFile={sourceFile} />}
                 </Box>
             </Grid2>
         </Grid2>

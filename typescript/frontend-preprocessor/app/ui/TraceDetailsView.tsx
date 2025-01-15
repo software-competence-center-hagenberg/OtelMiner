@@ -15,6 +15,8 @@ import RestService from "@/app/lib/RestService";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import JsonView from "@/app/ui/json/JsonView";
+import {SimpleTreeView} from '@mui/x-tree-view/SimpleTreeView';
+import {TreeItem} from '@mui/x-tree-view/TreeItem';
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -44,6 +46,59 @@ interface TraceDetailsTableProps {
     sourceFile: string;
 }
 
+interface KeyValue {
+    key: string;
+    value: string;
+}
+
+interface SpanEvent {
+    time_unix_nano: string;
+    name: string;
+    attributes: KeyValue[];
+    dropped_attributes_count: string;
+}
+
+interface SpanLink {
+    trace_id: string;
+    span_id: string;
+    trace_state: string;
+    attributes: KeyValue[];
+    dropped_attributes_count: string;
+}
+
+interface Status {
+    message: string;
+    code: string;
+}
+
+interface Span {
+    trace_id: string;
+    span_id: string;
+    trace_state: string;
+    parent_span_id: string;
+    name: string;
+    kind: string;
+    start_time_unix_nano: string;
+    end_time_unix_nano: string;
+    attributes: KeyValue[];
+    dropped_attributes_count: string;
+    events: SpanEvent[]
+    dropped_events_count: string;
+    links: SpanLink[];
+    dropped_links_count: string;
+    status: Status | undefined;
+}
+
+interface SpanTreeNode {
+    span: Span;
+    children: SpanTreeNode[];
+}
+
+interface SpanTreeModel {
+    traceId: string;
+    spanTrees: SpanTreeNode[];
+}
+
 function defaultSourceDetails(sourceFile: string) {
     return {
         sourceFile: sourceFile,
@@ -58,20 +113,22 @@ function defaultSourceDetails(sourceFile: string) {
 const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
     const [selectedRow, setSelectedRow] = useState<TraceDetails>(); // FIXME check if better with useRef
-    const [selectedRowSpanTrees, setSelectedRowSpanTrees] = useState<string | null>(null);
+    const [selectedRowSpanTrees, setSelectedRowSpanTrees] = useState<SpanTreeModel | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setSelectedRow(undefined); // Clear previous row selection
-        setLoading(true);          // Reset loading state
-        setSourceDetails(defaultSourceDetails(sourceFile))
+        setSelectedRowSpanTrees(null); // clear
+        setLoading(true); // Reset loading state
         fetchSourceDetails(sourceDetails);
-    }, [sourceFile]);
+    }, [sourceDetails.sourceFile, sourceDetails.page, sourceDetails.size]);
+
     useEffect(() => {
-        setSelectedRow(undefined); // Clear previous row selection
-        setLoading(true);          // Reset loading state
-        fetchSourceDetails(sourceDetails);
-    }, [sourceDetails.page, sourceDetails.size]);
+        setSourceDetails((prevDetails) => ({
+            ...prevDetails,
+            sourceFile: sourceFile,
+        }));
+    }, [sourceFile]);
 
     const handlePageChange = (_event: unknown, newPage: number) => {
         setSourceDetails((prevDetails) => ({
@@ -98,6 +155,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const handleRowClick = (selectedRow: TraceDetails) => {
+        setSelectedRowSpanTrees(null);
         setSelectedRow(selectedRow);
     };
 
@@ -106,7 +164,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
             setLoading(true);
             const response = await RestService.post<TraceDetails, string>("/generate-span-trees", selectedRow!);
             const model = await pollModel(response.data);
-            setSelectedRowSpanTrees(model);
+            setSelectedRowSpanTrees(JSON.parse(JSON.stringify(model)));
         } catch (error) {
             console.error('Error generating model:', error);
         } finally {
@@ -121,6 +179,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                     const response = await RestService.get<string>("/model/" + traceId);
                     if (response.data !== '') {
                         clearInterval(intervalId); // Stop polling
+                        console.log(response.data);
                         resolve(response.data);
                     }
                 } catch (error) {
@@ -164,6 +223,15 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
         </Grid2>;
     }
 
+    const renderSpanTree = (spanTree: SpanTreeNode) => {
+        if (spanTree.children.length === 0) {
+            return <TreeItem itemId={spanTree.span.span_id} label={JSON.stringify(spanTree.span)}/>
+        }
+        return <TreeItem itemId={spanTree.span.span_id} label={JSON.stringify(spanTree.span)}>
+            {spanTree.children.map(child => renderSpanTree(child))}
+        </TreeItem>
+    }
+
     const renderTable = () => {
         return (
             <Grid2 container>
@@ -201,7 +269,14 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                         {renderJsonView(selectedRow)}
                         {selectedRowSpanTrees && (
                             <Grid2 size={6} columns={6}>
-                                <JsonView data={selectedRowSpanTrees}/>
+                                {selectedRowSpanTrees.spanTrees.map(spanTree => {
+                                    return <SimpleTreeView
+                                        key={selectedRowSpanTrees.traceId + selectedRowSpanTrees.spanTrees.indexOf(spanTree)}>
+                                        {renderSpanTree(spanTree)}
+                                    </SimpleTreeView>;
+                                })
+                                }
+                                {/*<JsonView data={selectedRowSpanTrees}/>*/}
                             </Grid2>
                         )}
                     </Grid2>
