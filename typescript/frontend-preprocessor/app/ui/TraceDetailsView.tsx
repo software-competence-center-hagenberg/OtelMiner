@@ -164,7 +164,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
             setLoading(true);
             const response = await RestService.post<TraceDetails, string>("/generate-span-trees", selectedRow!);
             const model = await pollModel(response.data);
-            setSelectedRowSpanTrees(JSON.parse(JSON.stringify(model)));
+            setSelectedRowSpanTrees((_prev) => JSON.parse(JSON.stringify(model)));
         } catch (error) {
             console.error('Error generating model:', error);
         } finally {
