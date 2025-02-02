@@ -22,11 +22,11 @@ public class ProbDeclare extends BaseEntity<String> {
 
     private boolean generating;
 
-    @JsonManagedReference
+    @JsonManagedReference("d_pd")
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Declare> declareList;
 
-    @JsonManagedReference
+    @JsonManagedReference("pdt_pd")
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ProbDeclareToTrace> traces;
 

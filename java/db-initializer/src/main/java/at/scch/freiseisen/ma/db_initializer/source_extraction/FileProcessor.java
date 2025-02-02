@@ -1,7 +1,10 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
+import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.FileParser;
+import at.scch.freiseisen.ma.db_service.service.SpanService;
+import at.scch.freiseisen.ma.db_service.service.TraceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,7 +24,8 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class FileProcessor {
-    private final RestTemplate restTemplate;
+    private final TraceService traceService;
+    private final SpanService spanService;
     private final HashMap<String, Trace> traces = new HashMap<>();
     private final HashMap<Integer, List<Trace>> tracesByNrNodes = new HashMap<>();
 
@@ -35,6 +40,7 @@ public class FileProcessor {
                     .forEach(path -> fileParser.parse(path, traces));
         }
         traces.values().forEach(t -> {
+            t.setSpans(t.getSpans().stream().distinct().toList());
             int nrNodes = t.getSpans().size();
             t.setNrNodes(nrNodes);
             if (tracesByNrNodes.containsKey(nrNodes)) {
@@ -44,11 +50,16 @@ public class FileProcessor {
             }
         });
         log.info("########## traces found with n nodes: ###########");
-        tracesByNrNodes.forEach((key, value) -> {
-            log.info("{} traces with {} nodes found", value.size(), key);
-            if (key >= 5) {
-                value.forEach(t -> t.setSpans(t.getSpans().stream().distinct().toList()));
-                restTemplate.postForLocation(dbServiceUrl + "/v1/traces", value.stream().distinct().toList());
+        tracesByNrNodes.forEach((nrNodes, traces) -> {
+            log.info("{} traces with {} nodes found", traces.size(), nrNodes);
+            if (nrNodes >= 5) {
+                traces.forEach(trace -> {
+                    List<Span> spans = trace.getSpans();
+                    trace.setSpans(Collections.emptyList());
+                    Trace t = traceService.save(trace);
+                    spans.forEach(s -> s.setTrace(t));
+                    spanService.saveAll(spans);
+                });
             }
         });
         log.info("#################################################");

@@ -40,6 +40,16 @@
             <artifactId>commons-compress</artifactId>
             <version>1.26.0</version>
         </dependency>
+        <dependency>
+            <groupId>at.scch.freiseisen.ma</groupId>
+            <artifactId>db-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
 </project>

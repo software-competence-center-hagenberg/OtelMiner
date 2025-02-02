@@ -5,6 +5,7 @@ import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,16 +20,20 @@ public class DTOCreator {
                 .build();
     }
 
-    public void addSpan(String traceId, String spanId, String parentSpanId, String sourceFile, String line, Map<String, Trace> traces) {
+    public void addSpan(String traceId, String spanId, String parentSpanId, String sourceFile, String line,
+                        Map<String, Trace> traces) {
         Span span = Span.builder()
                 .id(spanId)
                 .parentId(parentSpanId)
                 .json(line)
                 .build();
-        if (!traces.containsKey(traceId)) {
-            traces.put(traceId, createTrace(traceId, sourceFile, span));
-        } else {
+        if (traces.containsKey(traceId)) {
+            span.setTrace(traces.get(traceId));
             traces.get(traceId).getSpans().add(span);
+        } else {
+            Trace trace = createTrace(traceId, sourceFile, span);
+            trace.getSpans().forEach(s -> s.setTrace(trace));
+            traces.put(traceId, trace);
         }
     }
 

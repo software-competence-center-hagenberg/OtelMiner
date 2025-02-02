@@ -31,7 +31,7 @@ public class Declare extends BaseEntity<String> {
 
     @ManyToOne
     @JoinColumn(name = "prob_declare_id")
-    @JsonBackReference
+    @JsonBackReference("d_pd")
     private ProbDeclare probDeclare;
 
     public Declare(ProbDeclareToTrace probDeclareToTrace, String constraintTemplate) {

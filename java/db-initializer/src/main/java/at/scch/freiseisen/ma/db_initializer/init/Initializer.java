@@ -6,6 +6,7 @@ import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.JaegerTrac
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.OtelTxtParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,8 @@ public class Initializer {
     private final FileProcessor fileProcessor;
     private final OtelTxtParser otelTxtParser;
     private final JaegerTracesJsonParser jaegerTracesJsonParser;
+    @Value("${test-data.file-paths}")
+    private String resourceLocation;
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws IOException {
@@ -33,7 +36,7 @@ public class Initializer {
 //        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
 //        archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
 //        fileProcessor.parseFiles(extractionDirectory, ".txt", otelTxtParser);
-        Resource archiveResource = resourceLoader.getResource("classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz");
+        Resource archiveResource = resourceLoader.getResource(resourceLocation);
         Resource extractionDirectoryResource = resourceLoader.getResource("classpath:test-data/");
         Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
         archiveExtractor.extractTarGz(archiveResource, extractionDirectory);

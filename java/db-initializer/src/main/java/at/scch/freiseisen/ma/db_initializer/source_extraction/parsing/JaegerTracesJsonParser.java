@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -33,9 +34,7 @@ public class JaegerTracesJsonParser implements FileParser {
                 spans.forEach(span -> {
                     String traceId = span.get("traceID").asText();
                     String spanId = span.get("spanID").asText();
-                    String parentSpanId = span.has("parentSpanID")
-                            ? span.get("parentSpanID").asText()
-                            : StringUtils.EMPTY;
+                    String parentSpanId = extractParentSpanId(span);
                     dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces);
                 });
             });
@@ -43,5 +42,19 @@ public class JaegerTracesJsonParser implements FileParser {
             throw new FileParsingException(path.toString());
         }
         log.info("parsing done");
+    }
+
+    private String extractParentSpanId(JsonNode span) {
+        AtomicReference<String> parentSpanId = new AtomicReference<>(StringUtils.EMPTY);
+        if (span.has("references")) {
+            span.get("references").forEach(reference -> {
+                if (reference.has("refType")
+                    && reference.get("refType").asText().equals("CHILD_OF")
+                    && reference.has("spanID")) {
+                    parentSpanId.set(reference.get("spanID").asText());
+                }
+            });
+        }
+        return parentSpanId.get();
     }
 }

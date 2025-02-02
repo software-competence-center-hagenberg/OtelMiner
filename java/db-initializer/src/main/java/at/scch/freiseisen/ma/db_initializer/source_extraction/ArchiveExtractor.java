@@ -35,6 +35,7 @@ public class ArchiveExtractor {
                     if (destinationPath.getParent() != null) {
                         Files.createDirectories(destinationPath.getParent());
                     }
+                    Files.deleteIfExists(destinationPath);
                     Files.copy(tarInput, destinationPath);
                 }
             }

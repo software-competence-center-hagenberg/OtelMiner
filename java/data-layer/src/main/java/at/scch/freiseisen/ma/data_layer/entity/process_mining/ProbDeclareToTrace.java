@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.data_layer.entity.process_mining;
 
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +24,12 @@ public class ProbDeclareToTrace {
 
     @ManyToOne
     @JoinColumn(name = "prob_declare_id", nullable = false)
+    @JsonBackReference("pdt_pd")
     private ProbDeclare probDeclare;
 
     @ManyToOne
     @JoinColumn(name = "trace_id", nullable = false)
+    @JsonBackReference("pdt_t")
     private Trace trace;
 
     @CreationTimestamp
@@ -38,19 +41,5 @@ public class ProbDeclareToTrace {
         this.trace = trace;
         this.insertDate = LocalDateTime.now();
     }
-
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        ProbDeclareToTrace entity = (ProbDeclareToTrace) o;
-//        return id.equals(entity.id);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id);
-//    }
 
 }

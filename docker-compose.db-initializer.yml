@@ -7,7 +7,7 @@ services:
 #    security_opt:
 #      - "no-new-privileges=true"
     build:
-      context: java
+      context: java/db-initializer
       dockerfile: ./Dockerfile
       args:
         ARTIFACT_ID: db-initializer
