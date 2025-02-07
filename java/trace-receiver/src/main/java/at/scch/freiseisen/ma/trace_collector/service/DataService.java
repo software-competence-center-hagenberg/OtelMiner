@@ -5,6 +5,7 @@ import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
+import at.scch.freiseisen.ma.data_layer.entity.pre_processing.CanonizedSpanTree;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,8 @@ public class DataService {
 
     // FIXME change from String to String[]
     public String generateTraceModel(TraceData traceDetails) {
+        log.info("generating trace model for trace {}... deleting existing", traceDetails.getTraceId());
+        restTemplate.delete(restConfig.canonizedSpanTreeUrl + "/" + traceDetails.getTraceId());
         collectorService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
         return traceDetails.getTraceId();
     }

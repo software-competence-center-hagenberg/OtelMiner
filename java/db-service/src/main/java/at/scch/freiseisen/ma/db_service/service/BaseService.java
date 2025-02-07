@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +36,12 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
 
     public void delete(T id) {
         log.info("deleting entry with id {}", id);
-        repository.delete(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity with id " + id + " not found!")));
+        Optional<E> entity = repository.findById(id);
+        if (entity.isPresent()) {
+            repository.delete(entity.get());
+        } else {
+            log.error("entity not found");
+        }
     }
 
     public void deleteAllByIdInBatch(List<T> ids) {
