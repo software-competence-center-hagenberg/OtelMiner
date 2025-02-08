@@ -4,8 +4,8 @@ import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTraceId;
-import at.scch.freiseisen.ma.db_service.service.ProbDeclareService;
-import at.scch.freiseisen.ma.db_service.service.ProbDeclareToTraceService;
+import at.scch.freiseisen.ma.data_layer.service.ProbDeclareService;
+import at.scch.freiseisen.ma.data_layer.service.ProbDeclareToTraceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

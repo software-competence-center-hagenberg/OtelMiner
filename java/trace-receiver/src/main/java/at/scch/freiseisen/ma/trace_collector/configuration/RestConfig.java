@@ -32,7 +32,7 @@ public class RestConfig {
             @Value("${db-service.prob-declare.url}") String probDeclareUrl,
             @Value("${db-service.prob-declare-to-trace.url}") String probDeclareToTraceUrl,
             @Value("${db-service.traces.endpoints.source}") String tracesSourceUrl,
-            @Value("${db-service.traces.endpoints.canonized-span-tree.url}") String canonizedSpanTreeUrl
+            @Value("${db-service.canonized-span-tree.url}") String canonizedSpanTreeUrl
     ) {
         this.dataOverviewUrl = dbServiceBaseUrl + tracesUrl + dataOverview;
         this.spansUrl = dbServiceBaseUrl + spansUrl;

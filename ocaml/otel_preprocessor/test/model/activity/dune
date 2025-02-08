@@ -1,4 +1,0 @@
-(test
- (name test_activity)
- (modules test_activity)
- (libraries ounit2 activity util))

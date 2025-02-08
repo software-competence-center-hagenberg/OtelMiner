@@ -155,8 +155,16 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const handleRowClick = (selectedRow: TraceDetails) => {
-        setSelectedRowSpanTrees(null);
-        setSelectedRow(selectedRow);
+        setSelectedRowSpanTrees(() => null);
+        setSelectedRow(() => selectedRow);
+        if (selectedRow.traceId) {
+            retrieveModel(selectedRow.traceId)
+                .then(result =>
+                    result.data != ''
+                        ? setSelectedRowSpanTrees((_prev) => JSON.parse(JSON.stringify(result.data)))
+                        : setSelectedRowSpanTrees( () => null))
+                .catch(error => console.log(error));
+        }
     };
 
     const onClickGenerateModel = async () => {
@@ -170,6 +178,10 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const retrieveModel = async (traceId: string) => {
+        return await RestService.get<string>("/model/" + traceId);
     };
 
     const pollModel = async (traceId: string): Promise<string> => {

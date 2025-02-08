@@ -14,5 +14,9 @@ spring:
     driverClassName: org.postgresql.Driver
 db-service:
   url: http://db-service:4242
+#test-data:
+#  file-paths: /java/test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
+#test-data:
+#  file-paths: classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
 test-data:
-  file-paths: /java/test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
+  file-paths: /test-data/traces-jaeger

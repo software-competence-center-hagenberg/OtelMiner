@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
@@ -36,13 +35,17 @@ public class Initializer {
 //        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
 //        archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
 //        fileProcessor.parseFiles(extractionDirectory, ".txt", otelTxtParser);
-        Resource archiveResource = resourceLoader.getResource(resourceLocation);
-        Resource extractionDirectoryResource = resourceLoader.getResource("classpath:test-data/");
-        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
-        archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
-        Resource targetDirectoryResource = resourceLoader.getResource("classpath:test-data/traces-jaeger/");
-        Path targetDirectory = Paths.get(targetDirectoryResource.getURI());
-        fileProcessor.parseFiles(targetDirectory, ".json", jaegerTracesJsonParser);
+//        Resource archiveResource = resourceLoader.getResource(resourceLocation);
+//        Resource extractionDirectoryResource = resourceLoader.getResource("classpath:test-data/");
+//        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI()).resolve("extraction");
+//        log.info("extractionDirectory: {}", extractionDirectory);
+//        archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
+//        Resource targetDirectoryResource = resourceLoader.getResource("classpath:test-data/test/traces-jaeger/");
+//        log.info("targetDirectoryResource: {}", targetDirectoryResource);
+//        Path targetDirectory = Paths.get(targetDirectoryResource.getURI());
+//        log.info("targetDirectoryPath: {}", targetDirectory);
+        Path extractionDirectory = Paths.get(resourceLocation);
+        fileProcessor.parseFiles(extractionDirectory, ".json", jaegerTracesJsonParser);
     }
 
 }

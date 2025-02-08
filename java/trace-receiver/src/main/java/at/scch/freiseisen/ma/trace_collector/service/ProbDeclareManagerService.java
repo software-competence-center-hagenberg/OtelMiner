@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -126,7 +125,7 @@ public class ProbDeclareManagerService {
     }
 
 
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
+//    @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
     public void receiveProbDeclare(Message msg) {
         ConversionResponse response = objectMapper.convertValue(msg.getBody(), ConversionResponse.class);
         log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints());

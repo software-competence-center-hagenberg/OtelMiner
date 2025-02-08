@@ -1,7 +1,6 @@
-package at.scch.freiseisen.ma.db_service.service;
+package at.scch.freiseisen.ma.data_layer.service;
 
 import at.scch.freiseisen.ma.data_layer.entity.pre_processing.CanonizedSpanTree;
-import at.scch.freiseisen.ma.data_layer.repository.otel.TraceRepository;
 import at.scch.freiseisen.ma.data_layer.repository.pre_processing.CanonizedSpanTreeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

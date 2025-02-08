@@ -1,8 +1,7 @@
-package at.scch.freiseisen.ma.db_service.service;
+package at.scch.freiseisen.ma.data_layer.service;
 
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.repository.BaseRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,22 +19,22 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
     protected final R repository;
 
     public Page<E> findAll(int page, int size, Sort sort) {
-        log.info("retrieving page {} of size {} with sort {}", page, size, sort);
+        log.debug("retrieving page {} of size {} with sort {}", page, size, sort);
         return repository.findAll(PageRequest.of(page, size, sort));
     }
 
     public E save(E entity) {
-        log.info("persisting entity {}", entity.getId());
+        log.debug("persisting entity {}", entity.getId());
         return repository.saveAndFlush(entity);
     }
 
     public List<E> saveAll(List<E> entities) {
-        log.info("persisting {} entities", entities.size());
+        log.debug("persisting {} entities", entities.size());
         return repository.saveAllAndFlush(entities);
     }
 
     public void delete(T id) {
-        log.info("deleting entry with id {}", id);
+        log.debug("deleting entry with id {}", id);
         Optional<E> entity = repository.findById(id);
         if (entity.isPresent()) {
             repository.delete(entity.get());
@@ -45,16 +44,17 @@ public abstract class BaseService<R extends BaseRepository<E, T>, E extends Base
     }
 
     public void deleteAllByIdInBatch(List<T> ids) {
-        log.info("deleting entries with ids in batch {}", ids);
+        log.debug("deleting entries with ids in batch {}", ids);
         repository.deleteAllByIdInBatch(ids);
     }
 
     public E findById(T id) {
-        log.info("retrieving entry with id {}", id);
+        log.debug("retrieving entity with id {}", id);
         return repository.findById(id).orElse(null);
     }
 
     public E safeFindById(T id) {
+        log.debug("safe retrieving entity with id {}", id);
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " not found"));
     }

@@ -2,7 +2,7 @@ package at.scch.freiseisen.ma.db_service.controller;
 
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.repository.BaseRepository;
-import at.scch.freiseisen.ma.db_service.service.BaseService;
+import at.scch.freiseisen.ma.data_layer.service.BaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

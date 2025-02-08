@@ -1,3 +1,0 @@
-(library
- (name declare)
- (libraries ltl yojson))

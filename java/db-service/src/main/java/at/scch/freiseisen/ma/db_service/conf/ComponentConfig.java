@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(
         basePackages = {
                 "at.scch.freiseisen.ma.db_service.controller",
-                "at.scch.freiseisen.ma.db_service.service"
+                "at.scch.freiseisen.ma.data_layer.service",
         })
 public class ComponentConfig {
 }

@@ -1,6 +1,5 @@
 package at.scch.freiseisen.ma.trace_collector.rest;
 
-import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
@@ -56,8 +55,6 @@ public class DataController {
 
     @PostMapping("/generate-span-trees")
     public String generateSpanTrees(@RequestBody TraceData traceDetails) {
-        probDeclareManagerService.transformAndPipe(
-                traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
-        return traceDetails.getTraceId();
+        return dataService.generateTraceModel(traceDetails);
     }
 }

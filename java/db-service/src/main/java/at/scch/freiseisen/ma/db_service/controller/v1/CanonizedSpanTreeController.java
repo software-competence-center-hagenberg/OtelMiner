@@ -2,8 +2,8 @@ package at.scch.freiseisen.ma.db_service.controller.v1;
 
 import at.scch.freiseisen.ma.data_layer.entity.pre_processing.CanonizedSpanTree;
 import at.scch.freiseisen.ma.data_layer.repository.pre_processing.CanonizedSpanTreeRepository;
+import at.scch.freiseisen.ma.data_layer.service.CanonizedSpanTreeService;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
-import at.scch.freiseisen.ma.db_service.service.CanonizedSpanTreeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;

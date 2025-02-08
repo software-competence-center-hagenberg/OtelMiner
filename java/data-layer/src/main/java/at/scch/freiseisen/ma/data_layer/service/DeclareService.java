@@ -1,4 +1,4 @@
-package at.scch.freiseisen.ma.db_service.service;
+package at.scch.freiseisen.ma.data_layer.service;
 
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;

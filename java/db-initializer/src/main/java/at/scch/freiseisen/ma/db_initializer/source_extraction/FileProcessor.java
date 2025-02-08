@@ -2,14 +2,12 @@ package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
+import at.scch.freiseisen.ma.data_layer.service.SpanService;
+import at.scch.freiseisen.ma.data_layer.service.TraceService;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.FileParser;
-import at.scch.freiseisen.ma.db_service.service.SpanService;
-import at.scch.freiseisen.ma.db_service.service.TraceService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +20,6 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FileProcessor {
     private final TraceService traceService;
     private final SpanService spanService;
@@ -31,6 +28,11 @@ public class FileProcessor {
 
     @Value("${db-service.url}")
     private String dbServiceUrl;
+
+    public FileProcessor(TraceService traceService, SpanService spanService) {
+        this.traceService = traceService;
+        this.spanService = spanService;
+    }
 
     public void parseFiles(Path directory, String fileType, FileParser fileParser) throws IOException {
         log.info("parsing all '{}' files from {}", fileType, directory);

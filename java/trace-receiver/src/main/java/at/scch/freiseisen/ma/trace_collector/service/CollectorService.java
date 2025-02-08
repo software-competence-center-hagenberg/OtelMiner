@@ -1,7 +1,7 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
-import at.scch.freiseisen.ma.data_layer.dto.SpanTreeNode;
+import at.scch.freiseisen.ma.data_layer.dto.SpanTreeNodeConversionResponse;
 import at.scch.freiseisen.ma.data_layer.entity.pre_processing.CanonizedSpanTree;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
@@ -55,11 +55,11 @@ public class CollectorService {
         String model = new String(msg.getBody());
         log.info("received probdeclare result: {}", model);
         try {
-            SpanTreeNode spanTreeNode = objectMapper.readValue(model, SpanTreeNode.class);
-            traceModels.put(spanTreeNode.getSpan().getTraceId(), model);
+            SpanTreeNodeConversionResponse spanTreeNode = objectMapper.readValue(model, SpanTreeNodeConversionResponse.class);
+            traceModels.put(spanTreeNode.getTraceId(), model);
             CanonizedSpanTree canonizedSpanTree = CanonizedSpanTree.builder()
-                    .id(spanTreeNode.getSpan().getTraceId())
-                    .traceId(spanTreeNode.getSpan().getTraceId())
+                    .id(spanTreeNode.getTraceId())
+                    .traceId(spanTreeNode.getTraceId())
                     .canonizedSpanTree(model)
                     .build();
             restTemplate.postForLocation(restConfig.canonizedSpanTreeUrl + "/one", canonizedSpanTree);
@@ -73,8 +73,6 @@ public class CollectorService {
         if (traceModels.containsKey(traceId)) {
             String model = traceModels.get(traceId);
             log.info("retrieved model: {}", model);
-            log.info("removed model from local storage");
-            traceModels.remove(traceId);
             return model;
         }
         log.info("no model present in local storage -> accessing data base");
@@ -132,5 +130,9 @@ public class CollectorService {
         } catch (InvalidProtocolBufferException e) {
             throw new MergeJsonNodeToResourceSpansBuilderException(e);
         }
+    }
+
+    public void addTraceModel(String traceId) {
+        traceModels.put(traceId, "");
     }
 }

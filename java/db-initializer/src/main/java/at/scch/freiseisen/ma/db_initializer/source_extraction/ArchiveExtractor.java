@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 @Slf4j
 @Service
@@ -27,16 +28,16 @@ public class ArchiveExtractor {
             TarArchiveEntry entry;
             Path destinationPath;
             while ((entry = tarInput.getNextEntry()) != null) {
-                log.info("extracting entry {}", entry.getName());
-                destinationPath = destinationDirectory.resolve(entry.getName());
+                destinationPath = destinationDirectory.resolve(entry.getName()).toAbsolutePath().normalize();
+                log.info("extracting entry {} to destinationPath {}", entry.getName(), destinationPath);
                 if (entry.isDirectory()) {
                     Files.createDirectories(destinationPath);
                 } else {
                     if (destinationPath.getParent() != null) {
                         Files.createDirectories(destinationPath.getParent());
                     }
-                    Files.deleteIfExists(destinationPath);
-                    Files.copy(tarInput, destinationPath);
+//                    Files.deleteIfExists(destinationPath);
+                    Files.copy(tarInput, destinationPath, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
         }
