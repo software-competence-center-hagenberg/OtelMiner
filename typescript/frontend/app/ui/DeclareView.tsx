@@ -5,7 +5,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
 
 interface DeclareViewProps {
-    rawData: string;
+    rawData: string[];
 }
 
 function parseRawData (rawData: string): Map<string, string[]> {
@@ -31,7 +31,7 @@ const DeclareView = ({ rawData }: DeclareViewProps) => {
     const [model, setModel] = useState<Map<string, string[]>>(new Map<string, string[]>());
 
     useEffect(() => {
-        const parsedModel = parseRawData(rawData);
+        const parsedModel = parseRawData(rawData.toString());
         setModel(parsedModel);
     }, [rawData]);
 

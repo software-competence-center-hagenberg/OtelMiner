@@ -3,16 +3,14 @@ package at.scch.freiseisen.ma.trace_collector.service;
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -28,6 +26,7 @@ public class DeclareService {
     public String generateFromSpanList(String traceId, List<String> spans) {
         log.info("generating declare model for trace {}... deleting existing", traceId);
         restTemplate.delete(restConfig.declareUrl + "/" + traceId);
+        declarePerTrace.put(traceId, new String[]{});
         transformAndPipe(traceId, spans, TraceDataType.JAEGER_SPANS_LIST);
         return traceId;
     }

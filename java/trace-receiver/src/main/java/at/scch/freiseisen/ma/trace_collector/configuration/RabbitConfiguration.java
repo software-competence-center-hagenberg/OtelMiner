@@ -23,6 +23,10 @@ public class RabbitConfiguration {
     private String routingKeyMetrics;
     @Value("${open_telemetry.exporter.routing_key.logs}")
     private String routingKeyLogs;
+    @Value("${otel_to_probd.routing_key.in.span_trees}")
+    private String spanTrees;
+    @Value("${otel_to_probd.routing_key.in.declare}")
+    private String declare;
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
@@ -69,6 +73,16 @@ public class RabbitConfiguration {
     @Bean
     public Queue logQueue() {
         return new Queue(routingKeyLogs);
+    }
+
+    @Bean
+    public Queue spanTreeResultQueue() {
+        return new Queue(spanTrees, false);
+    }
+
+    @Bean
+    public Queue declareResultQueue() {
+        return new Queue(declare, false);
     }
 
 }

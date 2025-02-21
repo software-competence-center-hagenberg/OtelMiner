@@ -36,7 +36,7 @@ let _ =
   Queue.declare channel "jaeger-trace-spans-list-queue"
   >>= fun jaeger_trace_spans_list_queue ->
   Log.info "Created jaeger trace spans list listener queue";
-  Queue.declare channel "probd-result-queue" >>= fun result_queue ->
+  Queue.declare channel "span-tree-result-queue" >>= fun result_queue ->
   Log.info "Created result queue";
   (* setting up listener for resource spans *)
   Queue.consume ~id:"accept-resource-spans"

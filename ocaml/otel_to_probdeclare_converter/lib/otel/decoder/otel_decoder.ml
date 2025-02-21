@@ -267,7 +267,7 @@ let decode (span : trace_string_type) (json : Yojson.Basic.t) : Trace.span list
       List.flatten (List.map decode_jaeger_trace jaeger_traces)
   | JAEGER_SPANS_LIST ->
       let trace_spans = json |> to_list in
-      List.map decode_jaeger_trace_span_string trace_spans
+      List.map decode_jaeger_trace_span trace_spans
   | OTEL_SPANS_LIST ->
       let trace_spans = json |> to_list in
       List.map decode_trace_span trace_spans

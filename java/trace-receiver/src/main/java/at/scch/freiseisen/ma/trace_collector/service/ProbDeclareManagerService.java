@@ -123,6 +123,7 @@ public class ProbDeclareManagerService {
     @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
         ConversionResponse response = objectMapper.convertValue(msg.getBody(), ConversionResponse.class);
+        declareService.add(response.traceId(), response.constraints());
         log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints());
         UUID traceId = UUID.fromString(response.traceId());
         if (generating.containsKey(traceId)) {
@@ -132,7 +133,6 @@ public class ProbDeclareManagerService {
             log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
 //            throw new ModelGenerationException("traceId " + traceId + " not found");
         }
-        declareService.add(response.traceId(), response.constraints());
     }
 
     private void processResponse(ConversionResponse conversionResponse, String probDeclareId) {
