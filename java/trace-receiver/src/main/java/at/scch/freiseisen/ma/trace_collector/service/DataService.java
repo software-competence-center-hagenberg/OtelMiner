@@ -25,7 +25,7 @@ import java.util.Objects;
 public class DataService {
     private final RestConfig restConfig;
     private final RestTemplate restTemplate;
-    private final CollectorService collectorService;
+    private final CanonizedSpanTreeService canonizedSpanTreeService;
     private final ProbDeclareManagerService probDeclareManagerService;
 
     public List<DataOverview> getDataOverview() {
@@ -42,20 +42,6 @@ public class DataService {
                 }
         );
         return Objects.requireNonNull(response.getBody());
-    }
-
-    // FIXME change from String to String[]
-    public String generateTraceModel(TraceData traceDetails) {
-        log.info("generating trace model for trace {}... deleting existing", traceDetails.getTraceId());
-        restTemplate.delete(restConfig.canonizedSpanTreeUrl + "/" + traceDetails.getTraceId());
-        collectorService.addTraceModel(traceDetails.getTraceId());
-        probDeclareManagerService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
-        return traceDetails.getTraceId();
-    }
-
-    // FIXME change from String to String[]
-    public String checkTraceModel(String traceId) {
-        return collectorService.retrieveModel(traceId);
     }
 
     public String generateProbDeclareModel(SourceDetails sourceDetails) {

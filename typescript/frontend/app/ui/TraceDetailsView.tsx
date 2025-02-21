@@ -93,7 +93,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     const onClickGenerateModel = async () => {
         try {
             setLoading(true);
-            const response = await RestService.post<TraceDetails, string>("/generate-model", selectedRow!);
+            const response = await RestService.post<TraceDetails, string>("/declare/generate", selectedRow!);
             const model = await pollModel(response.data);
             setSelectedRowModel(model);
         } catch (error) {
@@ -105,7 +105,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
 
     const pollModel = async (traceId: string): Promise<string> => {
         try {
-            const response = await RestService.get<string>("/model/" + traceId);
+            const response = await RestService.get<string>("/declare/" + traceId);
             if (response.data !== '') {
                 return response.data;
             } else {

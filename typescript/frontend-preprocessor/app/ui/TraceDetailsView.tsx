@@ -181,14 +181,14 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const retrieveModel = async (traceId: string) => {
-        return await RestService.get<string>("/model/" + traceId);
+        return await RestService.get<string>("/span-trees/" + traceId);
     };
 
     const pollModel = async (traceId: string): Promise<string> => {
         return new Promise((resolve, reject) => {
             const intervalId = setInterval(async () => {
                 try {
-                    const response = await RestService.get<string>("/model/" + traceId);
+                    const response = await RestService.get<string>("/span-trees/" + traceId);
                     if (response.data !== '') {
                         clearInterval(intervalId); // Stop polling
                         console.log(response.data);

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -40,10 +41,11 @@ public class ProbDeclareManagerService {
     private final ExecutorService declareConstraintGenerationExecutor = Executors.newSingleThreadExecutor(); // TODO evaluate if and how many threads
     private final ExecutorService modelUpdateExecutor = Executors.newSingleThreadExecutor();
     private final Map<UUID, CompletableFuture<ConversionResponse>> generating = new ConcurrentHashMap<>();
-    private final CollectorService collectorService;
+    private final CanonizedSpanTreeService canonizedSpanTreeService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, Float> probabilityConstraints = new ConcurrentHashMap<>();
     private final List<String> crispConstraints = new CopyOnWriteArrayList<>();
+    private final DeclareService declareService;
 
     private void persist(ProbDeclare probDeclare) {
         restTemplate.postForLocation(restConfig.probDeclareUrl, probDeclare);
@@ -97,7 +99,7 @@ public class ProbDeclareManagerService {
                     CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclareId);
                     generating.put(UUID.fromString(trace.getId()), future);
                     declareConstraintGenerationExecutor.submit(
-                            () -> transformAndPipe(
+                            () -> declareService.transformAndPipe(
                                     trace.getId(),
                                     trace.getSpansAsJson(),
                                     TraceDataType.JAEGER_SPANS_LIST
@@ -117,16 +119,9 @@ public class ProbDeclareManagerService {
         return future;
     }
 
-    // FIXME temporarily set from private to public for use with preprocessor
-    public void transformAndPipe(String traceId, List<String> spans, TraceDataType traceDataType) {
-        String routingKey = otelToProbdeclareConfiguration.determineRoutingKey(traceDataType);
-//        SpansListConversionRequest request = new SpansListConversionRequest(traceId, spans);
-        rabbitTemplate.convertAndSend(routingKey, "{ traceId: \"" + traceId + "\", spans: [" + String.join(",", spans) + "] }");
-    }
 
-
-//    @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
-    public void receiveProbDeclare(Message msg) {
+    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
+    public void receiveDeclare(Message msg) {
         ConversionResponse response = objectMapper.convertValue(msg.getBody(), ConversionResponse.class);
         log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints());
         UUID traceId = UUID.fromString(response.traceId());
@@ -134,8 +129,10 @@ public class ProbDeclareManagerService {
             generating.get(traceId).complete(response);
             generating.remove(traceId);
         } else {
-            throw new ModelGenerationException("traceId " + traceId + " not found");
+            log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
+//            throw new ModelGenerationException("traceId " + traceId + " not found");
         }
+        declareService.add(response.traceId(), response.constraints());
     }
 
     private void processResponse(ConversionResponse conversionResponse, String probDeclareId) {
