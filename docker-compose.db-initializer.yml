@@ -1,13 +1,8 @@
 name: db-init
 services:
   db-initializer:
-#    user: "1000:1000"
-#    cap_drop:
-#      - ALL
-#    security_opt:
-#      - "no-new-privileges=true"
     build:
-      context: java
+      context: java/db-initializer
       dockerfile: ./Dockerfile
       args:
         ARTIFACT_ID: db-initializer

@@ -20,6 +20,7 @@ public class RestConfig {
     public final String probDeclareUrl;
     public final String probDeclareToTraceUrl;
     public final String tracesSourceUrl;
+    public final String canonizedSpanTreeUrl;
 
     public RestConfig(
             @Value("${db-service.base-url}") String dbServiceBaseUrl,
@@ -30,7 +31,8 @@ public class RestConfig {
             @Value("${db-service.declare.url}") String declareUrl,
             @Value("${db-service.prob-declare.url}") String probDeclareUrl,
             @Value("${db-service.prob-declare-to-trace.url}") String probDeclareToTraceUrl,
-            @Value("${db-service.traces.endpoints.source}") String tracesSourceUrl
+            @Value("${db-service.traces.endpoints.source}") String tracesSourceUrl,
+            @Value("${db-service.canonized-span-tree.url}") String canonizedSpanTreeUrl
     ) {
         this.dataOverviewUrl = dbServiceBaseUrl + tracesUrl + dataOverview;
         this.spansUrl = dbServiceBaseUrl + spansUrl;
@@ -39,6 +41,7 @@ public class RestConfig {
         this.probDeclareUrl = dbServiceBaseUrl + probDeclareUrl;
         this.probDeclareToTraceUrl = dbServiceBaseUrl + probDeclareToTraceUrl;
         this.tracesSourceUrl = dbServiceBaseUrl + tracesUrl + tracesSourceUrl;
+        this.canonizedSpanTreeUrl = dbServiceBaseUrl + canonizedSpanTreeUrl;
     }
 
     @Bean

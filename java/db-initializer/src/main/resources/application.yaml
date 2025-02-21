@@ -1,6 +1,22 @@
 spring:
   application:
     name: db-initializer
-
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://database:5432/postgres
+    username: db-user
+    password: super-secure-12345
+    driverClassName: org.postgresql.Driver
 db-service:
   url: http://db-service:4242
+#test-data:
+#  file-paths: /java/test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
+#test-data:
+#  file-paths: classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
+test-data:
+  file-paths: /test-data/traces-jaeger

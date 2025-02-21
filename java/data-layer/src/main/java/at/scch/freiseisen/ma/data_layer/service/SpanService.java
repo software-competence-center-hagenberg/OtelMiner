@@ -1,4 +1,4 @@
-package at.scch.freiseisen.ma.db_service.service;
+package at.scch.freiseisen.ma.data_layer.service;
 
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.repository.otel.SpanRepository;

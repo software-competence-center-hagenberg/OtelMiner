@@ -240,6 +240,9 @@ let decode_jaeger_trace_span json =
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
 
+let decode_jaeger_trace_span_string json =
+  decode_jaeger_trace_span (Yojson.Basic.from_string (json |> to_string))
+
 let decode_jaeger_trace json =
   let jaeger_trace_spans = json |> member "spans" |> to_list in
   List.map decode_jaeger_trace_span jaeger_trace_spans
@@ -264,7 +267,7 @@ let decode (span : trace_string_type) (json : Yojson.Basic.t) : Trace.span list
       List.flatten (List.map decode_jaeger_trace jaeger_traces)
   | JAEGER_SPANS_LIST ->
       let trace_spans = json |> to_list in
-      List.map decode_jaeger_trace_span trace_spans
+      List.map decode_jaeger_trace_span_string trace_spans
   | OTEL_SPANS_LIST ->
       let trace_spans = json |> to_list in
       List.map decode_trace_span trace_spans

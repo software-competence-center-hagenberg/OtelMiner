@@ -46,7 +46,10 @@ public class DataService {
 
     // FIXME change from String to String[]
     public String generateTraceModel(TraceData traceDetails) {
-        collectorService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
+        log.info("generating trace model for trace {}... deleting existing", traceDetails.getTraceId());
+        restTemplate.delete(restConfig.canonizedSpanTreeUrl + "/" + traceDetails.getTraceId());
+        collectorService.addTraceModel(traceDetails.getTraceId());
+        probDeclareManagerService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
         return traceDetails.getTraceId();
     }
 

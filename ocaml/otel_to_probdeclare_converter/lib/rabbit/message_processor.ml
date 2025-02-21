@@ -25,7 +25,7 @@ let process (span : trace_string_type) (message : string) : result =
   Log.info "processing ...";
   let json = Yojson.Basic.from_string message in
   let trace_id = json |> member "traceId" |> to_string in
-  let data = json |> member "data" in
+  let data = json |> member "spans" in
   Log.info "Trace id: %s" trace_id;
   let constraints = decode_and_convert span data in
   Log.info "conversion complete";

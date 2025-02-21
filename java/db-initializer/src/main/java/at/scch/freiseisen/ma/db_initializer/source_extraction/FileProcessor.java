@@ -1,31 +1,38 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
+import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
+import at.scch.freiseisen.ma.data_layer.service.SpanService;
+import at.scch.freiseisen.ma.data_layer.service.TraceService;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.FileParser;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FileProcessor {
-    private final RestTemplate restTemplate;
+    private final TraceService traceService;
+    private final SpanService spanService;
     private final HashMap<String, Trace> traces = new HashMap<>();
     private final HashMap<Integer, List<Trace>> tracesByNrNodes = new HashMap<>();
 
     @Value("${db-service.url}")
     private String dbServiceUrl;
+
+    public FileProcessor(TraceService traceService, SpanService spanService) {
+        this.traceService = traceService;
+        this.spanService = spanService;
+    }
 
     public void parseFiles(Path directory, String fileType, FileParser fileParser) throws IOException {
         log.info("parsing all '{}' files from {}", fileType, directory);
@@ -35,6 +42,7 @@ public class FileProcessor {
                     .forEach(path -> fileParser.parse(path, traces));
         }
         traces.values().forEach(t -> {
+            t.setSpans(t.getSpans().stream().distinct().toList());
             int nrNodes = t.getSpans().size();
             t.setNrNodes(nrNodes);
             if (tracesByNrNodes.containsKey(nrNodes)) {
@@ -44,11 +52,16 @@ public class FileProcessor {
             }
         });
         log.info("########## traces found with n nodes: ###########");
-        tracesByNrNodes.forEach((key, value) -> {
-            log.info("{} traces with {} nodes found", value.size(), key);
-            if (key >= 5) {
-                value.forEach(t -> t.setSpans(t.getSpans().stream().distinct().toList()));
-                restTemplate.postForLocation(dbServiceUrl + "/v1/traces", value.stream().distinct().toList());
+        tracesByNrNodes.forEach((nrNodes, traces) -> {
+            log.info("{} traces with {} nodes found", traces.size(), nrNodes);
+            if (nrNodes >= 5) {
+                traces.forEach(trace -> {
+                    List<Span> spans = trace.getSpans();
+                    trace.setSpans(Collections.emptyList());
+                    Trace t = traceService.save(trace);
+                    spans.forEach(s -> s.setTrace(t));
+                    spanService.saveAll(spans);
+                });
             }
         });
         log.info("#################################################");

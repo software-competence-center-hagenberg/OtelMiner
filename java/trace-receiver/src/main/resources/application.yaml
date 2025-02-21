@@ -4,14 +4,12 @@ spring:
   rabbitmq:
     port: 5672
     host: rabbitmq-server
-
 open_telemetry:
   exporter:
     routing_key:
       traces: otlp_spans
       metrics: otlp_metrics
       logs: otlp_logs
-
 otel_to_probd:
   routing_key:
     out:
@@ -20,10 +18,8 @@ otel_to_probd:
       jaeger-trace-queue: jaeger-trace-queue
       jaeger_trace_spans_list_queue: jaeger-trace-spans-list-queue
     in: probd-result-queue
-
 server:
   port: 4020
-
 db-service:
   base-url: http://db-service:4242/v1
   traces:
@@ -41,4 +37,5 @@ db-service:
     url: /prob-declare
   prob-declare-to-trace:
     url: /prob-declare-to-trace
-
+  canonized-span-tree:
+    url: /canonized-span-tree

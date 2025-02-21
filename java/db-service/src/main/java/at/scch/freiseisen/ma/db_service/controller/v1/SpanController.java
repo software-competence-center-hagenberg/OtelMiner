@@ -2,8 +2,8 @@ package at.scch.freiseisen.ma.db_service.controller.v1;
 
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.repository.otel.SpanRepository;
+import at.scch.freiseisen.ma.data_layer.service.SpanService;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
-import at.scch.freiseisen.ma.db_service.service.SpanService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;

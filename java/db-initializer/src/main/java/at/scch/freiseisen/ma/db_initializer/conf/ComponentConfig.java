@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan(
         basePackages = {
+                "at.scch.freiseisen.ma.data_layer.service",
                 "at.scch.freiseisen.ma.db_initializer.init",
-                "at.scch.freiseisen.ma.db_initializer.source_extraction"
+                "at.scch.freiseisen.ma.db_initializer.source_extraction",
         })
 public class ComponentConfig {
 }

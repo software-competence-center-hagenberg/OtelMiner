@@ -46,12 +46,12 @@ public class Trace extends BaseEntity<String> {
     private String sourceFile;
     //FIXME add traceDataType!
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @JsonManagedReference("s_t")
+    @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = false)
     private List<Span> spans;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @JsonManagedReference("pdt_t")
+    @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = false)
     private List<ProbDeclareToTrace> probDeclareToTraces;
 
     public List<String> getSpansAsJson() {

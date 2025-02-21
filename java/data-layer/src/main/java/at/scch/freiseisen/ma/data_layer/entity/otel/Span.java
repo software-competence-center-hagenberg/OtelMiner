@@ -23,6 +23,6 @@ public class Span extends BaseEntity<String> {
 
     @ManyToOne
     @JoinColumn(name = "trace_id")
-    @JsonBackReference
+    @JsonBackReference("s_t")
     private Trace trace;
 }

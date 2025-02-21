@@ -28,26 +28,22 @@ public class OtelTxtParser implements FileParser {
     @Override
     public void parse(Path path, HashMap<String, Trace> traces) {
         log.info("parsing {}", path);
+        String line;
+        String traceId;
+        String spanId;
+        String parentSpanId;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(path)))) {
-            String line;
             while ((line = reader.readLine()) != null) {
-                String traceId;
-                String spanId;
-                String parentSpanId;
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(line);
-                    traceId = jsonNode.get("traceId").asText();
-                    spanId = jsonNode.get("spanId").asText();
-                    parentSpanId = jsonNode.has("parentSpanId")
-                            ? jsonNode.get("parentSpanId").asText()
-                            : StringUtils.EMPTY;
-                    dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), line, traces);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                JsonNode jsonNode = objectMapper.readTree(line);
+                traceId = jsonNode.get("traceId").asText();
+                spanId = jsonNode.get("spanId").asText();
+                parentSpanId = jsonNode.has("parentSpanId")
+                        ? jsonNode.get("parentSpanId").asText()
+                        : StringUtils.EMPTY;
+                dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), line, traces);
             }
         } catch (IOException e) {
-            throw new FileParsingException(path.toString());
+            throw new FileParsingException(path.toString(), e);
         }
         log.info("parsing done");
     }

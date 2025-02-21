@@ -4,7 +4,6 @@ import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
-import at.scch.freiseisen.ma.data_layer.dto.SpansListConversionRequest;
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
@@ -12,12 +11,10 @@ import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import at.scch.freiseisen.ma.trace_collector.error.ModelGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -120,18 +117,15 @@ public class ProbDeclareManagerService {
         return future;
     }
 
-    private void transformAndPipe(String traceId, List<String> spans, TraceDataType traceDataType) {
+    // FIXME temporarily set from private to public for use with preprocessor
+    public void transformAndPipe(String traceId, List<String> spans, TraceDataType traceDataType) {
         String routingKey = otelToProbdeclareConfiguration.determineRoutingKey(traceDataType);
-        SpansListConversionRequest request = new SpansListConversionRequest(traceId, spans);
-        try {
-            rabbitTemplate.convertAndSend(routingKey, objectMapper.writeValueAsString(request));//"[" + String.join(",", trace) + "]");
-        } catch (JsonProcessingException e) {
-            throw new ModelGenerationException("Error serializing request");
-        }
+//        SpansListConversionRequest request = new SpansListConversionRequest(traceId, spans);
+        rabbitTemplate.convertAndSend(routingKey, "{ traceId: \"" + traceId + "\", spans: [" + String.join(",", spans) + "] }");
     }
 
 
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
+//    @RabbitListener(queues = "${otel_to_probd.routing_key.in}")
     public void receiveProbDeclare(Message msg) {
         ConversionResponse response = objectMapper.convertValue(msg.getBody(), ConversionResponse.class);
         log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints());
