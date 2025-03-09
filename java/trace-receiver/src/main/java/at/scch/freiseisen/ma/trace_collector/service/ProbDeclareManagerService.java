@@ -11,6 +11,7 @@ import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import at.scch.freiseisen.ma.trace_collector.error.ModelGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,19 +120,24 @@ public class ProbDeclareManagerService {
         return future;
     }
 
-
+// FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
     @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
-        ConversionResponse response = objectMapper.convertValue(msg.getBody(), ConversionResponse.class);
-        declareService.add(response.traceId(), response.constraints());
-        log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints());
-        UUID traceId = UUID.fromString(response.traceId());
-        if (generating.containsKey(traceId)) {
-            generating.get(traceId).complete(response);
-            generating.remove(traceId);
-        } else {
-            log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
-//            throw new ModelGenerationException("traceId " + traceId + " not found");
+        String model = new String(msg.getBody());
+        log.info("received probdeclare result: {}", model);
+        try {
+            ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
+            declareService.add(response.traceId(), response.constraints());
+            log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints()[0]);
+            UUID traceId = UUID.fromString(response.traceId());
+            if (generating.containsKey(traceId)) {
+                generating.get(traceId).complete(response);
+                generating.remove(traceId);
+            } else {
+                log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
+            }
+        } catch (JsonProcessingException e) {
+            throw new ModelGenerationException("Error parsing declare", e);
         }
     }
 

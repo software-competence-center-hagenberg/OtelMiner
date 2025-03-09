@@ -240,8 +240,8 @@ let decode_jaeger_trace_span json =
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
 
-let decode_jaeger_trace_span_string json =
-  decode_jaeger_trace_span (Yojson.Basic.from_string (json |> to_string))
+(* let decode_jaeger_trace_span_string json = *)
+(*  decode_jaeger_trace_span (Yojson.Basic.from_string (json |> to_string)) *)
 
 let decode_jaeger_trace json =
   let jaeger_trace_spans = json |> member "spans" |> to_list in
