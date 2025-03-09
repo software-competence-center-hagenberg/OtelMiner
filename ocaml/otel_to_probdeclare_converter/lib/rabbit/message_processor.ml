@@ -66,12 +66,17 @@ let process_traces (span : trace_string_type) (message : string) : traces_model
   Log.info "processing complete";
   { trace_ids; constraints }
 
+(* FIXME change to proper Yojson*)
 let traces_model_to_json_string (model : traces_model) : string =
   let constraints = Declare.list_list_to_json_string model.constraints in
-  Printf.sprintf "{ traceId: \"%s\", constraints:\"%s\" }" (Yojson.Basic.pretty_to_string (`List (List.map (fun x -> `String x) model.trace_ids)))
+  Printf.sprintf "{ \"traceIds\": \"%s\", \"constraints\":\"%s\" }"
+    (Yojson.Basic.pretty_to_string
+       (`List (List.map (fun x -> `String x) model.trace_ids)))
     constraints
 
 let trace_model_to_json_string (model : trace_model) : string =
-  let constraints = Declare.list_to_json_string model.constraints in
-  Printf.sprintf "{ traceId: \"%s\", constraints:\"%s\" }" model.trace_id
-    constraints
+  let constraints = Declare.list_to_json_string_list model.constraints in
+  let json_obj =
+    `Assoc [ ("traceId", `String model.trace_id); ("constraints", constraints) ]
+  in
+  Yojson.Basic.pretty_to_string json_obj

@@ -152,9 +152,10 @@ let map_to_json_string (l : t list) : Yojson.Basic.t list =
   in
   map_to_string_aux l (fun x -> x)
 
-let list_to_json_string (dl : t list) : string =
-  Yojson.Basic.pretty_to_string (`List (map_to_json_string dl))
+let list_to_json_string_list (dl : t list) : Yojson.Basic.t =
+  `List (map_to_json_string dl)
 
+(* FIXME bad for serialization*)
 let list_list_to_json_string (dll : t list list) : string =
   let rec map_to_json_list l k =
     match l with

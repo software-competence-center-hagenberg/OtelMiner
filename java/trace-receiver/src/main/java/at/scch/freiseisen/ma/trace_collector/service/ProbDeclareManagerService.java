@@ -41,7 +41,7 @@ public class ProbDeclareManagerService {
     private final OtelToProbdeclareConfiguration otelToProbdeclareConfiguration;
     private final ExecutorService declareConstraintGenerationExecutor = Executors.newSingleThreadExecutor(); // TODO evaluate if and how many threads
     private final ExecutorService modelUpdateExecutor = Executors.newSingleThreadExecutor();
-    private final Map<UUID, CompletableFuture<ConversionResponse>> generating = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<ConversionResponse>> generating = new ConcurrentHashMap<>();
     private final CanonizedSpanTreeService canonizedSpanTreeService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, Float> probabilityConstraints = new ConcurrentHashMap<>();
@@ -98,7 +98,7 @@ public class ProbDeclareManagerService {
         traces.forEach(
                 trace -> {
                     CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclareId);
-                    generating.put(UUID.fromString(trace.getId()), future);
+                    generating.put(trace.getId(), future);
                     declareConstraintGenerationExecutor.submit(
                             () -> declareService.transformAndPipe(
                                     trace.getId(),
@@ -127,9 +127,9 @@ public class ProbDeclareManagerService {
         log.info("received probdeclare result: {}", model);
         try {
             ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
-            declareService.add(response.traceId(), response.constraints());
+            String traceId = response.traceId();
+            declareService.add(traceId, response.constraints());
             log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints()[0]);
-            UUID traceId = UUID.fromString(response.traceId());
             if (generating.containsKey(traceId)) {
                 generating.get(traceId).complete(response);
                 generating.remove(traceId);
