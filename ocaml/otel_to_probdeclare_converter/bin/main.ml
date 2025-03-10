@@ -4,10 +4,17 @@ open Util
 
 let host = Sys.argv.(1)
 
-let handler_single_trace (span : trace_string_type) channel probd_result_queue message =
+
+(* 
+ * Handles single trace, MUST NOT be called RESOURCE_SPANS or multiple traces!
+ * Calling the function with RESOURCE_SPANS or multiple traces will lead to a 
+ * fail!
+ * type of data: { trace_id : string; spans : string list }
+ *)
+let handler_single_trace (tt : trace_type) channel probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  let processed = Message_processor.process_trace span data in
+  let processed = Message_processor.process_trace tt data in
   Log.info "encoding result as string ...";
   (*let constraints = Declare.string_of_declare_list_list converted in*)
   let result = Message_processor.trace_model_to_json_string processed in
@@ -16,10 +23,17 @@ let handler_single_trace (span : trace_string_type) channel probd_result_queue m
   Log.info "Sent result to trace-receiver";
   return ()
 
-let handler_resource_spans_and_multiple_traces (span : trace_string_type) channel probd_result_queue message =
+(* 
+ * Handles resource spans and multiple traces, should only be called with
+ * RESOURCE_SPANS or multiple traces 
+ * Calling the function with a single trace will lead to a fail!
+ * type of data: { trace_ids : string list; spans : string list list }
+ *)
+let handler_resource_spans_and_multiple_traces (tt : trace_type) channel
+    probd_result_queue message =
   let _content, data = message.Message.message in
   Log.info "Received message: %s" data;
-  let processed = Message_processor.process_traces span data in
+  let processed = Message_processor.process_traces tt data in
   Log.info "encoding result as string ...";
   (*let constraints = Declare.string_of_declare_list_list converted in*)
   let result = Message_processor.traces_model_to_json_string processed in
@@ -30,6 +44,10 @@ let handler_resource_spans_and_multiple_traces (span : trace_string_type) channe
 
 let rabbitmq_consumer_cancelled () = Log.info "Consumer cancelled"
 
+(* 
+ * sets up RabbitMQ Connections, opens up the channel, declares queues, 
+ * and sets up consumers with the correct handler function
+ *)
 let _ =
   Connection.connect ~id:"otel-to-probdeclare-converter" host
   >>= fun connection ->
@@ -55,26 +73,33 @@ let _ =
     resource_spans_queue
   >>= fun (_consumer, reader) ->
   spawn
-    (Pipe.iter reader ~f:(handler_resource_spans_and_multiple_traces RESOURCE_SPANS channel probd_result_queue));
+    (Pipe.iter reader
+       ~f:
+         (handler_resource_spans_and_multiple_traces RESOURCE_SPANS channel
+            probd_result_queue));
   (* setting up listener for otel trace spans *)
   Queue.consume ~id:"accept-trace-spans" ~on_cancel:rabbitmq_consumer_cancelled
     ~no_ack:true ~exclusive:true channel trace_spans_queue
   >>= fun (_consumer, reader) ->
   spawn
-    (Pipe.iter reader ~f:(handler_single_trace OTEL_SPANS_LIST channel probd_result_queue));
+    (Pipe.iter reader
+       ~f:(handler_single_trace OTEL_SPANS_LIST channel probd_result_queue));
   (* setting up listener for jaeger traces *)
   Queue.consume ~id:"accept-jaeger-traces"
     ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel
     jaeger_trace_queue
   >>= fun (_consumer, reader) ->
-  spawn (Pipe.iter reader ~f:(handler_single_trace JAEGER_TRACE channel probd_result_queue));
+  spawn
+    (Pipe.iter reader
+       ~f:(handler_single_trace JAEGER_TRACE channel probd_result_queue));
   (* setting up listener for jaeger trace spans list *)
   Queue.consume ~id:"accept-jaeger-trace-spans"
     ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel
     jaeger_trace_spans_list_queue
   >>= fun (_consumer, reader) ->
   spawn
-    (Pipe.iter reader ~f:(handler_single_trace JAEGER_SPANS_LIST channel probd_result_queue));
+    (Pipe.iter reader
+       ~f:(handler_single_trace JAEGER_SPANS_LIST channel probd_result_queue));
   Log.info "Listening for traces";
   (* TODO add listener for multiple traces *)
   return ()

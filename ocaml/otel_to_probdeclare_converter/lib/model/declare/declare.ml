@@ -155,16 +155,14 @@ let map_to_json_string (l : t list) : Yojson.Basic.t list =
 let list_to_json_string_list (dl : t list) : Yojson.Basic.t =
   `List (map_to_json_string dl)
 
-(* FIXME bad for serialization*)
-let list_list_to_json_string (dll : t list list) : string =
+let list_list_to_json_string_list_list (dll : t list list) : Yojson.Basic.t =
   let rec map_to_json_list l k =
     match l with
     | [] -> k []
     | h :: t ->
         map_to_json_list t (fun a -> k (`List (map_to_json_string h) :: a))
   in
-  let json_list_list = `List (map_to_json_list dll (fun x -> x)) in
-  Yojson.Basic.pretty_to_string json_list_list
+  `List (map_to_json_list dll (fun x -> x))
 
 let compare d1 d2 =
   let compare_pairs (a1, b1) (a2, b2) =

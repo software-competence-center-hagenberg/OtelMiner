@@ -259,9 +259,9 @@ let decode_jaeger_spans_list_string json_string : Trace.span list =
   let trace_spans = json |> to_list in
   List.map decode_jaeger_trace_span trace_spans
 
-let decode (span : trace_string_type) (json : Yojson.Basic.t) : Trace.span list
+let decode (tt : trace_type) (json : Yojson.Basic.t) : Trace.span list
     =
-  match span with
+  match tt with
   | JAEGER_TRACE ->
       let jaeger_traces = json |> member "data" |> to_list in
       List.flatten (List.map decode_jaeger_trace jaeger_traces)
@@ -272,5 +272,5 @@ let decode (span : trace_string_type) (json : Yojson.Basic.t) : Trace.span list
       let trace_spans = json |> to_list in
       List.map decode_trace_span trace_spans
   | _ ->
-      let type_string = trace_string_type_to_string span in
+      let type_string = trace_string_type_to_string tt in
       failwith (Printf.sprintf "decode: Type %s not supported" type_string)
