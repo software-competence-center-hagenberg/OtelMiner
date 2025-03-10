@@ -16,6 +16,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DeclareView from "@/app/ui/DeclareView";
 import JsonView from "@/app/ui/json/JsonView";
+import {defaultSourceDetails} from "@/app/lib/Util";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -26,40 +27,14 @@ const columns: readonly Column[] = [
     {id: 'nrNodes', label: 'Number of Nodes', minWidth: 100, format: (value: number) => value.toString()}
 ];
 
-interface TraceDetails {
-    traceId?: string;
-    nrNodes?: number;
-    spans?: Buffer[]; // large strings -> buffer
-}
-
-interface SourceDetails {
-    sourceFile: string;
-    traces: TraceDetails[];
-    page: number;
-    size: number;
-    totalPages: number;
-    sort: string;
-}
-
 interface TraceDetailsTableProps {
     sourceFile: string;
-}
-
-function defaultSourceDetails(sourceFile: string) {
-    return {
-        sourceFile: sourceFile,
-        traces: [],
-        page: 1,
-        size: 10,
-        totalPages: 1,
-        sort: "sourceFile"
-    }
 }
 
 const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
     const [selectedRow, setSelectedRow] = useState<TraceDetails>(); // FIXME check if better with useRef
-    const [selectedRowModel, setSelectedRowModel] = useState<string | null>(null);
+    const [selectedRowModel, setSelectedRowModel] = useState<string[] | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -73,11 +48,11 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const fetchSourceDetails = (sourceDetails: SourceDetails) => {
-        setLoading(true);
+        setLoading(() => true);
         RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
-            .then((response) => setSourceDetails(response.data))
+            .then((response) => setSourceDetails(() => response.data))
             .catch((error) => console.error('Error fetching source details:', error))
-            .finally(() => setLoading(false));
+            .finally(() => setLoading(() => false));
     };
 
     const handlePageSizeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,34 +62,39 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const handleRowClick = (selectedRow: TraceDetails) => {
-        setSelectedRow(selectedRow);
+        setSelectedRow(() => selectedRow);
     };
 
     const onClickGenerateModel = async () => {
         try {
-            setLoading(true);
+            setLoading(() => true);
             const response = await RestService.post<TraceDetails, string>("/declare/generate", selectedRow!);
             const model = await pollModel(response.data);
-            setSelectedRowModel(model);
+            setSelectedRowModel(() => JSON.parse(JSON.stringify(model)));
         } catch (error) {
             console.error('Error generating model:', error);
         } finally {
-            setLoading(false);
+            setLoading(() => false);
         }
     };
 
     const pollModel = async (traceId: string): Promise<string> => {
-        try {
-            const response = await RestService.get<string>("/declare/" + traceId);
-            if (response.data !== '') {
-                return response.data;
-            } else {
-                return await pollModel(traceId);
-            }
-        } catch (error) {
-            console.error('Error polling model:', error);
-            throw error;
-        }
+        return new Promise((resolve, reject) => {
+            const intervalId = setInterval(async () => {
+                try {
+                    const response = await RestService.get<string>("/declare/" + traceId);
+                    if (response.data !== '') {
+                        clearInterval(intervalId); // Stop polling
+                        console.log(response.data);
+                        resolve(response.data);
+                    }
+                } catch (error) {
+                    console.error('Error polling model:', error);
+                    clearInterval(intervalId)
+                    reject(error);
+                }
+            }, 2000); // Poll every 2 seconds
+        });
     };
 
     const renderTableRow = (row: TraceDetails) => {

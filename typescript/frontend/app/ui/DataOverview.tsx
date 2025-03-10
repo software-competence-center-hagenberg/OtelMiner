@@ -43,12 +43,12 @@ const DataOverview: React.FC = () => {
     const fetchDataOverview = () => {
         RestService.get<DataOverviewProps[]>('/overview')
             .then((response) => {
-                setData(response.data);
-                setLoading(false);
+                setData(() => response.data);
+                setLoading(() => false);
             })
             .catch((error) => {
-                setError(error);
-                setLoading(false);
+                setError(() => error);
+                setLoading(() => false);
             });
     }
 
@@ -56,7 +56,7 @@ const DataOverview: React.FC = () => {
 
     const handleRowClick = (sourceFile: string) => {
         if (sourceFile) {
-            setSourceFile(sourceFile);
+            setSourceFile(() => sourceFile);
         }
     };
 
@@ -116,14 +116,14 @@ const DataOverview: React.FC = () => {
             {renderTable()}
             <Button
                 variant={"contained"}
-                onClick={() => setGeneratingProbDeclare(true)}
+                onClick={() => setGeneratingProbDeclare(() => true)}
                 disabled={!sourceFile || generatingProbDeclare}
             >
                 generate PB Model
             </Button>
             <Button
                 variant={'contained'}
-                onClick={() => setGeneratingProbDeclare(false)}
+                onClick={() => setGeneratingProbDeclare(() => false)}
                 disabled={!sourceFile || !generatingProbDeclare}
             >
                 abort

@@ -45,6 +45,7 @@ public class DataService {
     }
 
     public String generateProbDeclareModel(SourceDetails sourceDetails) {
+        sourceDetails = getDetails(sourceDetails);
         return probDeclareManagerService.generate(sourceDetails);
     }
 

@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import JsonView from "@/app/ui/json/JsonView";
 import {AxiosResponse} from "axios";
+import {defaultSourceDetails} from "@/app/lib/Util";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
@@ -19,7 +20,7 @@ interface ProbDeclare {
     id: string;
     generating: boolean;
     constraints: DeclareConstraint[];
-    traces: String[];
+    traces: string[];
 }
 
 const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
@@ -28,15 +29,16 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
 
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
         const probDeclare: ProbDeclare = response.data;
-        setProbDeclare(probDeclare);
+        setProbDeclare(() => probDeclare);
         if (probDeclare.generating) {
             setTimeout(updateModel, 500);
         }
     }
 
     const initModelGeneration = () => {
-        setLoading(true);
-        RestService.post<string, ProbDeclare>("/generate-prob-declare-model", sourceFile)
+        setLoading(() => true);
+        const sourceDetails = defaultSourceDetails(sourceFile);
+        RestService.post<ProbDeclare, string>("/generate-prob-declare-model", sourceDetails)
             .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoading(false));
@@ -52,7 +54,7 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     }
 
     const updateModel = () => {
-        probDeclare ? fetchModel() : initModelGeneration();
+        probDeclare !== null ? fetchModel() : initModelGeneration();
     }
 
     useEffect(updateModel, [sourceFile]);

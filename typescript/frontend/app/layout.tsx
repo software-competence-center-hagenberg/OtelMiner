@@ -1,34 +1,28 @@
+"use client"
+
 import * as React from 'react';
-import {AppProvider, DashboardLayout, PageContainer} from '@toolpad/core';
-import {AppRouterCacheProvider} from '@mui/material-nextjs/v14-appRouter';
-import {CssBaseline, ThemeProvider} from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import theme from "@/app/theme";
+import { AppProvider } from '@toolpad/core';
+import { CacheProvider } from '@emotion/react';
+import createEmotionCache from '@/app/createEmotionCache';
+
+// Client-side cache, shared for the whole session of the user in the browser
+const clientSideEmotionCache = createEmotionCache();
 
 export default function RootLayout(props: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
         <body>
-          <ThemeProvider theme={theme}>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            {props.children}
-          </ThemeProvider>
+        <CacheProvider value={clientSideEmotionCache}>
+            <AppProvider>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    {props.children}
+                </ThemeProvider>
+            </AppProvider>
+        </CacheProvider>
         </body>
         </html>
-        // FIXME according to documentation (https://mui.com/material-ui/integrations/nextjs/) better like this,
-        //  but layout the layout looks better the current way...
-        // <html lang="en">
-        // <body>
-        // <AppRouterCacheProvider options={{enableCssLayer: true}}>
-        //     <AppProvider> {/*navigation={NAVIGATION} branding={BRANDING}*/}
-        //         <DashboardLayout>
-        //             <PageContainer>
-        //                 {props.children}
-        //             </PageContainer>
-        //         </DashboardLayout>
-        //     </AppProvider>
-        // </AppRouterCacheProvider>
-        // </body>
-        // </html>
     );
 }

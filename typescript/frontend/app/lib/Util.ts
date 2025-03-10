@@ -4,3 +4,29 @@ interface ColumnBase {
     align?: 'right';
     format?: (value: number) => string;
 }
+
+interface TraceDetails {
+    traceId?: string;
+    nrNodes?: number;
+    spans?: Buffer[]; // large strings -> buffer
+}
+
+interface SourceDetails {
+    sourceFile: string;
+    traces: TraceDetails[];
+    page: number;
+    size: number;
+    totalPages: number;
+    sort: string;
+}
+
+export function defaultSourceDetails(sourceFile: string) {
+    return {
+        sourceFile: sourceFile,
+        traces: [],
+        page: 1,
+        size: 10,
+        totalPages: 1,
+        sort: "sourceFile"
+    }
+}

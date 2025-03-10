@@ -49,7 +49,7 @@ public class ProbDeclareManagerService {
     private final DeclareService declareService;
 
     private void persist(ProbDeclare probDeclare) {
-        restTemplate.postForLocation(restConfig.probDeclareUrl, probDeclare);
+        restTemplate.postForLocation(restConfig.probDeclareUrl + "/one", probDeclare);
     }
 
     public String generate(SourceDetails sourceDetails) {

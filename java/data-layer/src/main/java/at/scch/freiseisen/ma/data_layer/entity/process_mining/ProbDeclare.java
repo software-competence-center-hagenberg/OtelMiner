@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,11 +25,11 @@ public class ProbDeclare extends BaseEntity<String> {
 
     @JsonManagedReference("d_pd")
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<Declare> declareList;
+    private List<Declare> declareList = new ArrayList<>();
 
     @JsonManagedReference("pdt_pd")
     @OneToMany(mappedBy = "probDeclare", fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<ProbDeclareToTrace> traces;
+    private List<ProbDeclareToTrace> traces = new ArrayList<>();
 
     public ProbDeclare(String id) {
         this.id = id;
