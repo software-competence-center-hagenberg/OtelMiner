@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import * as React from 'react';
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -14,14 +14,14 @@ export default function RootLayout(props: Readonly<{ children: React.ReactNode }
     return (
         <html lang="en">
         <body>
-        <CacheProvider value={clientSideEmotionCache}>
+        {/*<CacheProvider value={clientSideEmotionCache}>*/}
             <AppProvider>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
                     {props.children}
                 </ThemeProvider>
             </AppProvider>
-        </CacheProvider>
+        {/*</CacheProvider>*/}
         </body>
         </html>
     );

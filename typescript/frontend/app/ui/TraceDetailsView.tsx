@@ -16,7 +16,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DeclareView from "@/app/ui/DeclareView";
 import JsonView from "@/app/ui/json/JsonView";
-import {defaultSourceDetails} from "@/app/lib/Util";
+import {defaultSourceDetails, ColumnBase, SourceDetails, TraceDetails} from "@/app/lib/Util";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";

@@ -56,7 +56,18 @@ public class ProbDeclareManagerService {
         String id = UUID.randomUUID().toString();
         ProbDeclare probDeclare = new ProbDeclare(id);
         persist(probDeclare);
-        declareConstraintGenerationExecutor.submit(() -> generateDeclareConstraints(probDeclare.getId(), sourceDetails));
+        declareConstraintGenerationExecutor.submit(() -> {
+            log.info("Starting generation task for model ID: {}", id);
+            try {
+                generateDeclareConstraints(probDeclare.getId(), sourceDetails);
+            } catch (Exception e) {
+                throw new ModelGenerationException(
+                        String.format("error fetching traces for model (%s) generation", id)
+                );
+            } finally {
+                log.info("Finished generation task for model ID: {}", id);
+            }
+        });
 
         return id;
     }
@@ -82,12 +93,7 @@ public class ProbDeclareManagerService {
                 sourceDetails.setPage(page.getNumber() + 1);
                 generateDeclareConstraints(probDeclareId, sourceDetails);
             }
-            return;
         }
-
-        throw new ModelGenerationException(
-                String.format("error fetching traces for model (%s) generation", probDeclareId)
-        );
     }
 
     private void scheduleDeclareGeneration(
@@ -95,6 +101,7 @@ public class ProbDeclareManagerService {
             @NonNull List<Trace> traces
     ) {
         createAndPersistProbDeclareToTrace(probDeclareId, traces);
+        // FIXME move transform and pipe to listener location to assure that rabbitMQ queue does not overflow!
         traces.forEach(
                 trace -> {
                     CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclareId);

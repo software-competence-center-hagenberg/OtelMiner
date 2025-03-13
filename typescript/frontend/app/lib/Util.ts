@@ -1,17 +1,17 @@
-interface ColumnBase {
+export interface ColumnBase {
     label: string;
     minWidth?: number;
     align?: 'right';
     format?: (value: number) => string;
 }
 
-interface TraceDetails {
+export interface TraceDetails {
     traceId?: string;
     nrNodes?: number;
     spans?: Buffer[]; // large strings -> buffer
 }
 
-interface SourceDetails {
+export interface SourceDetails {
     sourceFile: string;
     traces: TraceDetails[];
     page: number;

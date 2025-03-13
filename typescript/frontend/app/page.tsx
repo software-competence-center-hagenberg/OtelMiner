@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 import * as React from 'react';
 import DataOverview from "@/app/ui/DataOverview";
 import {DashboardLayout} from '@toolpad/core';

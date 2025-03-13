@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import JsonView from "@/app/ui/json/JsonView";
 import {AxiosResponse} from "axios";
-import {defaultSourceDetails} from "@/app/lib/Util";
+import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
@@ -37,8 +37,8 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
 
     const initModelGeneration = () => {
         setLoading(() => true);
-        const sourceDetails = defaultSourceDetails(sourceFile);
-        RestService.post<ProbDeclare, string>("/generate-prob-declare-model", sourceDetails)
+        const sourceDetails: SourceDetails = defaultSourceDetails(sourceFile);
+        RestService.post<SourceDetails, ProbDeclare>("/generate-prob-declare-model", sourceDetails)
             .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoading(false));

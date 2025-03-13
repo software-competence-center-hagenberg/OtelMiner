@@ -16,6 +16,7 @@ import {
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import ProbDeclareView from "@/app/ui/ProbDeclareView";
+import {ColumnBase} from "@/app/lib/Util";
 
 interface DataOverviewProps {
     nrNodes: number[];
