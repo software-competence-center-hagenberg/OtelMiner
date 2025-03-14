@@ -61,21 +61,16 @@ public class ProbDeclareManagerService {
             try {
                 generateDeclareConstraints(probDeclare.getId(), sourceDetails);
             } catch (Exception e) {
-                throw new ModelGenerationException(
-                        String.format("error fetching traces for model (%s) generation", id)
-                );
+                throw new ModelGenerationException(String.format("error in generation model (%s)", id), e);
             } finally {
-                log.info("Finished generation task for model ID: {}", id);
+                log.info("Finished initializing generation task for model ID: {}", id);
             }
         });
 
         return id;
     }
 
-    private void generateDeclareConstraints(
-            @NonNull String probDeclareId,
-            @NonNull SourceDetails sourceDetails
-    ) {
+    private void generateDeclareConstraints(@NonNull String probDeclareId, @NonNull SourceDetails sourceDetails) {
         HttpEntity<SourceDetails> requestEntity = new HttpEntity<>(sourceDetails);
         ResponseEntity<Page<Trace>> response = restTemplate.exchange(
                 restConfig.tracesSourceUrl,
@@ -87,68 +82,20 @@ public class ProbDeclareManagerService {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Page<Trace> page = Objects.requireNonNull(response.getBody());
-            declareConstraintGenerationExecutor.submit(() -> scheduleDeclareGeneration(probDeclareId, page.getContent()));
-
-            if (page.getNumber() < page.getTotalPages()) {
-                sourceDetails.setPage(page.getNumber() + 1);
-                generateDeclareConstraints(probDeclareId, sourceDetails);
-            }
+            createAndPersistProbDeclareToTrace(probDeclareId, page.getContent());
+            generateDeclareForNextTrace(page, probDeclareId, sourceDetails);
         }
     }
 
-    private void scheduleDeclareGeneration(
-            @NonNull String probDeclareId,
-            @NonNull List<Trace> traces
-    ) {
-        createAndPersistProbDeclareToTrace(probDeclareId, traces);
-        // FIXME move transform and pipe to listener location to assure that rabbitMQ queue does not overflow!
-        traces.forEach(
-                trace -> {
-                    CompletableFuture<ConversionResponse> future = planResponseProcessing(probDeclareId);
-                    generating.put(trace.getId(), future);
-                    declareConstraintGenerationExecutor.submit(
-                            () -> declareService.transformAndPipe(
-                                    trace.getId(),
-                                    trace.getSpansAsJson(),
-                                    TraceDataType.JAEGER_SPANS_LIST
-                            )
-                    );
-                }
-        );
-    }
-
-    private void createAndPersistProbDeclareToTrace(String probDeclareId, List<Trace> traces) {
-        restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
-    }
-
-    private CompletableFuture<ConversionResponse> planResponseProcessing(String probDeclareId) {
+    private void generateDeclareForNextTrace(Page<Trace> page, String probDeclareId, SourceDetails sourceDetails) {
+        Trace trace = page.getContent().removeFirst();
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(response -> processResponse(response, probDeclareId));
-        return future;
+        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId, page, sourceDetails));
+        generating.put(trace.getId(), future);
+        declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
     }
 
-// FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
-    public void receiveDeclare(Message msg) {
-        String model = new String(msg.getBody());
-        log.info("received probdeclare result: {}", model);
-        try {
-            ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
-            String traceId = response.traceId();
-            declareService.add(traceId, response.constraints());
-            log.info("received result:\ntraceId: {}\nconstraints: {}", response.traceId(), response.constraints()[0]);
-            if (generating.containsKey(traceId)) {
-                generating.get(traceId).complete(response);
-                generating.remove(traceId);
-            } else {
-                log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
-            }
-        } catch (JsonProcessingException e) {
-            throw new ModelGenerationException("Error parsing declare", e);
-        }
-    }
-
-    private void processResponse(ConversionResponse conversionResponse, String probDeclareId) {
+    private void processResponse(ConversionResponse conversionResponse, String probDeclareId, Page<Trace> page, SourceDetails sourceDetails) {
         HttpEntity<ConversionResponse> requestEntity = new HttpEntity<>(conversionResponse);
         ResponseEntity<List<Declare>> response = postExchange(
                 restConfig.declareUrl + "/by-constraint-template" + probDeclareId,
@@ -160,13 +107,44 @@ public class ProbDeclareManagerService {
                 .filter(c -> !existingConstraints.contains(c))
                 .toArray(String[]::new);
         requestEntity = new HttpEntity<>(new ConversionResponse(conversionResponse.traceId(), newConstraintTemplates));
-        response = postExchange(
-                restConfig.declareUrl + "/add-constraints" + probDeclareId,
-                requestEntity
-        );
+        response = postExchange(restConfig.declareUrl + "/add-constraints" + probDeclareId, requestEntity);
 
         existingDeclare.addAll(Objects.requireNonNull(response.getBody()));
         modelUpdateExecutor.submit(() -> updateModel(existingDeclare));
+
+        if (page.hasContent()) {
+            generateDeclareForNextTrace(page, probDeclareId, sourceDetails);
+        } else if (page.getNumber() < page.getTotalPages()) {
+            sourceDetails.setPage(page.getNumber() + 1);
+            generateDeclareConstraints(probDeclareId, sourceDetails);
+        } else {
+            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
+        }
+    }
+
+    private void createAndPersistProbDeclareToTrace(String probDeclareId, List<Trace> traces) {
+        restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
+    }
+
+// FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
+    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
+    public void receiveDeclare(Message msg) {
+        String model = new String(msg.getBody());
+        log.info("received declare result: {}", model);
+        try {
+            ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
+            String traceId = response.traceId();
+            declareService.add(traceId, response.constraints());
+            log.info("received result:\n\ttraceId: {}\n\tconstraints: {}", response.traceId(), response.constraints());
+            if (generating.containsKey(traceId)) {
+                generating.get(traceId).complete(response);
+                generating.remove(traceId);
+            } else {
+                log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
+            }
+        } catch (JsonProcessingException e) {
+            throw new ModelGenerationException("Error parsing declare", e);
+        }
     }
 
     private void updateModel(List<Declare> declareList) {
@@ -193,10 +171,9 @@ public class ProbDeclareManagerService {
 
     private boolean checkIfGenerationFinished(String probDeclareId) {
         if (generating.isEmpty()) {
-            restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + probDeclareId);
+//            restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + probDeclareId);
             return true;
         }
-
         return false;
     }
 }

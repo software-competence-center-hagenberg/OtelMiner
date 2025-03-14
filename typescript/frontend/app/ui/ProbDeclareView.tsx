@@ -38,7 +38,7 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     const initModelGeneration = () => {
         setLoading(() => true);
         const sourceDetails: SourceDetails = defaultSourceDetails(sourceFile);
-        RestService.post<SourceDetails, ProbDeclare>("/generate-prob-declare-model", sourceDetails)
+        RestService.post<SourceDetails, ProbDeclare>("/prob-declare/generate", sourceDetails)
             .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoading(false));
