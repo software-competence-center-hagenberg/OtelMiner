@@ -1,27 +1,18 @@
-// "use client"
-
 import * as React from 'react';
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import {CssBaseline, ThemeProvider} from "@mui/material";
 import theme from "@/app/theme";
-import { AppProvider } from '@toolpad/core';
-import { CacheProvider } from '@emotion/react';
-import createEmotionCache from '@/app/createEmotionCache';
-
-// Client-side cache, shared for the whole session of the user in the browser
-const clientSideEmotionCache = createEmotionCache();
+import {AppProvider} from '@toolpad/core';
 
 export default function RootLayout(props: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning={true}>
         <body>
-        {/*<CacheProvider value={clientSideEmotionCache}>*/}
-            <AppProvider>
-                <ThemeProvider theme={theme}>
+            <ThemeProvider theme={theme}>
+                <AppProvider>
                     <CssBaseline />
                     {props.children}
-                </ThemeProvider>
-            </AppProvider>
-        {/*</CacheProvider>*/}
+                </AppProvider>
+            </ThemeProvider>
         </body>
         </html>
     );

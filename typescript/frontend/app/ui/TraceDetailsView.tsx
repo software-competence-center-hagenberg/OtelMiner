@@ -48,11 +48,11 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     };
 
     const fetchSourceDetails = (sourceDetails: SourceDetails) => {
-        setLoading(() => true);
+        setLoading(true);
         RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
             .then((response) => setSourceDetails(() => response.data))
             .catch((error) => console.error('Error fetching source details:', error))
-            .finally(() => setLoading(() => false));
+            .finally(() => setLoading(false));
     };
 
     const handlePageSizeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,14 +67,14 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
 
     const onClickGenerateModel = async () => {
         try {
-            setLoading(() => true);
+            setLoading(true);
             const response = await RestService.post<TraceDetails, string>("/declare/generate", selectedRow!);
             const model = await pollModel(response.data);
             setSelectedRowModel(() => JSON.parse(JSON.stringify(model)));
         } catch (error) {
             console.error('Error generating model:', error);
         } finally {
-            setLoading(() => false);
+            setLoading(false);
         }
     };
 

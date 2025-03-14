@@ -3,6 +3,7 @@ package at.scch.freiseisen.ma.data_layer.entity.otel;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -54,6 +55,7 @@ public class Trace extends BaseEntity<String> {
     @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = false)
     private List<ProbDeclareToTrace> probDeclareToTraces;
 
+    @JsonIgnore
     public List<String> getSpansAsJson() {
         return spans.stream()
                 .map(Span::getJson)

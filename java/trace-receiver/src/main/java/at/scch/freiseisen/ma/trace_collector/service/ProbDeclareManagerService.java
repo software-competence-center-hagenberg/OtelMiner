@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
+import at.scch.freiseisen.ma.commons.RestPageImpl;
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
@@ -14,6 +15,7 @@ import at.scch.freiseisen.ma.trace_collector.error.ModelGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -52,7 +54,7 @@ public class ProbDeclareManagerService {
         restTemplate.postForLocation(restConfig.probDeclareUrl + "/one", probDeclare);
     }
 
-    public String generate(SourceDetails sourceDetails) {
+    public ProbDeclareModel generate(SourceDetails sourceDetails) {
         String id = UUID.randomUUID().toString();
         ProbDeclare probDeclare = new ProbDeclare(id);
         persist(probDeclare);
@@ -61,21 +63,27 @@ public class ProbDeclareManagerService {
             try {
                 generateDeclareConstraints(probDeclare.getId(), sourceDetails);
             } catch (Exception e) {
+                log.error(e.getMessage());
+                log.error(Arrays.toString(e.getStackTrace()));
                 throw new ModelGenerationException(String.format("error in generation model (%s)", id), e);
             } finally {
                 log.info("Finished initializing generation task for model ID: {}", id);
             }
         });
 
-        return id;
+        return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
 
+    @SneakyThrows
     private void generateDeclareConstraints(@NonNull String probDeclareId, @NonNull SourceDetails sourceDetails) {
-        HttpEntity<SourceDetails> requestEntity = new HttpEntity<>(sourceDetails);
-        ResponseEntity<Page<Trace>> response = restTemplate.exchange(
-                restConfig.tracesSourceUrl,
-                HttpMethod.POST,
-                requestEntity,
+        ResponseEntity<RestPageImpl<Trace>> response = restTemplate.exchange(
+                restConfig.tracesUrl
+                + "?sourceFile=" + sourceDetails.getSourceFile()
+                + "&page=" + sourceDetails.getPage()
+                + "&size=" + sourceDetails.getSize()
+                + "&sort=" + sourceDetails.getSort(),
+                HttpMethod.GET,
+                null,
                 new ParameterizedTypeReference<>() {
                 }
         );

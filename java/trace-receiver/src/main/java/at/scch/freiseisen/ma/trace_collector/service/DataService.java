@@ -44,8 +44,8 @@ public class DataService {
         return Objects.requireNonNull(response.getBody());
     }
 
-    public String generateProbDeclareModel(SourceDetails sourceDetails) {
-        sourceDetails = getDetails(sourceDetails);
+    // FIXME change again so only source file is received in request and manage rest with pages in manager service!
+    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails) {
         return probDeclareManagerService.generate(sourceDetails);
     }
 

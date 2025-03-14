@@ -36,7 +36,7 @@ public class DataController {
     }
 
     @PostMapping("/prob-declare/generate")
-    public String generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
+    public ProbDeclareModel generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
         return dataService.generateProbDeclareModel(sourceDetails);
     }
 

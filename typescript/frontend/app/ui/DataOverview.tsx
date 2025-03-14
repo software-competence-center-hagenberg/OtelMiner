@@ -45,11 +45,11 @@ const DataOverview: React.FC = () => {
         RestService.get<DataOverviewProps[]>('/overview')
             .then((response) => {
                 setData(() => response.data);
-                setLoading(() => false);
+                setLoading(false);
             })
             .catch((error) => {
                 setError(() => error);
-                setLoading(() => false);
+                setLoading(false);
             });
     }
 
@@ -117,14 +117,14 @@ const DataOverview: React.FC = () => {
             {renderTable()}
             <Button
                 variant={"contained"}
-                onClick={() => setGeneratingProbDeclare(() => true)}
+                onClick={() => setGeneratingProbDeclare(true)}
                 disabled={!sourceFile || generatingProbDeclare}
             >
                 generate PB Model
             </Button>
             <Button
                 variant={'contained'}
-                onClick={() => setGeneratingProbDeclare(() => false)}
+                onClick={() => setGeneratingProbDeclare(false)}
                 disabled={!sourceFile || !generatingProbDeclare}
             >
                 abort

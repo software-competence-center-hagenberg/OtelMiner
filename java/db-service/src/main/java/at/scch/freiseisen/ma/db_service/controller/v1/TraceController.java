@@ -37,6 +37,11 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
         return service.findBySourceFile(sourceDetails);
     }
 
+    @GetMapping
+    public Page<Trace> retrieveAll(@Param("sourceFile") String sourceFile, @Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
+        return service.findBySourceFile(sourceFile, page, size, Sort.by(sort));
+    }
+
     @Override
     @GetMapping
     public Page<Trace> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {

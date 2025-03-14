@@ -25,6 +25,7 @@ interface ProbDeclare {
 
 const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState(true);
+    const [initialized, setInitialized] = useState(false)
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
 
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
@@ -36,7 +37,8 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     }
 
     const initModelGeneration = () => {
-        setLoading(() => true);
+        setLoading(true);
+        setInitialized(true)
         const sourceDetails: SourceDetails = defaultSourceDetails(sourceFile);
         RestService.post<SourceDetails, ProbDeclare>("/prob-declare/generate", sourceDetails)
             .then((response) => handleProbDeclareResponse(response))
@@ -54,10 +56,12 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     }
 
     const updateModel = () => {
-        probDeclare !== null ? fetchModel() : initModelGeneration();
+        if (probDeclare !== null || !initialized) {
+            probDeclare !== null ? fetchModel() : initModelGeneration();
+        }
     }
 
-    useEffect(updateModel, [sourceFile]);
+    useEffect(updateModel, [sourceFile, probDeclare]);
 
     return (
         <Box>
