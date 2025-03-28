@@ -31,19 +31,16 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
         const probDeclare: ProbDeclare = response.data;
         setProbDeclare(() => probDeclare);
-        if (probDeclare.generating) {
-            setTimeout(updateModel, 500);
-        }
     }
 
     const initModelGeneration = () => {
-        setLoading(true);
-        setInitialized(true)
+        setLoading(() => true);
+        setInitialized(() => true)
         const sourceDetails: SourceDetails = defaultSourceDetails(sourceFile);
         RestService.post<SourceDetails, ProbDeclare>("/prob-declare/generate", sourceDetails)
             .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
-            .finally(() => setLoading(false));
+            .finally(() => setLoading(() => false));
     };
 
     const fetchModel = async  () => {
@@ -56,8 +53,10 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
     }
 
     const updateModel = () => {
-        if (probDeclare !== null || !initialized) {
-            probDeclare !== null ? fetchModel() : initModelGeneration();
+        if (!initialized) {
+            initModelGeneration()
+        } else if (probDeclare?.generating) {
+            setTimeout(fetchModel, 2000);
         }
     }
 

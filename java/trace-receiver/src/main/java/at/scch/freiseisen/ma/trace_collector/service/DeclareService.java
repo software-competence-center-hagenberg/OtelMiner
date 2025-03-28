@@ -57,4 +57,8 @@ public class DeclareService {
         declarePerTrace.put(traceId, declare);
         return declare;
     }
+
+    public void clear() {
+        declarePerTrace.clear();
+    }
 }

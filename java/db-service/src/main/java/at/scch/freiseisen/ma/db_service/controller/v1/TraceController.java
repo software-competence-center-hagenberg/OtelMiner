@@ -9,7 +9,6 @@ import at.scch.freiseisen.ma.data_layer.service.TraceService;
 import at.scch.freiseisen.ma.db_service.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,13 +37,15 @@ public class TraceController extends BaseController<TraceService, TraceRepositor
     }
 
     @GetMapping
-    public Page<Trace> retrieveAll(@Param("sourceFile") String sourceFile, @Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
-        return service.findBySourceFile(sourceFile, page, size, Sort.by(sort));
+    public Page<Trace> retrieveAllBySourceFile(@RequestParam(name ="sourceFile", required = false) String sourceFile, @RequestParam("page") int page, @RequestParam("size") int size, @RequestParam("sort") String sort) {
+        if (sourceFile != null) {
+            return service.findBySourceFile(sourceFile, page, size, Sort.by(sort));
+        }
+        return retrieveAll(page, size, sort);
     }
 
     @Override
-    @GetMapping
-    public Page<Trace> retrieveAll(@Param("page") int page, @Param("size") int size, @Param("sort") String sort) {
+    public Page<Trace> retrieveAll(int page, int size, String sort) {
         return service.findAll(page, size, Sort.by(sort));
     }
 

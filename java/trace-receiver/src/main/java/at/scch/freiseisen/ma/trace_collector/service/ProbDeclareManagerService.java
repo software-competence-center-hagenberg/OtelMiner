@@ -3,6 +3,7 @@ package at.scch.freiseisen.ma.trace_collector.service;
 import at.scch.freiseisen.ma.commons.RestPageImpl;
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraint;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
@@ -29,8 +30,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.xml.transform.Source;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -49,32 +52,55 @@ public class ProbDeclareManagerService {
     private final Map<String, Float> probabilityConstraints = new ConcurrentHashMap<>();
     private final List<String> crispConstraints = new CopyOnWriteArrayList<>();
     private final DeclareService declareService;
+    private AtomicReference<String> currentId = new AtomicReference<>(null);
 
     private void persist(ProbDeclare probDeclare) {
         restTemplate.postForLocation(restConfig.probDeclareUrl + "/one", probDeclare);
     }
 
     public ProbDeclareModel generate(SourceDetails sourceDetails) {
+        if (currentId.getAcquire() != null) {
+            return getCurrentModel();
+        }
         String id = UUID.randomUUID().toString();
-        ProbDeclare probDeclare = new ProbDeclare(id);
-        persist(probDeclare);
-        declareConstraintGenerationExecutor.submit(() -> {
-            log.info("Starting generation task for model ID: {}", id);
-            try {
-                generateDeclareConstraints(probDeclare.getId(), sourceDetails);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                log.error(Arrays.toString(e.getStackTrace()));
-                throw new ModelGenerationException(String.format("error in generation model (%s)", id), e);
-            } finally {
-                log.info("Finished initializing generation task for model ID: {}", id);
-            }
-        });
-
+        declareConstraintGenerationExecutor.submit(() -> initDeclareGeneration(sourceDetails, id));
         return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
 
-    @SneakyThrows
+    private void initDeclareGeneration(SourceDetails sourceDetails, String id) {
+        currentId = new AtomicReference<>(id);
+        ProbDeclare probDeclare = new ProbDeclare(id);
+        persist(probDeclare);
+        log.info("Starting generation task for model ID: {}", id);
+        try {
+            generateDeclareConstraints(probDeclare.getId(), sourceDetails);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            log.error(Arrays.toString(e.getStackTrace()));
+            finishGeneration(true);
+            throw new ModelGenerationException(String.format("error in generation model (%s)", id), e);
+        } finally {
+            log.info("Finished initializing generation task for model ID: {}", id);
+        }
+    }
+
+    private void finishGeneration(boolean abort) {
+        probabilityConstraints.clear();
+        crispConstraints.clear();
+        declareService.clear();
+        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId);
+        if (abort) {
+            // FIXME differentiate between abortion and finishing
+        }
+    }
+
+    private ProbDeclareModel getCurrentModel() {
+        List<ProbDeclareConstraint> constraints = new ArrayList<>(probabilityConstraints.entrySet().stream().map(entry -> new ProbDeclareConstraint(entry.getValue(), entry.getKey())).toList());
+        List<ProbDeclareConstraint> crisps = crispConstraints.stream().map(c -> new ProbDeclareConstraint(1f, c)).toList();
+        constraints.addAll(crisps);
+        return new ProbDeclareModel(currentId.get(), constraints, isGenerationFinished());
+    }
+
     private void generateDeclareConstraints(@NonNull String probDeclareId, @NonNull SourceDetails sourceDetails) {
         ResponseEntity<RestPageImpl<Trace>> response = restTemplate.exchange(
                 restConfig.tracesUrl
@@ -148,7 +174,7 @@ public class ProbDeclareManagerService {
                 generating.get(traceId).complete(response);
                 generating.remove(traceId);
             } else {
-                log.info("traceId {}, not present in generation -> passing it on to declareService", traceId);
+                log.info("traceId {}, not present in generation -> ONLY passing it on to declareService", traceId);
             }
         } catch (JsonProcessingException e) {
             throw new ModelGenerationException("Error parsing declare", e);
@@ -174,14 +200,12 @@ public class ProbDeclareManagerService {
 
     // TODO check if necessary or if better done directly in data service
     public ProbDeclareModel getProbDeclareModel(String id) {
-        return restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
+        return id.equals(currentId.get())
+                ? getCurrentModel()
+                : restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
     }
 
-    private boolean checkIfGenerationFinished(String probDeclareId) {
-        if (generating.isEmpty()) {
-//            restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + probDeclareId);
-            return true;
-        }
-        return false;
+    private boolean isGenerationFinished() {
+        return generating.isEmpty();
     }
 }
