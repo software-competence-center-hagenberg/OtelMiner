@@ -13,10 +13,10 @@ import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import at.scch.freiseisen.ma.trace_collector.error.ModelGenerationException;
+import at.scch.freiseisen.ma.trace_collector.model.ProbDeclareGenerationDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -30,10 +30,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.transform.Source;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,12 +63,12 @@ public class ProbDeclareManagerService {
             return getCurrentModel();
         }
         String id = UUID.randomUUID().toString();
+        currentId.weakCompareAndSetAcquire(null, id);
         declareConstraintGenerationExecutor.submit(() -> initDeclareGeneration(sourceDetails, id));
         return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
 
     private void initDeclareGeneration(SourceDetails sourceDetails, String id) {
-        currentId = new AtomicReference<>(id);
         ProbDeclare probDeclare = new ProbDeclare(id);
         persist(probDeclare);
         log.info("Starting generation task for model ID: {}", id);
@@ -85,6 +85,7 @@ public class ProbDeclareManagerService {
     }
 
     private void finishGeneration(boolean abort) {
+        currentId.set(null);
         probabilityConstraints.clear();
         crispConstraints.clear();
         declareService.clear();
@@ -116,40 +117,43 @@ public class ProbDeclareManagerService {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Page<Trace> page = Objects.requireNonNull(response.getBody());
+            ProbDeclareGenerationDTO dto = new ProbDeclareGenerationDTO(page);
             createAndPersistProbDeclareToTrace(probDeclareId, page.getContent());
-            generateDeclareForNextTrace(page, probDeclareId, sourceDetails);
+            generateDeclareForNextTrace(dto, probDeclareId, sourceDetails);
+        } else {
+            finishGeneration(true);
+            throw new ModelGenerationException("persistance of probdeclare to trace entitities failed, aborting");
         }
     }
 
-    private void generateDeclareForNextTrace(Page<Trace> page, String probDeclareId, SourceDetails sourceDetails) {
-        Trace trace = page.getContent().removeFirst();
+    private void generateDeclareForNextTrace(ProbDeclareGenerationDTO dto, String probDeclareId, SourceDetails sourceDetails) {
+        Trace trace = dto.getNext();
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId, page, sourceDetails));
+        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId, dto, sourceDetails));
         generating.put(trace.getId(), future);
         declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
     }
 
-    private void processResponse(ConversionResponse conversionResponse, String probDeclareId, Page<Trace> page, SourceDetails sourceDetails) {
-        HttpEntity<ConversionResponse> requestEntity = new HttpEntity<>(conversionResponse);
+    private void processResponse(ConversionResponse conversionResponse, String probDeclareId, ProbDeclareGenerationDTO dto, SourceDetails sourceDetails) {
         ResponseEntity<List<Declare>> response = postExchange(
-                restConfig.declareUrl + "/by-constraint-template" + probDeclareId,
-                requestEntity
+                restConfig.declareUrl + "/by-constraint-template/" + probDeclareId,
+                new HttpEntity<>(conversionResponse.constraints())
         );
         List<Declare> existingDeclare = Objects.requireNonNull(response.getBody());
         List<String> existingConstraints = existingDeclare.stream().map(Declare::getConstraintTemplate).toList();
         String[] newConstraintTemplates = Arrays.stream(conversionResponse.constraints())
                 .filter(c -> !existingConstraints.contains(c))
                 .toArray(String[]::new);
-        requestEntity = new HttpEntity<>(new ConversionResponse(conversionResponse.traceId(), newConstraintTemplates));
+        HttpEntity<ConversionResponse> requestEntity = new HttpEntity<>(new ConversionResponse(conversionResponse.traceId(), newConstraintTemplates));
         response = postExchange(restConfig.declareUrl + "/add-constraints" + probDeclareId, requestEntity);
 
         existingDeclare.addAll(Objects.requireNonNull(response.getBody()));
         modelUpdateExecutor.submit(() -> updateModel(existingDeclare));
 
-        if (page.hasContent()) {
-            generateDeclareForNextTrace(page, probDeclareId, sourceDetails);
-        } else if (page.getNumber() < page.getTotalPages()) {
-            sourceDetails.setPage(page.getNumber() + 1);
+        if (dto.hasContent()) {
+            generateDeclareForNextTrace(dto, probDeclareId, sourceDetails);
+        } else if (dto.hasMorePages()) {
+            sourceDetails.setPage(dto.getCurrentPage() + 1);
             generateDeclareConstraints(probDeclareId, sourceDetails);
         } else {
             log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
@@ -157,6 +161,7 @@ public class ProbDeclareManagerService {
     }
 
     private void createAndPersistProbDeclareToTrace(String probDeclareId, List<Trace> traces) {
+        log.debug("creating association between prob declare model {} and trace ids: {}", probDeclareId, traces.stream().map(Trace::getId).collect(Collectors.joining(", ")));
         restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
     }
 

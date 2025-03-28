@@ -18,17 +18,21 @@ import java.time.LocalDateTime;
 public class ProbDeclareToTrace {
 
     @Id
+    @Column(name = "prob_declare_id")
     private String probDeclareId;
     @Id
+    @Column(name = "trace_id")
     private String traceId;
 
     @ManyToOne
-    @JoinColumn(name = "prob_declare_id", nullable = false)
+    @MapsId("probDeclareId")
+    @JoinColumn(name = "prob_declare_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_pd")
     private ProbDeclare probDeclare;
 
     @ManyToOne
-    @JoinColumn(name = "trace_id", nullable = false)
+    @MapsId("traceId")
+    @JoinColumn(name = "trace_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_t")
     private Trace trace;
 
@@ -40,6 +44,8 @@ public class ProbDeclareToTrace {
         this.probDeclare = probDeclare;
         this.trace = trace;
         this.insertDate = LocalDateTime.now();
+        this.probDeclareId = probDeclare.getId();
+        this.traceId = trace.getId();
     }
 
 }
