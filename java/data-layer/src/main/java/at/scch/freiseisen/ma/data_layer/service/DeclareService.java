@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.data_layer.service;
 
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraintModelEntry;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
@@ -27,12 +28,22 @@ public class DeclareService extends BaseService<DeclareRepository, Declare, Stri
         this.probDeclareToTraceService = probDeclareToTraceService;
     }
 
-    public List<Declare> findAllByConstraintTemplateInAndProbDeclare(List<String> constraintTemplates, String probDeclareId) {
+    public List<ProbDeclareConstraintModelEntry> findAllByConstraintTemplateInAndProbDeclare(List<String> constraintTemplates, String probDeclareId) {
         ProbDeclare probDeclare = probDeclareService.safeFindById(probDeclareId);
-        return repository.findAllByConstraintTemplateInAndProbDeclare(constraintTemplates, probDeclare);
+        return mapToModel(repository.findAllByConstraintTemplateInAndProbDeclare(constraintTemplates, probDeclare));
     }
 
-    public List<Declare> addNewlyConverted(ConversionResponse response, String probDeclareId) {
+    private List<ProbDeclareConstraintModelEntry> mapToModel(List<Declare> entities) {
+        return entities.stream()
+                .map(declare ->
+                        new ProbDeclareConstraintModelEntry(
+                                declare.getConstraintTemplate(),
+                                declare.getProbability(),
+                                declare.getNr())
+                ).toList();
+    }
+
+    public List<ProbDeclareConstraintModelEntry> addNewlyConverted(ConversionResponse response, String probDeclareId) {
         log.info("retrieving prob declare with id {}", probDeclareId);
 
         ProbDeclareToTraceId probDeclareToTraceId = new ProbDeclareToTraceId(probDeclareId, response.traceId());
@@ -42,6 +53,6 @@ public class DeclareService extends BaseService<DeclareRepository, Declare, Stri
                 .map(c -> new Declare(probDeclareToTrace, c))
                 .toList();
 
-        return saveAll(entities);
+        return mapToModel(saveAll(entities));
     }
 }

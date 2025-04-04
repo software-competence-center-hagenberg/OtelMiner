@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
 import at.scch.freiseisen.ma.data_layer.dto.ConversionResponse;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraintModelEntry;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.Declare;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.DeclareRepository;
 import at.scch.freiseisen.ma.data_layer.service.DeclareService;
@@ -57,7 +58,7 @@ public class DeclareController extends BaseController<DeclareService, DeclareRep
     }
 
     @PostMapping("/by-constraint-template/{prob-declare-id}")
-    public List<Declare> postByConstraintTemplate(
+    public List<ProbDeclareConstraintModelEntry> postByConstraintTemplate(
             @RequestBody List<String> constraintTemplates,
             @PathVariable("prob-declare-id") String probDeclareId
     ) {
@@ -65,7 +66,7 @@ public class DeclareController extends BaseController<DeclareService, DeclareRep
     }
 
     @PostMapping("/add-constraints/{prob-declare-id}")
-    public List<Declare> postAddConstraints(
+    public List<ProbDeclareConstraintModelEntry> postAddConstraints(
             @RequestBody ConversionResponse conversionResponse,
             @PathVariable("prob-declare-id") String probDeclareId
     ){
