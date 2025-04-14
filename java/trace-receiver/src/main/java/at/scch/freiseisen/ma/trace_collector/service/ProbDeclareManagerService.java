@@ -99,7 +99,7 @@ public class ProbDeclareManagerService {
                 .stream()
                 .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
                 .toList();
-        return new ProbDeclareModel(currentId.get(), model, isGenerationFinished());
+        return new ProbDeclareModel(currentId.get(), model, !isGenerationFinished());
     }
 
     private void generateDeclareConstraints(@NonNull String probDeclareId, @NonNull SourceDetails sourceDetails) {
@@ -129,16 +129,27 @@ public class ProbDeclareManagerService {
     private void generateProbDeclareForNextTrace(ProbDeclareGenerationDTO dto, String probDeclareId, SourceDetails sourceDetails) {
         Trace trace = dto.getNext();
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId, dto, sourceDetails));
+        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId, dto, sourceDetails))
+                .exceptionally(e -> {
+                    log.error("exception occurred during response processing", e);
+                    return null;
+                });
         generating.put(trace.getId(), future);
         declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
     }
 
     private void processResponse(ConversionResponse conversionResponse, String probDeclareId, ProbDeclareGenerationDTO dto, SourceDetails sourceDetails) {
-        ResponseEntity<List<ProbDeclareConstraintModelEntry>> response = postExchange(
+        ResponseEntity<List<ProbDeclareConstraintModelEntry>> response = restTemplate.exchange(
                 restConfig.declareUrl + "/by-constraint-template/" + probDeclareId,
-                new HttpEntity<>(conversionResponse.constraints())
-        ); // FIXME refactor so just the new constraints get sent to db-service and are updated correctly!
+                HttpMethod.POST,
+                new HttpEntity<>(conversionResponse.constraints()),
+                new ParameterizedTypeReference<>() {
+                });
+        if (conversionResponse == null) {
+            log.debug("conversion response is null, aborting generation...");
+            finishGeneration(true);
+            return;
+        }
         List<ProbDeclareConstraintModelEntry> existingDeclare = Objects.requireNonNull(response.getBody());
         List<String> existingConstraints = existingDeclare.stream().map(ProbDeclareConstraintModelEntry::getConstraintTemplate).toList();
         /*
@@ -158,16 +169,19 @@ public class ProbDeclareManagerService {
                         .limit(10)
                         .toList())
                 .toList();
-        newConstraintTemplates.forEach(newConstraintTemplate -> {
-            ResponseEntity<List<ProbDeclareConstraintModelEntry>> createdDeclare = postExchange(
+        newConstraintTemplates.forEach(templates -> {
+            ResponseEntity<List<ProbDeclareConstraintModelEntry>> createdDeclare = restTemplate.exchange(
                     restConfig.declareUrl + "/add-constraints/" + probDeclareId,
+                    HttpMethod.POST,
                     new HttpEntity<>(new ConversionResponse(conversionResponse.traceId(),
-                            newConstraintTemplate.toArray(String[]::new)))
+                            templates.toArray(String[]::new))),
+                    new ParameterizedTypeReference<>() {
+                    }
             );
 
             existingDeclare.addAll(Objects.requireNonNull(createdDeclare.getBody()));
         });
-        updateModel(existingDeclare);
+        updateModel(existingDeclare, probDeclareId);
 
         if (dto.hasContent()) {
             generateProbDeclareForNextTrace(dto, probDeclareId, sourceDetails);
@@ -205,7 +219,7 @@ public class ProbDeclareManagerService {
         }
     }
 
-    private void updateModel(List<ProbDeclareConstraintModelEntry> declareList) {
+    private void updateModel(List<ProbDeclareConstraintModelEntry> declareList, String probDeclareId) {
         long currentNrTraces = nrTraces.getAcquire();
         log.info("updating model");
         log.debug("declareList: {}", declareList);
@@ -228,7 +242,7 @@ public class ProbDeclareManagerService {
             nrTraces.compareAndSet(currentNrTraces, currentNrTraces + 1);
             declareList.forEach(declare -> visited.add(updateOrAddConstraint(declare)));
             declareList.addAll(updateConstraintsNotContainedInCurrentTrace(visited));
-            restTemplate.postForLocation(restConfig.declareUrl, declareList);
+            restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, declareList); // FIXME 500 error when posting
         }
     }
 
@@ -244,23 +258,22 @@ public class ProbDeclareManagerService {
     private String updateOrAddConstraint(ProbDeclareConstraintModelEntry declare) {
         log.debug("updating {}", declare);
         if (constraints.containsKey(declare.getConstraintTemplate())) {
-            log.debug("constraint exists");
-            ProbDeclareConstraintModelEntry d = constraints.remove(declare.getConstraintTemplate());
+            log.debug("constraint exists --> updating");
+            ProbDeclareConstraintModelEntry d = constraints.get(declare.getConstraintTemplate());
             log.debug("removing {}", d);
             assert d.getNr() >= declare.getNr();
             assert d.getProbability() <= declare.getProbability();
             declare.setNr(d.getNr() + 1);
             if (d.getProbability() != 1d) {
                 log.debug("constraint not crisp --> updating probability");
-                declare.setProbability(declare.getProbability() / ((double) nrTraces.getAcquire()));
+                declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
             }
         } else {
             log.debug("constraint does not exist --> updating probability");
-            declare.setProbability(declare.getProbability() / ((double) nrTraces.getAcquire()));
+            declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
+            log.debug("adding to constraints: {}", declare);
+            constraints.put(declare.getConstraintTemplate(), declare);
         }
-        log.debug("updated constraint: {}", declare);
-        constraints.put(declare.getConstraintTemplate(), declare);
-        log.debug("adding constraint to visited");
         return declare.getConstraintTemplate();
     }
 
@@ -272,19 +285,10 @@ public class ProbDeclareManagerService {
                 .forEach(c -> {
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
                     declare.setNr(declare.getNr() + 1);
-                    declare.setProbability(declare.getProbability() / ((double) nrTraces.getAcquire()));
+                    declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
                     declareList.add(declare);
                 });
         return declareList;
-    }
-
-    private <S extends Serializable> ResponseEntity<List<S>> postExchange(String url, HttpEntity<?> requestEntity) {
-        return restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                requestEntity,
-                new ParameterizedTypeReference<>() {
-                });
     }
 
     // TODO check if necessary or if better done directly in data service

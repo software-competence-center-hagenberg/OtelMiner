@@ -26,10 +26,10 @@ public class ProbDeclareGenerationDTO {
     }
 
     public Trace getNext() {
-        return traces.removeFirst();
+        return !traces.isEmpty() ? traces.removeFirst() : null;
     }
 
     public boolean hasMorePages() {
-        return currentPage < totalPages;
+        return currentPage < totalPages-1;
     }
 }

@@ -11,8 +11,17 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProbDeclareConstraintModelEntry implements Serializable {
+public class ProbDeclareConstraintModelEntry implements Serializable, Cloneable {
     private String constraintTemplate;
     private Double probability;
     private Long nr;
+
+    @Override
+    public ProbDeclareConstraintModelEntry clone() {
+        ProbDeclareConstraintModelEntry entry = new ProbDeclareConstraintModelEntry();
+        entry.constraintTemplate = this.constraintTemplate;
+        entry.probability = this.probability;
+        entry.nr = this.nr;
+        return entry;
+    }
 }
