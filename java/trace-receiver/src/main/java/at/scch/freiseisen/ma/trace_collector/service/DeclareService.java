@@ -24,8 +24,8 @@ public class DeclareService {
     private final Map<String, String[]> declarePerTrace = new ConcurrentHashMap<>();
 
     public String generateFromSpanList(String traceId, List<String> spans) {
-        log.info("generating declare model for trace {}... deleting existing", traceId);
-        restTemplate.delete(restConfig.declareUrl + "/" + traceId);
+        log.info("generating declare model for trace...");// {}... deleting existing", traceId);
+//        restTemplate.delete(restConfig.declareUrl + "/" + traceId); TODO delete assoc 
         declarePerTrace.put(traceId, new String[]{});
         transformAndPipe(traceId, spans, TraceDataType.JAEGER_SPANS_LIST);
         return traceId;
