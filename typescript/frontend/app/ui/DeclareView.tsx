@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Accordion, AccordionDetails, AccordionSummary, List, ListItem} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -27,7 +27,7 @@ function parseRawData (rawData: string[]): Map<string, string[]> {
 const DeclareView = ({ rawData }: DeclareViewProps) => {
     const [model, setModel] = useState<Map<string, string[]>>(new Map<string, string[]>());
 
-    useEffect(() => {
+    useMemo(() => {
         const parsedModel = parseRawData(rawData);
         setModel(() => parsedModel);
     }, [rawData]);

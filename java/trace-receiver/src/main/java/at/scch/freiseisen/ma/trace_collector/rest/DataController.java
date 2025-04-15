@@ -10,6 +10,7 @@ import at.scch.freiseisen.ma.trace_collector.service.DeclareService;
 import at.scch.freiseisen.ma.trace_collector.service.ProbDeclareManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,13 @@ public class DataController {
     @PostMapping("/prob-declare/generate")
     public ProbDeclareModel generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
         return dataService.generateProbDeclareModel(sourceDetails);
+    }
+
+    @PostMapping("/prob-declare/abort")
+    public ResponseEntity<Void> abortProbDeclareModelGeneration() {
+        return dataService.abortProbDeclareModelGeneration()
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
     }
 
     @GetMapping("/prob-declare/{id}")

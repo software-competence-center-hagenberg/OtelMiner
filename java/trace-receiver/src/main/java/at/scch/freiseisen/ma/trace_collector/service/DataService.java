@@ -52,4 +52,8 @@ public class DataService {
     public ProbDeclareModel getProbDeclareModel(String id) {
         return probDeclareManagerService.getProbDeclareModel(id);
     }
+
+    public boolean abortProbDeclareModelGeneration() {
+        return probDeclareManagerService.abort();
+    }
 }

@@ -10,8 +10,10 @@ Options:
     -b          Trigger build
     -a          Enable all processes
     -o          Enable ocaml process
-    -j          Enable spring boot processes
-    -f          Enable frontend
+    -j          Enable all java processes
+    -d         Enable db-service
+    -r         Enable trace-receiver
+    -t          Enable all typescript processes
 EOF
 }
 
@@ -19,17 +21,21 @@ EOF
 BUILD=false
 OCAML=false
 SPRING=false
-FRONTEND=false
+DB_SERVICE=false
+TRACE_RECEIVER=false
+TS=false
 
 # Parse command-line options
-while getopts "hbaojf" opt; do
+while getopts "hbaojdrt" opt; do
     case ${opt} in
         h) show_help; exit 0 ;;
         b) BUILD=true ;;
-        a) OCAML=true; SPRING=true; FRONTEND=true ;;
+        a) OCAML=true; SPRING=true; TS=true ;;
         o) OCAML=true ;;
         j) SPRING=true ;;
-        f) FRONTEND=true ;;
+        d) DB_SERVICE=true ;;
+        r) TRACE_RECEIVER=true ;;
+        t) TS=true ;;
         *) echo "Invalid option: -$OPTARG" >&2; show_help; exit 1 ;;
     esac
 done
@@ -52,6 +58,8 @@ start_service() {
 # Start services based on flags
 [ "$OCAML" = true ] && start_service otel-to-probdeclare-converter
 [ "$SPRING" = true ] && start_service "db-service trace-receiver"
-[ "$FRONTEND" = true ] && start_service frontend
+[ "$DB_SERVICE" = true ] && start_service db-service
+[ "$TRACE_RECEIVER" = true ] && start_service trace-receiver
+[ "$TS" = true ] && start_service frontend
 
 exit 0

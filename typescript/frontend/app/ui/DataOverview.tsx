@@ -1,5 +1,5 @@
 'use client'
-import React, {useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import TraceDetailsView from './TraceDetailsView';
 import RestService from "@/app/lib/RestService";
 import {
@@ -53,7 +53,7 @@ const DataOverview: React.FC = () => {
             });
     }
 
-    useEffect(fetchDataOverview, []);
+    useMemo(fetchDataOverview, []);
 
     const handleRowClick = (sourceFile: string) => {
         if (sourceFile) {
@@ -122,13 +122,6 @@ const DataOverview: React.FC = () => {
             >
                 generate PB Model
             </Button>
-            <Button
-                variant={'contained'}
-                onClick={() => setGeneratingProbDeclare(false)}
-                disabled={!sourceFile || !generatingProbDeclare}
-            >
-                abort
-            </Button>
         </Box>
     }
 
@@ -141,7 +134,7 @@ const DataOverview: React.FC = () => {
             <Grid2 size={"grow"}>
                 <Box height="100%">
                     {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
-                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile}/>}
+                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} abortCallback={() => setGeneratingProbDeclare(false)}/>}
                 </Box>
             </Grid2>
         </Grid2>

@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {CircularProgress} from "@mui/material";
+import React, {useMemo, useState} from 'react';
+import {Button, CircularProgress} from "@mui/material";
 import RestService from "@/app/lib/RestService";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -9,6 +9,7 @@ import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
+    abortCallback: () => void;
 }
 
 interface DeclareConstraint {
@@ -23,7 +24,7 @@ interface ProbDeclare {
     traces: string[];
 }
 
-const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
+const ProbDeclareView = ({sourceFile, abortCallback}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState(true);
     const [initialized, setInitialized] = useState(false)
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
@@ -60,11 +61,25 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
         }
     }
 
-    useEffect(updateModel, [sourceFile, probDeclare]);
+    const abort = () => {
+        if (initialized) {
+            console.debug("model initialized --> sending abort request to backend.")
+            const sourceDetails: SourceDetails = defaultSourceDetails(sourceFile);
+            RestService.post<SourceDetails, void>("/prob-declare/abort", sourceDetails)
+                .then((_) => abortCallback())
+                .catch((error) => console.error('Error aborting generation of prob declare model', error))
+                .finally(() => setLoading(() => false));
+        } else {
+            console.debug("model NOT initialized --> calling abort callback immediately.")
+            abortCallback();
+        }
+    }
+
+    useMemo(updateModel, [sourceFile, probDeclare]);
 
     return (
         <Box>
-            <Typography variant="h4">Trace Details</Typography>
+            <Typography variant="h4">Prob Declare Modell for {sourceFile}</Typography>
             {loading && !probDeclare ? (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                     <CircularProgress/>
@@ -94,6 +109,13 @@ const ProbDeclareView = ({sourceFile}: ProbDeclareViewProps) => {
                         )}
                  */
             )}
+            <Button
+                variant={'contained'}
+                onClick={abort}
+                // disabled={!sourceFile || !generatingProbDeclare}
+            >
+                abort
+            </Button>
         </Box>
     );
 };

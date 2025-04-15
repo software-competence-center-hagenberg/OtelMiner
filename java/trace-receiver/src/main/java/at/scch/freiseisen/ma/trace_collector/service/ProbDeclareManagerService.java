@@ -84,14 +84,17 @@ public class ProbDeclareManagerService {
     }
 
     private void finishGeneration(boolean abort) {
-        currentId.set(null);
+        log.debug("Finishing generation task for model ID: {}", currentId.get());
         constraints.clear();
         declareService.clear();
+        generating.clear();
         restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId);
         nrTraces.set(0L);
+        currentId.set(null);
         if (abort) {
             // FIXME differentiate between abortion and finishing
         }
+        log.info("Finished generation task for model ID: {}", currentId.get());
     }
 
     private ProbDeclareModel getCurrentModel() {
@@ -148,6 +151,10 @@ public class ProbDeclareManagerService {
         if (conversionResponse == null) {
             log.debug("conversion response is null, aborting generation...");
             finishGeneration(true);
+            return;
+        }
+        if (currentId.getAcquire() == null) {
+            log.info("Currently no generation runnning --> aborting");
             return;
         }
         List<ProbDeclareConstraintModelEntry> existingDeclare = Objects.requireNonNull(response.getBody());
@@ -300,5 +307,16 @@ public class ProbDeclareManagerService {
 
     private boolean isGenerationFinished() {
         return generating.isEmpty(); // FIXME evaluate
+    }
+
+    protected boolean abort() {
+        try {
+            log.info("aborting prob declare by frontend request");
+            finishGeneration(true);
+        } catch (ModelGenerationException e) {
+            log.error("error aborting prob declare model", e);
+            return false;
+        }
+        return true;
     }
 }
