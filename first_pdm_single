@@ -1,0 +1,219 @@
+process model ts-travel-service.json
+
+* 302 traces
+* 21 pages with 10 traces per page
+* traces with 6,7,8,10, and 12 spans
+* ~20s per trace
+    measured by hand: 8pages(80traces) ~30min -> 3-4.5min per page -> ~120min per 320traces -> ~0.375min per trace = 20s
+
+at the moment trace-receiver uses SingleThreadedExecutorService -> 10 threads should give a runtime acceleration of approximately a factor of 10 -> ~2s per trace
+possible bottle-neck: capacity of rabbitMQ Queue,
+possible solutions for bottle-neck:
+* use multiple queues
+* trim data (currently whole trace is sent while only fields trace_id, parent_span_id, span_id, and name are used) --> might also further increase performance
+
+further possible performance boosters:
+* multiple instances of otel-to-prob-declare-converter
+* send traces in batches of n
+* less db persistence (currently every result per trace is persisted; implicit reduction with batching; maybe also only persist in the end and take risk of data loss if failure occurs)
+
+planned quality of life features:
+* better (textual) representation of model in frontend (current representation looks like the model bellow)
+* pause and resume of model generation (save info of current trace of current page with page size to continue later + PAUSE and RESUME button in frontend)
+* make already generated models inspectable
+* better layouting in frontend
+
+planned code quality features:
+* refactor trace-receiver
+* add missing javadoc
+* normalize and scale probability computation with THRESHOLD (Long.MAX_SIZE/100), SCALE_FACTOR (10), ROUNDING (SCALE_FACTOR/2) and recalculate nrTraces and nr of each span when threshold is reached to ensure no overflow can occur
+* switch out useEffect usages in frontend with useMemo to be more stable
+
+nice-to-haves:
+* switch polling to SSE (if there is enough time for implementation)
+
+planned steps to ensure model correctness:
+* compare created model and approach to PROB_DECLARE approach in papers (mainly interesting for probability calculation)
+* add join table declare_to_trace to remember association
+
+NOTE: model bellow shows generating true while it is already finished, the process crashed because the last page retrieved was empty due to false calculation of pages (index starts with 0, therefore hasMorePages should be currentPage < totalPages-1) bug should be fixed now.
+Bug occurred in frontend: due to laptop going into lock screen -> the frontend stopped polling
+model:
+{
+    "id": "e5be205d-4d9d-4131-808d-2d8a1457ef95",
+    "constraints": [
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "INIT(POST /travel/getTripsByRouteId)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "EXISTENCE(EMController.runSut)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "CHAIN_SUCCESSION(POST /travel/getTripsByRouteId, TravelController.getTripsByRouteId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "CHAIN_SUCCESSION(TripRepository.save, update ts.trip)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "CHAIN_SUCCESSION(TravelController.getTripsByRouteId, TripRepository.findByRouteId)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "SUCCESSION(TravelController.getTripsByRouteId, find ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "CHAIN_SUCCESSION(POST /travel/create, TravelController.create)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "EXISTENCE(POST /travel/create)"
+        },
+        {
+            "probability": 0.11643835616438356,
+            "declareTemplate": "LAST(BasicErrorController.error)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(TravelController.create, update ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "CHAIN_SUCCESSION(TravelController.create, TripRepository.save)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "INIT(POST /travel/create)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "EXISTENCE(PUT /controller/api/runSUT)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "SUCCESSION(EMController.runSut, find ts.trip)"
+        },
+        {
+            "probability": 0.11643835616438356,
+            "declareTemplate": "CHAIN_SUCCESSION(POST /travel/create, BasicErrorController.error)"
+        },
+        {
+            "probability": 0.11643835616438356,
+            "declareTemplate": "CHOICE(BasicErrorController.error, TravelController.create)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "CHOICE(TripRepository.findByTripId, TripRepository.save)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "SUCCESSION(PUT /controller/api/runSUT, TripRepository.findByTripId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(POST /travel/create, find ts.trip)"
+        },
+        {
+            "probability": 0.1095890410958904,
+            "declareTemplate": "EXISTENCE(TripRepository.findByTripId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(TravelController.create, find ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "EXISTENCE(TripRepository.save)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "CHAIN_SUCCESSION(TripRepository.findByRouteId, find ts.trip)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "SUCCESSION(POST /travel/getTripsByRouteId, TripRepository.findByRouteId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(POST /travel/create, TripRepository.save)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "SUCCESSION(POST /travel/getTripsByRouteId, find ts.trip)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "CHAIN_SUCCESSION(EMController.runSut, TripRepository.findByTripId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(POST /travel/create, update ts.trip)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "EXISTENCE(POST /travel/getTripsByRouteId)"
+        },
+        {
+            "probability": 1.0,
+            "declareTemplate": "LAST(find ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "EXISTENCE(TravelController.create)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "CHAIN_SUCCESSION(PUT /controller/api/runSUT, EMController.runSut)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "SUCCESSION(PUT /controller/api/runSUT, find ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "EXISTENCE(update ts.trip)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "EXISTENCE(TravelController.getTripsByRouteId)"
+        },
+        {
+            "probability": 1.0,
+            "declareTemplate": "EXISTENCE(find ts.trip)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "SUCCESSION(POST /travel/create, TripRepository.findByTripId)"
+        },
+        {
+            "probability": 0.903114186851211,
+            "declareTemplate": "EXISTENCE(TripRepository.findByRouteId)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "CHAIN_SUCCESSION(TravelController.create, TripRepository.findByTripId)"
+        },
+        {
+            "probability": 0.1095890410958904,
+            "declareTemplate": "CHAIN_SUCCESSION(TripRepository.findByTripId, find ts.trip)"
+        },
+        {
+            "probability": 0.0136986301369863,
+            "declareTemplate": "INIT(PUT /controller/api/runSUT)"
+        },
+        {
+            "probability": 0.11643835616438356,
+            "declareTemplate": "EXISTENCE(BasicErrorController.error)"
+        },
+        {
+            "probability": 0.11301369863013698,
+            "declareTemplate": "LAST(update ts.trip)"
+        }
+    ],
+    "generating": true
+}
