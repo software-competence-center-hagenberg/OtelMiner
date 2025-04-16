@@ -37,6 +37,7 @@ const columns: readonly Column[] = [
 const DataOverview: React.FC = () => {
     const [data, setData] = useState<DataOverviewProps[]>([]);
     const [sourceFile, setSourceFile] = useState<string | null>(null);
+    const [nrTraces, setNrTraces] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<unknown | null>(null);
     const [generatingProbDeclare, setGeneratingProbDeclare] = useState<boolean>(false);
@@ -55,10 +56,9 @@ const DataOverview: React.FC = () => {
 
     useMemo(fetchDataOverview, []);
 
-    const handleRowClick = (sourceFile: string) => {
-        if (sourceFile) {
-            setSourceFile(() => sourceFile);
-        }
+    const handleRowClick = (row: DataOverviewProps) => {
+        setSourceFile(() => row.sourceFile);
+        setNrTraces(() => row.nrTraces);
     };
 
     const renderTable = () => {
@@ -81,7 +81,7 @@ const DataOverview: React.FC = () => {
                     <TableBody>
                         {data.map((row) => (
                             <TableRow
-                                onClick={() => handleRowClick(row.sourceFile)}
+                                onClick={() => handleRowClick(row)}
                                 tabIndex={-1}
                                 key={row.sourceFile}
                             >
@@ -134,7 +134,7 @@ const DataOverview: React.FC = () => {
             <Grid2 size={"grow"}>
                 <Box height="100%">
                     {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
-                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} abortCallback={() => setGeneratingProbDeclare(false)}/>}
+                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} expectedTraces={nrTraces!} abortCallback={() => setGeneratingProbDeclare(false)}/>}
                 </Box>
             </Grid2>
         </Grid2>

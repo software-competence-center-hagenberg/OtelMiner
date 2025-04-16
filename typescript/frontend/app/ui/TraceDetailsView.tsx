@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Button,
     CircularProgress,
@@ -38,6 +38,14 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     const [selectedRow, setSelectedRow] = useState<TraceDetails | undefined>(undefined);
     const [selectedRowModel, setSelectedRowModel] = useState<string[] | undefined>(undefined);
 
+    useMemo(() => {
+        setSelectedRow(undefined);
+        setSelectedRowModel(undefined);
+        setSourceDetails(
+            _prev => (defaultSourceDetails(sourceFile))
+        );
+    }, [sourceFile])
+
     const fetchSourceDetails = () => {
         setLoadingPage(true)
         RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
@@ -45,10 +53,6 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
             .catch((error) => console.error('Error fetching source details:', error))
             .finally(() => setLoadingPage(false));
     };
-
-    useMemo(() => setSourceDetails(
-        _prev => (defaultSourceDetails(sourceFile))
-    ), [sourceFile])
 
     useMemo(fetchSourceDetails, [sourceDetails.sourceFile, sourceDetails.page, sourceDetails.size]);
 

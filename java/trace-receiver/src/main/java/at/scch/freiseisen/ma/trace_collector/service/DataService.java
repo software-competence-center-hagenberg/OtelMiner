@@ -1,10 +1,8 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
-import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
-import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +43,8 @@ public class DataService {
     }
 
     // FIXME change again so only source file is received in request and manage rest with pages in manager service!
-    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails) {
-        return probDeclareManagerService.generate(sourceDetails);
+    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails, int expectedTraces) {
+        return probDeclareManagerService.generate(sourceDetails, expectedTraces);
     }
 
     public ProbDeclareModel getProbDeclareModel(String id) {
@@ -55,5 +53,13 @@ public class DataService {
 
     public boolean abortProbDeclareModelGeneration() {
         return probDeclareManagerService.abort();
+    }
+
+    public boolean pauseProbDeclareModelGeneration(String probDeclareId) {
+        return probDeclareManagerService.pause(probDeclareId);
+    }
+
+    public boolean resumeProbDeclareModelGeneration(String probDeclareId) {
+        return probDeclareManagerService.resume(probDeclareId);
     }
 }

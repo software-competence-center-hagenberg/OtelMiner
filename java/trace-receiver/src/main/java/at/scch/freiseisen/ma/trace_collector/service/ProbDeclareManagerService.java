@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
@@ -25,9 +26,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -47,29 +48,103 @@ public class ProbDeclareManagerService {
     private final ConcurrentMap<String, CompletableFuture<ConversionResponse>> generating = new ConcurrentHashMap<>();
     private final CanonizedSpanTreeService canonizedSpanTreeService;
     private final ObjectMapper objectMapper;
-    //FIXME refactor data types
+    //FIXME refactor data types to (multiple) state objects
     private final ConcurrentMap<String, ProbDeclareConstraintModelEntry> constraints = new ConcurrentHashMap<>();
     private final DeclareService declareService;
     private final AtomicReference<String> currentId = new AtomicReference<>(null);
-    private final AtomicLong nrTraces = new AtomicLong(0);
+    private final AtomicReference<String> currentSourceFile = new AtomicReference<>(null);
+    private final AtomicLong currentNrTracesProcessed = new AtomicLong(0);
+    private final AtomicLong currentExpectedTraces = new AtomicLong(0);
+    private final AtomicBoolean isPaused = new AtomicBoolean(false);
+    private final AtomicReference<List<Runnable>> pausedGeneration = new AtomicReference<>(new ArrayList<>());
 
-    private void persist(ProbDeclare probDeclare) {
-        restTemplate.postForLocation(restConfig.probDeclareUrl + "/one", probDeclare);
+    // FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
+    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
+    public void receiveDeclare(Message msg) {
+        String model = new String(msg.getBody());
+        log.info("received declare result: {}", model);
+        try {
+            ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
+            String traceId = response.traceId();
+            declareService.add(traceId, response.constraints());
+            log.info("received result:\n\ttraceId: {}\n\tconstraints: {}", response.traceId(), response.constraints());
+            if (generating.containsKey(traceId)) {
+                CompletableFuture<ConversionResponse> future = generating.remove(traceId);
+                future.complete(response);
+            } else {
+                log.info("traceId {}, not present in generation -> ONLY passing it on to declareService", traceId);
+            }
+        } catch (JsonProcessingException e) {
+            throw new ModelGenerationException("Error parsing declare", e);
+        }
     }
 
-    public ProbDeclareModel generate(SourceDetails sourceDetails) {
-        if (currentId.getAcquire() != null) {
+    // TODO check if necessary or if better done directly in data service
+    protected ProbDeclareModel getProbDeclareModel(String id) {
+        return id.equals(currentId.get())
+                ? getCurrentModel()
+                : restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
+    }
+
+    protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces) {
+        if (currentExpectedTraces.get() == expectedTraces && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
             return getCurrentModel();
         }
+        clearCurrentState();
+        currentExpectedTraces.compareAndSet(0, expectedTraces);
+        currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
         String id = UUID.randomUUID().toString();
         currentId.weakCompareAndSetAcquire(null, id);
         declareConstraintGenerationExecutor.submit(() -> initDeclareGeneration(sourceDetails, id));
         return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
 
+    protected boolean abort() {
+        try {
+            log.info("aborting prob declare by frontend request");
+            finishGeneration(true);
+        } catch (ModelGenerationException e) {
+            log.error("error aborting prob declare model", e);
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean pause(String probDeclareId) {
+        log.info("pause of generation of model {} requested...", probDeclareId);
+        String cId = currentId.getAcquire();
+        if (!cId.equals(probDeclareId)) {
+            log.info("but currentId ({}) is unequal --> not pausing", cId);
+            return false;
+        }
+        log.info("pausing generation of model {}", probDeclareId);
+        isPaused.compareAndSet(false, true);
+        return isPaused.getAcquire();
+    }
+
+    protected boolean resume(String probDeclareId) {
+        log.info("resume of generation of model {} requested...", probDeclareId);
+        String cId = currentId.getAcquire();
+        if (!cId.equals(probDeclareId)) {
+            log.info("but currentId ({}) is unequal --> not resuming", cId);
+            return false;
+        }
+        if (!isPaused.getAcquire()) {
+            log.info("but current model generation is NOT paused --> not resuming");
+            return false;
+        }
+        log.info("resuming generation of model {}", probDeclareId);
+        pausedGeneration.getAcquire().forEach(Runnable::run);
+        isPaused.compareAndSet(true, false);
+        return true;
+    }
+
+    private ProbDeclare persist(ProbDeclare probDeclare) {
+        return restTemplate.postForObject(restConfig.probDeclareUrl + "/one", probDeclare, ProbDeclare.class);
+    }
+
     private void initDeclareGeneration(SourceDetails sourceDetails, String id) {
-        ProbDeclare probDeclare = new ProbDeclare(id);
-        persist(probDeclare);
+        ProbDeclare probDeclare = persist(new ProbDeclare(id));
         log.info("Starting generation task for model ID: {}", id);
         try {
             generateDeclareConstraints(probDeclare.getId(), sourceDetails);
@@ -85,16 +160,21 @@ public class ProbDeclareManagerService {
 
     private void finishGeneration(boolean abort) {
         log.debug("Finishing generation task for model ID: {}", currentId.get());
-        constraints.clear();
         declareService.clear();
         generating.clear();
-        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId);
-        nrTraces.set(0L);
-        currentId.set(null);
+        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId); // FIXME change to POST
         if (abort) {
-            // FIXME differentiate between abortion and finishing
+            clearCurrentState();
         }
         log.info("Finished generation task for model ID: {}", currentId.get());
+    }
+
+    private void clearCurrentState() {
+        currentId.set(null);
+        currentSourceFile.set(null);
+        currentNrTracesProcessed.set(0L);
+        currentExpectedTraces.set(0L);
+        constraints.clear();
     }
 
     private ProbDeclareModel getCurrentModel() {
@@ -102,7 +182,8 @@ public class ProbDeclareManagerService {
                 .stream()
                 .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
                 .toList();
-        return new ProbDeclareModel(currentId.get(), model, !isGenerationFinished());
+
+        return new ProbDeclareModel(currentId.get(), model, currentNrTracesProcessed.get() != currentExpectedTraces.get());
     }
 
     private void generateDeclareConstraints(@NonNull String probDeclareId, @NonNull SourceDetails sourceDetails) {
@@ -138,7 +219,19 @@ public class ProbDeclareManagerService {
                     return null;
                 });
         generating.put(trace.getId(), future);
-        declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
+
+        if (isPaused.getAcquire()) {
+            log.info("model generation is currently paused --> setting out next trace({}) until resume is requested"
+                    , trace.getId());
+            pausedGeneration.getAcquire()
+                    .add(() -> {
+                        log.debug("resuming with trace {}", trace.getId());
+                        declareService.transformAndPipe(
+                                trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
+                    });
+        } else {
+            declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
+        }
     }
 
     private void processResponse(ConversionResponse conversionResponse, String probDeclareId, ProbDeclareGenerationDTO dto, SourceDetails sourceDetails) {
@@ -154,7 +247,7 @@ public class ProbDeclareManagerService {
             return;
         }
         if (currentId.getAcquire() == null) {
-            log.info("Currently no generation runnning --> aborting");
+            log.info("Currently no generation running --> aborting");
             return;
         }
         List<ProbDeclareConstraintModelEntry> existingDeclare = Objects.requireNonNull(response.getBody());
@@ -188,14 +281,14 @@ public class ProbDeclareManagerService {
 
             existingDeclare.addAll(Objects.requireNonNull(createdDeclare.getBody()));
         });
-        updateModel(existingDeclare, probDeclareId);
 
+        updateModel(existingDeclare, probDeclareId);
         if (dto.hasContent()) {
             generateProbDeclareForNextTrace(dto, probDeclareId, sourceDetails);
         } else if (dto.hasMorePages()) {
             sourceDetails.setPage(dto.getCurrentPage() + 1);
             generateDeclareConstraints(probDeclareId, sourceDetails);
-        } else {
+        } else if (isGenerationFinished()) {
             log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
         }
     }
@@ -205,29 +298,8 @@ public class ProbDeclareManagerService {
         restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
     }
 
-// FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
-    public void receiveDeclare(Message msg) {
-        String model = new String(msg.getBody());
-        log.info("received declare result: {}", model);
-        try {
-            ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
-            String traceId = response.traceId();
-            declareService.add(traceId, response.constraints());
-            log.info("received result:\n\ttraceId: {}\n\tconstraints: {}", response.traceId(), response.constraints());
-            if (generating.containsKey(traceId)) {
-                CompletableFuture<ConversionResponse> future = generating.remove(traceId);
-                future.complete(response);
-            } else {
-                log.info("traceId {}, not present in generation -> ONLY passing it on to declareService", traceId);
-            }
-        } catch (JsonProcessingException e) {
-            throw new ModelGenerationException("Error parsing declare", e);
-        }
-    }
-
     private void updateModel(List<ProbDeclareConstraintModelEntry> declareList, String probDeclareId) {
-        long currentNrTraces = nrTraces.getAcquire();
+        long currentNrTraces = currentNrTracesProcessed.getAcquire();
         log.info("updating model");
         log.debug("declareList: {}", declareList);
         if (declareList.isEmpty()) {
@@ -246,15 +318,15 @@ public class ProbDeclareManagerService {
             List<String> visited = new ArrayList<>();
             assert currentNrTraces > 0;
             log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
-            nrTraces.compareAndSet(currentNrTraces, currentNrTraces + 1);
+            currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
             declareList.forEach(declare -> visited.add(updateOrAddConstraint(declare)));
             declareList.addAll(updateConstraintsNotContainedInCurrentTrace(visited));
-            restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, declareList); // FIXME 500 error when posting
+            restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, declareList);
         }
     }
 
     private void initModelWithCrisps(List<ProbDeclareConstraintModelEntry> declareList) {
-        nrTraces.compareAndSet(0, 1);
+        currentNrTracesProcessed.compareAndSet(0, 1);
         log.info("no constraints so far and no traces --> initializing crisps");
         declareList.forEach(declare -> {
             log.debug("adding crisp constraint: {}", declare.getConstraintTemplate());
@@ -273,11 +345,11 @@ public class ProbDeclareManagerService {
             declare.setNr(d.getNr() + 1);
             if (d.getProbability() != 1d) {
                 log.debug("constraint not crisp --> updating probability");
-                declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
+                declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
             }
         } else {
             log.debug("constraint does not exist --> updating probability");
-            declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
+            declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
             log.debug("adding to constraints: {}", declare);
             constraints.put(declare.getConstraintTemplate(), declare);
         }
@@ -292,31 +364,13 @@ public class ProbDeclareManagerService {
                 .forEach(c -> {
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
                     declare.setNr(declare.getNr() + 1);
-                    declare.setProbability(((double) declare.getNr())  / nrTraces.getAcquire());
+                    declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
                     declareList.add(declare);
                 });
         return declareList;
     }
 
-    // TODO check if necessary or if better done directly in data service
-    public ProbDeclareModel getProbDeclareModel(String id) {
-        return id.equals(currentId.get())
-                ? getCurrentModel()
-                : restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
-    }
-
     private boolean isGenerationFinished() {
-        return generating.isEmpty(); // FIXME evaluate
-    }
-
-    protected boolean abort() {
-        try {
-            log.info("aborting prob declare by frontend request");
-            finishGeneration(true);
-        } catch (ModelGenerationException e) {
-            log.error("error aborting prob declare model", e);
-            return false;
-        }
-        return true;
+        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire();
     }
 }

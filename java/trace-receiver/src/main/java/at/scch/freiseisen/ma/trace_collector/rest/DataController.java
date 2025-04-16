@@ -37,13 +37,30 @@ public class DataController {
     }
 
     @PostMapping("/prob-declare/generate")
-    public ProbDeclareModel generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
-        return dataService.generateProbDeclareModel(sourceDetails);
+    public ProbDeclareModel generateProbDeclareModel(@RequestParam("expected-traces") int expectedTraces, @RequestBody SourceDetails sourceDetails) {
+        return dataService.generateProbDeclareModel(sourceDetails, expectedTraces);
     }
 
-    @PostMapping("/prob-declare/abort")
-    public ResponseEntity<Void> abortProbDeclareModelGeneration() {
+    @GetMapping("/prob-declare/abort/{prob-declare-id}")
+    public ResponseEntity<Void> abortProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("aborting generation of model {}", probDeclareId);
         return dataService.abortProbDeclareModelGeneration()
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping("/prob-declare/pause/{prob-declare-id}")
+    public ResponseEntity<Void> pauseProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("pausing generation of model {}", probDeclareId);
+        return dataService.pauseProbDeclareModelGeneration(probDeclareId)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping("/prob-declare/resume/{prob-declare-id}")
+    public ResponseEntity<Void> resumeProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("resuming generation of model {}", probDeclareId);
+        return dataService.resumeProbDeclareModelGeneration(probDeclareId)
                 ? ResponseEntity.ok().build()
                 : ResponseEntity.internalServerError().build();
     }
