@@ -4,6 +4,7 @@ services:
     user: "1000:1000"
     ports:
       - "5672:5672"
+      - "15672:15672"
     cap_drop:
       - "ALL"
     security_opt:
