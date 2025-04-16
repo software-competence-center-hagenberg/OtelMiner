@@ -49,4 +49,9 @@ public class TraceService extends BaseService<TraceRepository, Trace, String> {
         );
         return repository.findBySourceFile(pageable, sourceDetails.getSourceFile());
     }
+
+    public Page<Trace> findBySourceFile(String sourceFile, int page, int size, Sort by) {
+        Pageable pageable = PageRequest.of(page, size, by);
+        return repository.findBySourceFile(pageable, sourceFile);
+    }
 }

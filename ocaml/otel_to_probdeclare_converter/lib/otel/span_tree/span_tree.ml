@@ -13,14 +13,13 @@ let rec pp_span_tree (fmt : Format.formatter) (span_tree : span_tree_node) =
       children
   in
   Format.fprintf fmt "{\n    span = %a; \n    children = %a \n}\n"
-    Otel_encoder.pp_span_custom span_tree.span pp_children
-    span_tree.children
+    Otel_encoder.pp_span_custom span_tree.span pp_children span_tree.children
 
 let string_of_node node =
   Format.flush_str_formatter (pp_span_tree Format.str_formatter node)
 
 let string_of_nodes nodes =
-  if nodes = [] then "[]" 
+  if nodes = [] then "[]"
   else String.concat "; " (List.map (fun n -> string_of_node n) nodes)
 
 (*let string_of_span_id node = String.of_bytes node.span.span_id*)
@@ -39,7 +38,32 @@ let extract_spans (resource_spans : Trace.resource_spans) =
  * returns (r, n) where r is a list of roots and n is a list of non-root nodes. 
  * Note: The original order of spans is kept.
  *)
-let generate_nodes (spans : Trace.span list) =
+let generate_nodes_for_single_trace (spans : Trace.span list) :
+    span_tree_node option * span_tree_node list =
+  let rec gen_aux (spans : Trace.span list) r fn =
+    match spans with
+    | [] -> (r, fn [])
+    | s :: t ->
+        if s.parent_span_id = Bytes.empty then
+          match r with
+          | Some cur_r ->
+              Log.error
+                "Found more than one root node for single trace! -> expect \
+                 errors; current:%s; found:%s"
+                (Bytes.to_string cur_r.span.span_id)
+                (Bytes.to_string s.span_id);
+              gen_aux t r fn
+          | None -> gen_aux t (Some (create_span_tree_node s)) fn
+        else gen_aux t r (fun a -> fn (create_span_tree_node s :: a))
+  in
+  gen_aux spans None (fun x -> x)
+
+ (*
+    * Creates a span_tree_node for every span and builds a list of roots and nodes.
+    * returns (r, n) where r is a list of roots and n is a list of non-root nodes.
+    * Note: The original order of spans is kept.
+    *)
+ let generate_nodes_for_multiple_traces (spans : Trace.span list) =
   let rec gen_aux (spans : Trace.span list) fr fn =
     match spans with
     | [] -> (fr [], fn [])
@@ -103,24 +127,43 @@ let build_tree root nodes =
   in
   build_tree_aux root root nodes
 
+(* Builds all span trees with given root and nodes. *)
+let build_span_trees_for_single_trace (nodes : span_tree_node list)
+    (root : span_tree_node) : span_tree_node =
+  let tree, n = build_tree root nodes in
+  match n with
+  | [] ->
+      Log.info "Tree successfully built -> no orphans left!";
+      tree
+  | _ ->
+      Log.error "Tree successfully built BUT orphans left!";
+      tree
+
 (* Builds all span trees with given roots and nodes. *)
-let build_span_trees nodes roots =
+let build_span_trees_for_multiple_traces nodes roots =
   let rec build_span_trees_aux nodes roots acc =
     match roots with
-    | [] -> 
-      Log.info "orphans remaining:\n";
-      Log.info "%s" (string_of_nodes nodes);
-      acc
+    | [] ->
+        Log.info "orphans remaining:\n";
+        Log.info "%s" (string_of_nodes nodes);
+        acc
     | root :: r ->
         let tree, n = build_tree root nodes in
         build_span_trees_aux n r (tree :: acc)
   in
   build_span_trees_aux nodes roots []
 
-let generate_span_trees_from_spans (spans : Trace.span list) :
-    span_tree_node list =
-  let roots, nodes = generate_nodes spans in
-  build_span_trees nodes roots
+let generate_span_trees_from_spans_for_single_trace (spans : Trace.span list) :
+    span_tree_node =
+  let root, nodes = generate_nodes_for_single_trace spans in
+  match root with
+  | Some r -> build_span_trees_for_single_trace nodes r
+  | None -> failwith "No root found!"
+
+let generate_span_trees_from_spans_for_multiple_traces (spans : Trace.span list) :
+  span_tree_node list =
+  let roots, nodes = generate_nodes_for_multiple_traces spans in
+  build_span_trees_for_multiple_traces nodes roots
 
 (* 
  * Takes resources_spans object. 
@@ -133,4 +176,4 @@ let generate_span_trees_from_spans (spans : Trace.span list) :
 let generate_span_trees_from_resource_spans
     (resource_spans : Trace.resource_spans) : span_tree_node list =
   let spans = extract_spans resource_spans in
-  generate_span_trees_from_spans spans
+  generate_span_trees_from_spans_for_multiple_traces spans

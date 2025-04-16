@@ -1,6 +1,6 @@
 package at.scch.freiseisen.ma.db_service.controller.v1;
 
-import at.scch.freiseisen.ma.data_layer.dto.DeclareConstraint;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraint;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.ProbDeclareRepository;
@@ -35,8 +35,8 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
     @GetMapping("/model/{id}")
     public ProbDeclareModel retrieveModel(@PathVariable("id") String id) {
         ProbDeclare probDeclare = service.findById(id);
-        List<DeclareConstraint> constraints = probDeclare.getDeclareList().stream()
-                .map(d -> new DeclareConstraint(d.getProbability(), d.getConstraintTemplate()))
+        List<ProbDeclareConstraint> constraints = probDeclare.getDeclareList().stream()
+                .map(d -> new ProbDeclareConstraint(d.getProbability(), d.getConstraintTemplate()))
                 .toList();
         return new ProbDeclareModel(probDeclare.getId(), constraints, probDeclare.isGenerating());
     }

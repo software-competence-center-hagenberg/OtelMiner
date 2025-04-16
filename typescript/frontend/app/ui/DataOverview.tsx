@@ -1,5 +1,5 @@
 'use client'
-import React, {useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import TraceDetailsView from './TraceDetailsView';
 import RestService from "@/app/lib/RestService";
 import {
@@ -16,6 +16,7 @@ import {
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import ProbDeclareView from "@/app/ui/ProbDeclareView";
+import {ColumnBase} from "@/app/lib/Util";
 
 interface DataOverviewProps {
     nrNodes: number[];
@@ -36,6 +37,7 @@ const columns: readonly Column[] = [
 const DataOverview: React.FC = () => {
     const [data, setData] = useState<DataOverviewProps[]>([]);
     const [sourceFile, setSourceFile] = useState<string | null>(null);
+    const [nrTraces, setNrTraces] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<unknown | null>(null);
     const [generatingProbDeclare, setGeneratingProbDeclare] = useState<boolean>(false);
@@ -43,21 +45,20 @@ const DataOverview: React.FC = () => {
     const fetchDataOverview = () => {
         RestService.get<DataOverviewProps[]>('/overview')
             .then((response) => {
-                setData(response.data);
+                setData(() => response.data);
                 setLoading(false);
             })
             .catch((error) => {
-                setError(error);
+                setError(() => error);
                 setLoading(false);
             });
     }
 
-    useEffect(fetchDataOverview, []);
+    useMemo(fetchDataOverview, []);
 
-    const handleRowClick = (sourceFile: string) => {
-        if (sourceFile) {
-            setSourceFile(sourceFile);
-        }
+    const handleRowClick = (row: DataOverviewProps) => {
+        setSourceFile(() => row.sourceFile);
+        setNrTraces(() => row.nrTraces);
     };
 
     const renderTable = () => {
@@ -80,7 +81,7 @@ const DataOverview: React.FC = () => {
                     <TableBody>
                         {data.map((row) => (
                             <TableRow
-                                onClick={() => handleRowClick(row.sourceFile)}
+                                onClick={() => handleRowClick(row)}
                                 tabIndex={-1}
                                 key={row.sourceFile}
                             >
@@ -121,13 +122,6 @@ const DataOverview: React.FC = () => {
             >
                 generate PB Model
             </Button>
-            <Button
-                variant={'contained'}
-                onClick={() => setGeneratingProbDeclare(false)}
-                disabled={!sourceFile || !generatingProbDeclare}
-            >
-                abort
-            </Button>
         </Box>
     }
 
@@ -140,7 +134,7 @@ const DataOverview: React.FC = () => {
             <Grid2 size={"grow"}>
                 <Box height="100%">
                     {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
-                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile}/>}
+                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} expectedTraces={nrTraces!} abortCallback={() => setGeneratingProbDeclare(false)}/>}
                 </Box>
             </Grid2>
         </Grid2>

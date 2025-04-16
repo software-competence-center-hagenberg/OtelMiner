@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Button,
     CircularProgress,
@@ -16,6 +16,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DeclareView from "@/app/ui/DeclareView";
 import JsonView from "@/app/ui/json/JsonView";
+import {ColumnBase, defaultSourceDetails, SourceDetails, TraceDetails} from "@/app/lib/Util";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -26,95 +27,88 @@ const columns: readonly Column[] = [
     {id: 'nrNodes', label: 'Number of Nodes', minWidth: 100, format: (value: number) => value.toString()}
 ];
 
-interface TraceDetails {
-    traceId?: string;
-    nrNodes?: number;
-    spans?: Buffer[]; // large strings -> buffer
-}
-
-interface SourceDetails {
-    sourceFile: string;
-    traces: TraceDetails[];
-    page: number;
-    size: number;
-    totalPages: number;
-    sort: string;
-}
-
 interface TraceDetailsTableProps {
     sourceFile: string;
 }
 
-function defaultSourceDetails(sourceFile: string) {
-    return {
-        sourceFile: sourceFile,
-        traces: [],
-        page: 1,
-        size: 10,
-        totalPages: 1,
-        sort: "sourceFile"
-    }
-}
-
 const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
-    const [selectedRow, setSelectedRow] = useState<TraceDetails>(); // FIXME check if better with useRef
-    const [selectedRowModel, setSelectedRowModel] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loadingPage, setLoadingPage] = useState<boolean>(false);
+    const [loadingModel, setLoadingModel] = useState<boolean>(false);
+    const [selectedRow, setSelectedRow] = useState<TraceDetails | undefined>(undefined);
+    const [selectedRowModel, setSelectedRowModel] = useState<string[] | undefined>(undefined);
 
-    useEffect(() => {
-        fetchSourceDetails(sourceDetails);
-    }, [sourceFile]);
+    useMemo(() => {
+        setSelectedRow(undefined);
+        setSelectedRowModel(undefined);
+        setSourceDetails(
+            _prev => (defaultSourceDetails(sourceFile))
+        );
+    }, [sourceFile])
 
-    const handlePageChange = (_event: unknown, newPage: number) => {
-        const sd = sourceDetails;
-        sd.page = newPage;
-        fetchSourceDetails(sd);
+    const fetchSourceDetails = () => {
+        setLoadingPage(true)
+        RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
+            .then((response) => setSourceDetails(() => response.data))
+            .catch((error) => console.error('Error fetching source details:', error))
+            .finally(() => setLoadingPage(false));
     };
 
-    const fetchSourceDetails = (sourceDetails: SourceDetails) => {
-        setLoading(true);
-        RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
-            .then((response) => setSourceDetails(response.data))
-            .catch((error) => console.error('Error fetching source details:', error))
-            .finally(() => setLoading(false));
+    useMemo(fetchSourceDetails, [sourceDetails.sourceFile, sourceDetails.page, sourceDetails.size]);
+
+    const handlePageChange = (_event: unknown, newPage: number) => {
+        setSourceDetails(prev => ({
+            ...prev,
+            page: newPage,
+        }));
+        setSelectedRow(undefined);
+        setSelectedRowModel(undefined);
     };
 
     const handlePageSizeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const sd = sourceDetails;
-        sd.size = +event.target.value;
-        fetchSourceDetails(sd);
+        setSourceDetails(prev => ({
+            ...prev,
+            page: 0,
+            size: +event.target.value
+        }));
     };
 
-    const handleRowClick = (selectedRow: TraceDetails) => {
-        setSelectedRow(selectedRow);
+    const handleRowClick = (newRow: TraceDetails) => {
+        setSelectedRow(newRow);
+        setSelectedRowModel(undefined);
     };
 
     const onClickGenerateModel = async () => {
         try {
-            setLoading(true);
-            const response = await RestService.post<TraceDetails, string>("/generate-model", selectedRow!);
+            setLoadingModel(true)
+            const response = await RestService.post<TraceDetails, string>("/declare/generate", selectedRow!);
             const model = await pollModel(response.data);
-            setSelectedRowModel(model);
+            const rowModel: string[] = JSON.parse(JSON.stringify(model));
+            setSelectedRowModel(rowModel);
         } catch (error) {
             console.error('Error generating model:', error);
         } finally {
-            setLoading(false);
+            setLoadingModel(false);
         }
     };
 
     const pollModel = async (traceId: string): Promise<string> => {
-        try {
-            const response = await RestService.get<string>("/model/" + traceId);
-            if (response.data !== '') {
-                return response.data;
-            } else {
-                return await pollModel(traceId);
-            }
-        } catch (error) {
-            console.error('Error polling model:', error);
-            throw error;
-        }
+        return new Promise((resolve, reject) => {
+            const intervalId = setInterval(async () => {
+                try {
+                    const response = await RestService.get<string>("/declare/" + traceId);
+                    if (response.data !== '') {
+                        clearInterval(intervalId); // Stop polling
+                        console.log(response.data);
+                        resolve(response.data);
+                    }
+                } catch (error) {
+                    console.error('Error polling model:', error);
+                    clearInterval(intervalId)
+                    reject(new Error("Error polling model"));
+                }
+            }, 2000); // Poll every 2 seconds
+        });
     };
 
     const renderTableRow = (row: TraceDetails) => {
@@ -136,14 +130,14 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
             </TableRow>
         );
     }
-    const renderJsonView = (selectedRow: TraceDetails) => {
+    const renderJsonView = () => {
         return <Grid2 size={6} columns={6}>
             <Box>
                 <Button variant={"contained"} onClick={onClickGenerateModel}>
                     generate Model
                 </Button>
-                {selectedRow.spans && (
-                    <JsonView data={selectedRow.spans.map(s => JSON.parse(s.toString()))}/>
+                {selectedRow!.spans && (
+                    <JsonView data={selectedRow!.spans.map(s => JSON.parse(s.toString()))}/>
                 )}
             </Box>
         </Grid2>;
@@ -168,7 +162,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {sourceDetails.traces.map((row) => renderTableRow(row))}
+                            {sourceDetails.traces.map((row:TraceDetails) => renderTableRow(row))}
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -183,10 +177,12 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                 />
                 {selectedRow && (
                     <Grid2 container spacing={2}>
-                        {renderJsonView(selectedRow)}
+                        {renderJsonView()}
                         {selectedRowModel && (
                             <Grid2 size={6} columns={6}>
-                                <DeclareView rawData={selectedRowModel}/>
+                                {loadingModel
+                                    ? <CircularProgress size={'3rem'}/> // FIXME not rendered yet
+                                    : <DeclareView rawData={selectedRowModel}/>}
                             </Grid2>
                         )}
                     </Grid2>
@@ -198,7 +194,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     return (
         <Box>
             <Typography variant="h4">Trace Details</Typography>
-            {loading ? (
+            {loadingPage ? (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                     <CircularProgress/>
                 </Box>

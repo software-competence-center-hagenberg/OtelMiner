@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestConfig {
 
+    public final String tracesUrl;
     public final String dataOverviewUrl;
     public final String spansUrl;
     public final String sourceDetailsUrl;
@@ -34,6 +35,7 @@ public class RestConfig {
             @Value("${db-service.traces.endpoints.source}") String tracesSourceUrl,
             @Value("${db-service.canonized-span-tree.url}") String canonizedSpanTreeUrl
     ) {
+        this.tracesUrl = dbServiceBaseUrl + tracesUrl;
         this.dataOverviewUrl = dbServiceBaseUrl + tracesUrl + dataOverview;
         this.spansUrl = dbServiceBaseUrl + spansUrl;
         this.sourceDetailsUrl = dbServiceBaseUrl + tracesUrl + sourceDetails;

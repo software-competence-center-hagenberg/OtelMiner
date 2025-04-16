@@ -84,7 +84,7 @@ let alternate_succession a b =
   AND (alternate_response a b, alternate_precedence a b)
 
 (* notRespondedExistence(A, B) =  F(A) → F(B) *)
-let not_responded_existence a b = THEN (F a, F b)
+let not_responded_existence a b = NOT (THEN (F a, F b))
 
 (* notResponse(A, B) = G(A → ¬F(B)) *)
 let not_response a b = G (THEN (a, NOT (F b)))

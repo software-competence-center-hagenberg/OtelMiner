@@ -54,6 +54,8 @@ services:
       - ALL
     security_opt:
       - "no-new-privileges=true"
+    ports:
+      - "4020:4020"
     build:
       context: java
       dockerfile: ./Dockerfile

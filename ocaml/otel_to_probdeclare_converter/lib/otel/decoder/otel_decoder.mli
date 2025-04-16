@@ -14,6 +14,6 @@ val decode_jaeger_spans_list_string :
   string -> Opentelemetry_proto.Trace.span list
 
 val decode :
-  Util.trace_string_type ->
+  Util.trace_type ->
   Yojson.Basic.t ->
   Opentelemetry_proto.Trace.span list

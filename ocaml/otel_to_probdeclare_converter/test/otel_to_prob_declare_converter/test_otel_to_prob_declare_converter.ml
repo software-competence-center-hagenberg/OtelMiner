@@ -106,18 +106,18 @@ let test_convert_trace_spans _ =
       "[" ^ String.concat "; " (List.map Declare.to_string elements) ^ "]"
     in
     assert_equal ~printer expected_model
-      (DeclareSet.of_list (List.flatten declare))
+      (DeclareSet.of_list declare)
   in
   test_aux "ac31d6a4e6fab4b650a501274d48d3c5.json"
     ac31d6a4e6fab4b650a501274d48d3c5_model
     (fun x -> List.map decode_trace_span x)
-    (fun x -> convert_trace_spans x);
+    (fun x -> convert_trace_spans_for_single_trace x);
   test_aux "jaeger_trace.json" jaeger_trace_model
     (fun x -> List.map decode_jaeger_trace_span x)
-    (fun x -> convert_trace_spans x);
+    (fun x -> convert_trace_spans_for_single_trace x);
   test_aux "jaeger_5575e1e883a056898c9ddee917664f9a.json" m2
     (fun x -> List.map decode_jaeger_trace_span x)
-    (fun x -> convert_trace_spans x)
+    (fun x -> convert_trace_spans_for_single_trace x)
 
 let test_map_choices _ =
   let printer set =

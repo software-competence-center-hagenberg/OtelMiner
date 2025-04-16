@@ -7,7 +7,10 @@ type mapping_conf = {
 val convert_resource_spans :
   Opentelemetry_proto.Trace.resource_spans list -> Declare.t list list
 
-val convert_trace_spans :
+val convert_trace_spans_for_single_trace :
+  Opentelemetry_proto.Trace.span list -> Declare.t list
+
+val convert_trace_spans_for_multiple_traces :
   Opentelemetry_proto.Trace.span list -> Declare.t list list
 
 val determine_relation : string -> string -> string list -> Declare.t option

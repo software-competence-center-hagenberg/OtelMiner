@@ -1,10 +1,8 @@
 package at.scch.freiseisen.ma.trace_collector.service;
 
-import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
-import at.scch.freiseisen.ma.data_layer.dto.TraceData;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,7 @@ import java.util.Objects;
 public class DataService {
     private final RestConfig restConfig;
     private final RestTemplate restTemplate;
-    private final CollectorService collectorService;
+    private final CanonizedSpanTreeService canonizedSpanTreeService;
     private final ProbDeclareManagerService probDeclareManagerService;
 
     public List<DataOverview> getDataOverview() {
@@ -44,25 +42,24 @@ public class DataService {
         return Objects.requireNonNull(response.getBody());
     }
 
-    // FIXME change from String to String[]
-    public String generateTraceModel(TraceData traceDetails) {
-        log.info("generating trace model for trace {}... deleting existing", traceDetails.getTraceId());
-        restTemplate.delete(restConfig.canonizedSpanTreeUrl + "/" + traceDetails.getTraceId());
-        collectorService.addTraceModel(traceDetails.getTraceId());
-        probDeclareManagerService.transformAndPipe(traceDetails.getTraceId(), traceDetails.getSpans(), TraceDataType.JAEGER_SPANS_LIST);
-        return traceDetails.getTraceId();
-    }
-
-    // FIXME change from String to String[]
-    public String checkTraceModel(String traceId) {
-        return collectorService.retrieveModel(traceId);
-    }
-
-    public String generateProbDeclareModel(SourceDetails sourceDetails) {
-        return probDeclareManagerService.generate(sourceDetails);
+    // FIXME change again so only source file is received in request and manage rest with pages in manager service!
+    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails, int expectedTraces) {
+        return probDeclareManagerService.generate(sourceDetails, expectedTraces);
     }
 
     public ProbDeclareModel getProbDeclareModel(String id) {
         return probDeclareManagerService.getProbDeclareModel(id);
+    }
+
+    public boolean abortProbDeclareModelGeneration() {
+        return probDeclareManagerService.abort();
+    }
+
+    public boolean pauseProbDeclareModelGeneration(String probDeclareId) {
+        return probDeclareManagerService.pause(probDeclareId);
+    }
+
+    public boolean resumeProbDeclareModelGeneration(String probDeclareId) {
+        return probDeclareManagerService.resume(probDeclareId);
     }
 }

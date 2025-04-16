@@ -33,5 +33,6 @@ type t =
 val map_declare_to_ltl : t -> Ltl.term
 val compare : t -> t -> int
 val to_string : t -> string
-val string_of_declare_list_list : t list list -> string
-val to_json_string : t list list -> string
+val list_list_to_string : t list list -> string
+val list_list_to_json_string_list_list : t list list -> Yojson.Basic.t
+val list_to_json_string_list : t list -> Yojson.Basic.t

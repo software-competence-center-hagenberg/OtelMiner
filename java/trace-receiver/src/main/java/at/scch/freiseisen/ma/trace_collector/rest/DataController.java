@@ -4,10 +4,13 @@ import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.data_layer.dto.TraceData;
+import at.scch.freiseisen.ma.trace_collector.service.CanonizedSpanTreeService;
 import at.scch.freiseisen.ma.trace_collector.service.DataService;
+import at.scch.freiseisen.ma.trace_collector.service.DeclareService;
 import at.scch.freiseisen.ma.trace_collector.service.ProbDeclareManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.List;
 public class DataController {
     private final DataService dataService;
     private final ProbDeclareManagerService probDeclareManagerService;
+    private final CanonizedSpanTreeService canonizedSpanTreeService;
+    private final DeclareService declareService;
 
     @GetMapping("/overview")
     public List<DataOverview> getDataOverview() {
@@ -31,9 +36,33 @@ public class DataController {
         return dataService.getDetails(sourceDetails);
     }
 
-    @PostMapping("/generate-prob-declare-model")
-    public String generateProbDeclareModel(@RequestBody SourceDetails sourceDetails) {
-        return dataService.generateProbDeclareModel(sourceDetails);
+    @PostMapping("/prob-declare/generate")
+    public ProbDeclareModel generateProbDeclareModel(@RequestParam("expected-traces") int expectedTraces, @RequestBody SourceDetails sourceDetails) {
+        return dataService.generateProbDeclareModel(sourceDetails, expectedTraces);
+    }
+
+    @GetMapping("/prob-declare/abort/{prob-declare-id}")
+    public ResponseEntity<Void> abortProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("aborting generation of model {}", probDeclareId);
+        return dataService.abortProbDeclareModelGeneration()
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping("/prob-declare/pause/{prob-declare-id}")
+    public ResponseEntity<Void> pauseProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("pausing generation of model {}", probDeclareId);
+        return dataService.pauseProbDeclareModelGeneration(probDeclareId)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping("/prob-declare/resume/{prob-declare-id}")
+    public ResponseEntity<Void> resumeProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
+        log.info("resuming generation of model {}", probDeclareId);
+        return dataService.resumeProbDeclareModelGeneration(probDeclareId)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.internalServerError().build();
     }
 
     @GetMapping("/prob-declare/{id}")
@@ -41,20 +70,23 @@ public class DataController {
         return dataService.getProbDeclareModel(id);
     }
 
-    // FIXME change to declare-model
-    @PostMapping("/generate-model")
-    public String generateModel(@RequestBody TraceData traceDetails) {
-        return dataService.generateTraceModel(traceDetails);
+    @PostMapping("/declare/generate")
+    public String generateDeclareModelForTrace(@RequestBody TraceData traceData) {
+        return declareService.generateFromSpanList(traceData.getTraceId(), traceData.getSpans());
     }
 
-    // FIXME change to declare-model
-    @GetMapping("/model/{id}")
-    public String checkModel(@PathVariable("id") String id) {
-        return dataService.checkTraceModel(id);
+    @GetMapping("/declare/{id}")
+    public String[] checkDeclareModelForTrace(@PathVariable("id") String traceId) {
+        return declareService.retrieve(traceId);
     }
 
-    @PostMapping("/generate-span-trees")
-    public String generateSpanTrees(@RequestBody TraceData traceDetails) {
-        return dataService.generateTraceModel(traceDetails);
+    @GetMapping("/span-trees/{id}")
+    public String checkSpanTreesForTrace(@PathVariable("id") String traceId) {
+        return canonizedSpanTreeService.retrieveSpanTrees(traceId);
+    }
+
+    @PostMapping("/span-trees/generate")
+    public String generateSpanTrees(@RequestBody TraceData traceData) {
+        return canonizedSpanTreeService.generateSpanTreesFromSpanList(traceData.getTraceId(), traceData.getSpans());
     }
 }

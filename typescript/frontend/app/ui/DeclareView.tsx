@@ -1,20 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Accordion, AccordionDetails, AccordionSummary, List, ListItem} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
 
 interface DeclareViewProps {
-    rawData: string;
+    rawData: string[];
 }
 
-function parseRawData (rawData: string): Map<string, string[]> {
+function parseRawData (rawData: string[]): Map<string, string[]> {
     const model = new Map<string, string[]>();
     const regex = /([A-Z_])*\([a-zA-Z ,/.]*\)/gm;
-    const matches = rawData.match(regex);
-    if (matches) {
-        matches.forEach((match) => {
-            const [key, value] = match.split('(');
+        rawData.forEach((constraint) => {
+            const [key, value] = constraint.split('(');
             const valueWithoutParenthesis = value.slice(0, -1);
             if (model.has(key)) {
                 model.get(key)?.push(valueWithoutParenthesis);
@@ -22,7 +20,6 @@ function parseRawData (rawData: string): Map<string, string[]> {
                 model.set(key, [valueWithoutParenthesis]);
             }
         });
-    }
     return model;
 }
 
@@ -30,9 +27,9 @@ function parseRawData (rawData: string): Map<string, string[]> {
 const DeclareView = ({ rawData }: DeclareViewProps) => {
     const [model, setModel] = useState<Map<string, string[]>>(new Map<string, string[]>());
 
-    useEffect(() => {
+    useMemo(() => {
         const parsedModel = parseRawData(rawData);
-        setModel(parsedModel);
+        setModel(() => parsedModel);
     }, [rawData]);
 
     return (

@@ -188,7 +188,7 @@ let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
   let final_constraints = add_existence final_conf.a final_conf.c in
   DeclareSet.elements final_constraints
 
-(* Takes a resource_spans object, creates a list of span_trees out of them and
+(* Takes a list of span_trees and
  * maps each tree to list of DECLARE constraints which reperesent the DECLARE
  * model of that tree 
  *)
@@ -220,53 +220,16 @@ let convert_resource_spans (resource_spans : Trace.resource_spans list) :
   in
   List.flatten (convert_aux resource_spans (fun x -> x))
 
-let convert_trace_spans (trace_spans : Trace.span list) : Declare.t list list =
-  let span_trees = Span_tree.generate_span_trees_from_spans trace_spans in
+let convert_trace_spans_for_single_trace (trace_spans : Trace.span list) :
+    Declare.t list =
+  let span_tree =
+    Span_tree.generate_span_trees_from_spans_for_single_trace trace_spans
+  in
+  map_to_declare span_tree
+
+let convert_trace_spans_for_multiple_traces (trace_spans : Trace.span list) :
+    Declare.t list list =
+  let span_trees =
+    Span_tree.generate_span_trees_from_spans_for_multiple_traces trace_spans
+  in
   create_declare_constraints span_trees
-
-(*
-open Ltl
-
-let create_val (node : Span_tree.span_tree_node) = V node.span.name
-
-let map_to_ltl (root : Span_tree.span_tree_node) : term =
-  (*Log.info (log_mapping_info root);*)
-  print_ltls;
-  let activities = StringSet.(empty |> add root.span.name) in
-  let root_val = create_val root in
-  let existence_root = EXISTENCE root_val in
-  let rec map_children (a_prev: String) (a: StringSet.t) (constraints : declare_constraint list) (children : Span_tree.span_tree_node list) =
-    match children with
-    | [] -> t
-    | c0 :: [] ->
-      let val_c0 = create_val c0 in
-      let last_c0 = LAST val_c0 in
-      let e_c0 = EXISTENCE  val_c0 in
-      let a = StringSet.(a |> add c0.span.name)
-      map_children
-    | c0 :: c1 :: rest -> t (*
-        let uec0 = map_children (U (t, F (create_val c0))) c0.children in
-        let uec1 = map_children (U (t, F (create_val c1))) c1.children in
-        let ac0c1 = AND (uec0, uec1) in
-        if rest = [] then ac0c1 else AND (ac0c1, map_children t rest)*)
-  in
-  map_children activities [existence_root] root.children*)
-(*
-let create_ltls (resource_spans : Trace.resource_spans) : term list =
-  let span_trees = Span_tree.create_span_trees resource_spans in
-  let rec create_ltls_aux (l : Span_tree.span_tree_node list) f =
-    match l with
-    | [] -> f []
-    | h :: t -> create_ltls_aux t (fun a -> f (map_to_ltl h :: a))
-  in
-  create_ltls_aux span_trees (fun x -> x)
-  
-let convert (resource_spans : Trace.resource_spans list) : term list =
-  (*map_to_ltl resource_spans*)
-  let rec convert_aux l k =
-    match l with
-    | [] -> k []
-    | h :: t -> convert_aux t (fun a -> k (create_ltls h :: a))
-  in
-  List.flatten (convert_aux resource_spans (fun x -> x))
-*)
