@@ -6,14 +6,15 @@ show_help() {
 Usage: $0 [OPTIONS]
 
 Options:
-    -h          Display this help message
-    -b          Trigger build
-    -a          Enable all processes
-    -o          Enable ocaml process
-    -j          Enable all java processes
+    -h         Display this help message
+    -b         Trigger build
+    -a         Enable all processes
+    -o         Enable ocaml process
+    -j         Enable all java processes
     -d         Enable db-service
     -r         Enable trace-receiver
-    -t          Enable all typescript processes
+    -t         Enable all typescript processes.
+    -e         Enable all backend processes.
 EOF
 }
 
@@ -26,16 +27,17 @@ TRACE_RECEIVER=false
 TS=false
 
 # Parse command-line options
-while getopts "hbaojdrt" opt; do
+while getopts "hbaojdrte" opt; do
     case ${opt} in
         h) show_help; exit 0 ;;
-        b) BUILD=true ;;
-        a) OCAML=true; SPRING=true; TS=true ;;
-        o) OCAML=true ;;
-        j) SPRING=true ;;
-        d) DB_SERVICE=true ;;
-        r) TRACE_RECEIVER=true ;;
-        t) TS=true ;;
+        b) echo "enabling build flag..."; BUILD=true ;;
+        a) echo "enabling all processes..."; OCAML=true; SPRING=true; TS=true ;;
+        o) echo "enabling ocaml process..."; OCAML=true ;;
+        j) echo "enabling all java processes..."; SPRING=true ;;
+        d) echo "enabling db-service..."; DB_SERVICE=true ;;
+        r) echo "enabling trace-receiver..."; TRACE_RECEIVER=true ;;
+        t) echo "enabling all typescript processes..."; TS=true ;;
+        e) echo "enabling all backend processes..."; OCAML=true; SPRING=true ;;
         *) echo "Invalid option: -$OPTARG" >&2; show_help; exit 1 ;;
     esac
 done

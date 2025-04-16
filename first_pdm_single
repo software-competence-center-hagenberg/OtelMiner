@@ -27,7 +27,7 @@ planned code quality features:
 * refactor trace-receiver
 * add missing javadoc
 * normalize and scale probability computation with THRESHOLD (Long.MAX_SIZE/100), SCALE_FACTOR (10), ROUNDING (SCALE_FACTOR/2) and recalculate nrTraces and nr of each span when threshold is reached to ensure no overflow can occur
-* switch out useEffect usages in frontend with useMemo to be more stable
+* switch out useEffect usages in frontend with useMemo to be more stable (done)
 
 nice-to-haves:
 * switch polling to SSE (if there is enough time for implementation)

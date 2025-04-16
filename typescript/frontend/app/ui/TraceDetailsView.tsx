@@ -49,6 +49,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
     useMemo(() => setSourceDetails(
         _prev => (defaultSourceDetails(sourceFile))
     ), [sourceFile])
+
     useMemo(fetchSourceDetails, [sourceDetails.sourceFile, sourceDetails.page, sourceDetails.size]);
 
     const handlePageChange = (_event: unknown, newPage: number) => {
