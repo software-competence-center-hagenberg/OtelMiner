@@ -24,4 +24,8 @@ public class ProbDeclareConstraintModelEntry implements Serializable, Cloneable 
         entry.nr = this.nr;
         return entry;
     }
+
+    public void increment() {
+        nr++;
+    }
 }

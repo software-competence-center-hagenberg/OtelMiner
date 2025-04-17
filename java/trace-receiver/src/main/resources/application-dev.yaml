@@ -7,4 +7,4 @@ db-service:
 
 logging:
   level:
-    root: DEBUG
+    at.scch: DEBUG
