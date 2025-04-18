@@ -36,7 +36,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private final TraceCacheManager traceCacheManager;
     private final ObjectMapper objectMapper;
     private final ModelGenerationConfig modelGenerationConfig;
-    //FIXME refactor data types to (multiple) state objects
+
     private final ExecutorService declareConstraintGenerationExecutor;
     private final ExecutorService probDeclareModelUpdateExecutor;
     private final ConcurrentMap<String, CompletableFuture<ConversionResponse>> generating;
@@ -62,7 +62,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         this.objectMapper = objectMapper;
         this.modelGenerationConfig = modelGenerationConfig;
 
-        // TODO evaluate
         declareConstraintGenerationExecutor = Executors.newFixedThreadPool(modelGenerationConfig.getNrThreads());
         probDeclareModelUpdateExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r, "ModelUpdate-Worker");
@@ -87,8 +86,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         finishGeneration(true);
     }
 
-    // FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}", concurrency = "1")
+    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
         String model = new String(msg.getBody());
         log.info("received declare result: {}", model);
@@ -108,7 +106,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         }
     }
 
-    // TODO check if necessary or if better done directly in data service
     protected ProbDeclareModel getProbDeclareModel(String id) {
         return id.equals(currentId.get())
                 ? getCurrentModel()
@@ -116,7 +113,8 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces) {
-        if (currentExpectedTraces.get() == expectedTraces && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
+        if (currentExpectedTraces.get() == expectedTraces
+            && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
             return getCurrentModel();
         }
         clearCurrentState();
@@ -124,7 +122,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
         String id = UUID.randomUUID().toString();
         currentId.weakCompareAndSetAcquire(null, id);
-//        declareConstraintGenerationExecutor.submit(() -> initDeclareGeneration(sourceDetails, id));
         initDeclareGeneration(sourceDetails, id);
         return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
@@ -181,8 +178,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.info("Starting generation task for model ID: {}", id);
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         try {
-//            generateDeclareConstraints(probDeclare.getId());
-//            declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
             for(int i = 0; i < modelGenerationConfig.getNrThreads(); i++) {
                 log.info("staring thread {}", i);
                 declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
@@ -214,6 +209,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentNrTracesProcessed.set(0L);
         currentExpectedTraces.set(0L);
         constraints.clear();
+        traceCacheManager.kill();
     }
 
     private ProbDeclareModel getCurrentModel() {
@@ -221,8 +217,8 @@ public class ProbDeclareManagerService implements DisposableBean {
                 .stream()
                 .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
                 .toList();
-
-        return new ProbDeclareModel(currentId.get(), model, currentNrTracesProcessed.get() != currentExpectedTraces.get());
+        boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
+        return new ProbDeclareModel(currentId.get(), model, isGenerating);
     }
 
     private void generateProbDeclareForNextTrace(String probDeclareId) {
@@ -234,7 +230,10 @@ public class ProbDeclareManagerService implements DisposableBean {
             throw new ModelGenerationException("exception occurred while accessing trace cache", e);
         }
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId))
+        future.thenAcceptAsync(
+                conversionResponse -> processResponse(conversionResponse, probDeclareId),
+                declareConstraintGenerationExecutor
+                )
                 .exceptionally(e -> {
                     log.error("exception occurred during response processing", e);
                     return null;
@@ -265,9 +264,10 @@ public class ProbDeclareManagerService implements DisposableBean {
             log.info("Currently no generation running --> aborting");
             return;
         }
-        probDeclareModelUpdateExecutor.submit(() -> updateModel(List.of(conversionResponse.constraints()), probDeclareId));
+        probDeclareModelUpdateExecutor.submit(
+                () -> updateModel(List.of(conversionResponse.constraints()), probDeclareId));
         if (!traceCacheManager.isCacheDone()) {
-            generateProbDeclareForNextTrace(probDeclareId);
+            declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclareId));
         } else if (isGenerationFinished()) {
             finishGeneration(false);
             log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
@@ -300,7 +300,6 @@ public class ProbDeclareManagerService implements DisposableBean {
                 visited.add(nc);
             });
             updateConstraintsNotContainedInCurrentTrace(visited);
-            //FIXME evaluate
             restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
         }
     }
@@ -350,7 +349,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     private boolean isGenerationFinished() {
-        // FIXME evaluate
-        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire() && traceCacheManager.isCacheDone();
+        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire()
+               && traceCacheManager.isCacheDone();
     }
 }
