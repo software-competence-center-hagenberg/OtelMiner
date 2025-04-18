@@ -212,15 +212,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         traceCacheManager.kill();
     }
 
-    private ProbDeclareModel getCurrentModel() {
-        List<ProbDeclareConstraint> model = constraints.values()
-                .stream()
-                .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
-                .toList();
-        boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
-        return new ProbDeclareModel(currentId.get(), model, isGenerating);
-    }
-
     private void generateProbDeclareForNextTrace(String probDeclareId) {
         Trace trace;
         try {
@@ -272,6 +263,21 @@ public class ProbDeclareManagerService implements DisposableBean {
             finishGeneration(false);
             log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
         }
+    }
+
+    private boolean isGenerationFinished() {
+        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire()
+               && traceCacheManager.isCacheDone();
+    }
+
+    // TODO move model + executor + model methods to dedicated ProbDeclareModelService
+    private ProbDeclareModel getCurrentModel() {
+        List<ProbDeclareConstraint> model = constraints.values()
+                .stream()
+                .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
+                .toList();
+        boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
+        return new ProbDeclareModel(currentId.get(), model, isGenerating);
     }
 
     private void updateModel(List<String> newConstraints, String probDeclareId) {
@@ -334,8 +340,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         }
     }
 
-    private List<ProbDeclareConstraintModelEntry> updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
-        List<ProbDeclareConstraintModelEntry> declareList = new ArrayList<>();
+    private void updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
         constraints.keySet()
                 .stream()
                 .filter(c -> !visited.contains(c))
@@ -343,13 +348,6 @@ public class ProbDeclareManagerService implements DisposableBean {
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
                     declare.setNr(declare.getNr() + 1);
                     declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
-                    declareList.add(declare);
                 });
-        return declareList;
-    }
-
-    private boolean isGenerationFinished() {
-        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire()
-               && traceCacheManager.isCacheDone();
     }
 }
