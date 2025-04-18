@@ -356,17 +356,13 @@ public class ProbDeclareManagerService implements DisposableBean {
                 .forEach(c -> {
                     log.info("updating {}", c);
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
-                    declare.increment();
                     updateProbability(declare);
                 });
     }
 
     private void updateProbability(ProbDeclareConstraintModelEntry declare) {
-        double probability = declare.getProbability();
-        log.info("updating probability of {}", declare.getConstraintTemplate());
-        log.info("old probability: {}", probability);
-        probability = (double) declare.getNr() / currentNrTracesProcessed.getAcquire();
-        log.info("new probability: {}", probability);
-        declare.setProbability(probability);
+        log.debug("updating probability of {} (old prob: {})", declare.getConstraintTemplate(), declare.getProbability());
+        declare.setProbability((double) declare.getNr() / currentNrTracesProcessed.getAcquire());
+        log.debug("new probability: {}", declare.getProbability());
     }
 }
