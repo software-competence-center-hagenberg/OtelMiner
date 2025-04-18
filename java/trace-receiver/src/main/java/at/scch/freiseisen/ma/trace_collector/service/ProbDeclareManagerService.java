@@ -179,7 +179,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         try {
             for(int i = 0; i < modelGenerationConfig.getNrThreads(); i++) {
-                log.info("staring thread {}", i);
+                log.info("starting thread {}", i);
                 declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
             }
         } catch (Exception e) {
@@ -295,17 +295,23 @@ public class ProbDeclareManagerService implements DisposableBean {
         if (constraints.isEmpty()) {
             assert currentNrTraces == 0;
             initModelWithCrisps(newConstraints);
+            assert newConstraints.size() == constraints.size();
         } else {
+            assert currentNrTraces > 0;
             log.info("existing {} constraints so far --> updating model", constraints.size());
             List<String> visited = new ArrayList<>();
-            assert currentNrTraces > 0;
             log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
             currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
+            log.info("updating constraints found in trace...");
             newConstraints.forEach(nc -> {
                 updateOrAddConstraint(nc);
                 visited.add(nc);
             });
+            assert visited.size() == newConstraints.size();
+            log.info("updated {} constraints", visited.size());
+            log.info("updating constraints NOT found in trace...");
             updateConstraintsNotContainedInCurrentTrace(visited);
+            log.info("updated {} constraints", constraints.size() - visited.size());
             restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
         }
     }
@@ -323,31 +329,44 @@ public class ProbDeclareManagerService implements DisposableBean {
 
     private void updateOrAddConstraint(String newConstraint) {
         log.debug("updating {}", newConstraint);
+        ProbDeclareConstraintModelEntry declare;
         if (constraints.containsKey(newConstraint)) {
             log.debug("constraint exists --> updating");
-            ProbDeclareConstraintModelEntry declare = constraints.get(newConstraint);
+            declare = constraints.get(newConstraint);
             declare.increment();
             if (declare.getProbability() != 1d) {
                 log.debug("constraint not crisp --> updating probability");
-                declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
+                updateProbability(declare);
             }
         } else {
-            log.debug("constraint does not exist --> updating probability");
-            ProbDeclareConstraintModelEntry declare = new ProbDeclareConstraintModelEntry(newConstraint, 1d, 1L);
-            declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
-            log.debug("adding to constraints: {}", declare);
+            log.debug("constraint does not exist --> creating new one");
+            declare = new ProbDeclareConstraintModelEntry(newConstraint, 1d, 1L);
+            log.debug("updating probability");
+            updateProbability(declare);
+            log.debug("adding to constraint: {}", newConstraint);
             constraints.put(declare.getConstraintTemplate(), declare);
         }
+        log.debug("updating done");
     }
 
     private void updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
         constraints.keySet()
                 .stream()
-                .filter(c -> !visited.contains(c))
+                .filter(visited::contains)
                 .forEach(c -> {
+                    log.info("updating {}", c);
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
-                    declare.setNr(declare.getNr() + 1);
-                    declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
+                    declare.increment();
+                    updateProbability(declare);
                 });
+    }
+
+    private void updateProbability(ProbDeclareConstraintModelEntry declare) {
+        double probability = declare.getProbability();
+        log.info("updating probability of {}", declare.getConstraintTemplate());
+        log.info("old probability: {}", probability);
+        probability = (double) declare.getNr() / currentNrTracesProcessed.getAcquire();
+        log.info("new probability: {}", probability);
+        declare.setProbability(probability);
     }
 }

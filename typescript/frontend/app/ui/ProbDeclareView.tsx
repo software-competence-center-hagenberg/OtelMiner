@@ -35,14 +35,13 @@ interface ProbDeclare {
     traces: string[];
 }
 
-const VISIBLE_FIELDS = ["probability", "template"];
-
 const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
     const [aborting, setAborting] = useState<boolean>(false);
     const [paused, setPaused] = useState<boolean>(false);
+    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
         const probDeclare: ProbDeclare = response.data;
@@ -51,6 +50,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             constraints: probDeclare.constraints,
             generating: probDeclare.generating,
         } : probDeclare));
+
         if (aborting) {
             abort();
         }
@@ -68,7 +68,16 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             .finally(() => setLoading(() => false));
     };
 
-    const fetchModel = async  () => {
+    const clearTimer = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+    }
+
+    const fetchModel = async () => {
+        clearTimer();
+
         try {
             const response = await RestService.get<ProbDeclare>("/prob-declare/" + probDeclare!.id);
             handleProbDeclareResponse(response);
@@ -78,17 +87,16 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
     }
 
     const updateModel = () => {
-        if (paused || aborting) {
+        if (paused || aborting || !initialized) {
             return;
         }
-        if (!initialized) {
-            initModelGeneration()
-        } else if (probDeclare?.generating) {
-            setTimeout(fetchModel, 2000);
+        if (probDeclare?.generating) {
+            timerRef.current = setTimeout(fetchModel, 2000);
         }
     }
 
     const reset = () => {
+        clearTimer();
         if (paused || probDeclare?.generating) {
             setPaused(false);
             abort();
@@ -103,6 +111,9 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
 
     const pause = () => {
         console.debug("model initialized --> sending pause request.")
+
+        clearTimer();
+
         RestService.get<void>("/prob-declare/pause/" + probDeclare!.id)
             .then((_) => setPaused(true))
             .catch((error) => console.error('Error pausing generation of prob declare model', error));
@@ -112,7 +123,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
         console.debug("model initialized --> sending resume request.")
         RestService.get<void>("/prob-declare/resume/" + probDeclare!.id)
             .then((_) => {
-                setPaused(() => false);
+                setPaused(false);
             })
             .catch((error) => console.error('Error pausing generation of prob declare model', error))
             .finally(fetchModel);
@@ -120,6 +131,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
 
     const abort = () => {
         setAborting(true);
+        clearTimer();
         if (initialized) {
             console.debug("model initialized --> sending abort request to backend.")
             RestService.get<void>("/prob-declare/abort/" + probDeclare?.id)
