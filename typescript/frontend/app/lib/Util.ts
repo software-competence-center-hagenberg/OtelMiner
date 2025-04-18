@@ -24,8 +24,8 @@ export function defaultSourceDetails(sourceFile: string) {
     return {
         sourceFile: sourceFile,
         traces: [],
-        page: 1,
-        size: 10,
+        page: 0,
+        size: 100,
         totalPages: 1,
         sort: "sourceFile"
     }

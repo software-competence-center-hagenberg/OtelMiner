@@ -69,7 +69,7 @@ let _ =
   Log.info "Created result queue";
   (* setting up listener for resource spans *)
   Queue.consume ~id:"accept-resource-spans"
-    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel
+    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:false channel
     resource_spans_queue
   >>= fun (_consumer, reader) ->
   spawn
@@ -79,14 +79,14 @@ let _ =
             probd_result_queue));
   (* setting up listener for otel trace spans *)
   Queue.consume ~id:"accept-trace-spans" ~on_cancel:rabbitmq_consumer_cancelled
-    ~no_ack:true ~exclusive:true channel trace_spans_queue
+    ~no_ack:true ~exclusive:false channel trace_spans_queue
   >>= fun (_consumer, reader) ->
   spawn
     (Pipe.iter reader
        ~f:(handler_single_trace OTEL_SPANS_LIST channel probd_result_queue));
   (* setting up listener for jaeger traces *)
   Queue.consume ~id:"accept-jaeger-traces"
-    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel
+    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:false channel
     jaeger_trace_queue
   >>= fun (_consumer, reader) ->
   spawn
@@ -94,7 +94,7 @@ let _ =
        ~f:(handler_single_trace JAEGER_TRACE channel probd_result_queue));
   (* setting up listener for jaeger trace spans list *)
   Queue.consume ~id:"accept-jaeger-trace-spans"
-    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:true channel
+    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:false channel
     jaeger_trace_spans_list_queue
   >>= fun (_consumer, reader) ->
   spawn

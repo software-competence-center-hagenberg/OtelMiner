@@ -26,6 +26,9 @@ otel_to_probd:
     in:
       declare: probd-result-queue
       span_trees: span-tree-result-queue
+model_generation:
+  nr_threads: 10
+  batch_size: 10
 server:
   port: 4020
 db-service:

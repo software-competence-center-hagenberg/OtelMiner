@@ -59,6 +59,7 @@ const DataOverview: React.FC = () => {
     const handleRowClick = (row: DataOverviewProps) => {
         setSourceFile(() => row.sourceFile);
         setNrTraces(() => row.nrTraces);
+        setGeneratingProbDeclare(() => false);
     };
 
     const renderTable = () => {

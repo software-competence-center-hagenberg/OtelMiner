@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,5 +32,11 @@ public class ProbDeclareGenerationDTO {
 
     public boolean hasMorePages() {
         return currentPage < totalPages-1;
+    }
+
+    public List<Trace> getNext(int batchSize) {
+        List<Trace> subList = traces.subList(0, Math.min(traces.size(), batchSize));
+        traces.removeAll(subList);
+        return subList;
     }
 }
