@@ -93,12 +93,12 @@ public class ProbDeclareManagerService implements DisposableBean {
         try {
             ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
             String traceId = response.traceId();
-            declareService.add(traceId, response.constraints());
             log.info("received result:\n\ttraceId: {}\n\tconstraints: {}", response.traceId(), response.constraints());
             if (generating.containsKey(traceId)) {
                 CompletableFuture<ConversionResponse> future = generating.remove(traceId);
                 future.complete(response);
             } else {
+                declareService.add(traceId, response.constraints());
                 log.info("traceId {}, not present in generation -> ONLY passing it on to declareService", traceId);
             }
         } catch (JsonProcessingException e) {
@@ -319,9 +319,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private void initModelWithCrisps(List<String> newConstraints) {
         currentNrTracesProcessed.compareAndSet(0, 1);
         log.info("no constraints so far and no traces --> initializing crisps");
-        newConstraints.stream()
-                .filter(c -> !constraints.containsKey(c))
-                .forEach(c -> {
+        newConstraints.forEach(c -> {
                     log.debug("adding crisp constraint: {}", c);
                     constraints.put(c, new ProbDeclareConstraintModelEntry(c, 1d, 1L));
                 });
@@ -352,7 +350,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private void updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
         constraints.keySet()
                 .stream()
-                .filter(visited::contains)
+                .filter(c -> !visited.contains(c))
                 .forEach(c -> {
                     log.info("updating {}", c);
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
