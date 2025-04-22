@@ -1,5 +1,15 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Button, CircularProgress} from "@mui/material";
+import React, {useMemo, useState} from "react";
+import {
+    Button,
+    CircularProgress,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
+} from "@mui/material";
 import RestService from "@/app/lib/RestService";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -15,7 +25,7 @@ interface ProbDeclareViewProps {
 
 interface DeclareConstraint {
     probability: number;
-    template: string;
+    declareTemplate: string;
 }
 
 interface ProbDeclare {
@@ -26,11 +36,12 @@ interface ProbDeclare {
 }
 
 const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclareViewProps) => {
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
     const [aborting, setAborting] = useState<boolean>(false);
     const [paused, setPaused] = useState<boolean>(false);
+    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
         const probDeclare: ProbDeclare = response.data;
@@ -39,6 +50,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             constraints: probDeclare.constraints,
             generating: probDeclare.generating,
         } : probDeclare));
+
         if (aborting) {
             abort();
         }
@@ -56,44 +68,52 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             .finally(() => setLoading(() => false));
     };
 
-    const fetchModel = async  () => {
+    const clearTimer = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+    }
+
+    const fetchModel = async () => {
+        clearTimer();
+
         try {
             const response = await RestService.get<ProbDeclare>("/prob-declare/" + probDeclare!.id);
             handleProbDeclareResponse(response);
-            // updateModel();
         } catch (error) {
             console.error('Error fetching prob declare model', error);
         }
     }
 
     const updateModel = () => {
-        if (paused || aborting) {
+        if (paused || aborting || !initialized) {
             return;
         }
-        if (!initialized) {
-            initModelGeneration()
-        } else if (probDeclare?.generating) {
-            setTimeout(fetchModel, 2000);
+        if (probDeclare?.generating) {
+            timerRef.current = setTimeout(fetchModel, 2000);
         }
     }
 
-    useMemo(updateModel, [sourceFile, probDeclare?.constraints, probDeclare?.generating]);
-
-    const abort = () => {
-        setAborting(true);
-        if (initialized) {
-            console.debug("model initialized --> sending abort request to backend.")
-            RestService.get<void>("/prob-declare/abort/" + probDeclare?.id)
-                .then((_) => abortCallback())
-                .catch((error) => console.error('Error aborting generation of prob declare model', error));
+    const reset = () => {
+        clearTimer();
+        if (paused || probDeclare?.generating) {
+            setPaused(false);
+            abort();
         } else {
-            console.debug("model NOT initialized --> aborting in callback.")
-            // abortCallback();
+            setInitialized(false);
+            setProbDeclare(null);
         }
     }
+
+    useMemo(reset, [sourceFile])
+    useMemo(updateModel, [probDeclare?.constraints, probDeclare?.generating]);
 
     const pause = () => {
         console.debug("model initialized --> sending pause request.")
+
+        clearTimer();
+
         RestService.get<void>("/prob-declare/pause/" + probDeclare!.id)
             .then((_) => setPaused(true))
             .catch((error) => console.error('Error pausing generation of prob declare model', error));
@@ -103,14 +123,33 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
         console.debug("model initialized --> sending resume request.")
         RestService.get<void>("/prob-declare/resume/" + probDeclare!.id)
             .then((_) => {
-                setPaused(() => false);
+                setPaused(false);
             })
             .catch((error) => console.error('Error pausing generation of prob declare model', error))
             .finally(fetchModel);
     }
 
+    const abort = () => {
+        setAborting(true);
+        clearTimer();
+        if (initialized) {
+            console.debug("model initialized --> sending abort request to backend.")
+            RestService.get<void>("/prob-declare/abort/" + probDeclare?.id)
+                .then(close)
+                .catch((error) => console.error('Error aborting generation of prob declare model', error));
+        } else {
+            console.debug("model NOT initialized --> aborting in callback.")
+            // abortCallback();
+        }
+    }
+    const close = () => {
+        reset();
+        abortCallback();
+    }
+
     return (
-        <Box>
+        <>
+            <Box>
             <Typography variant="h4">Prob Declare Modell for {sourceFile}</Typography>
             {loading && !probDeclare ? (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -118,43 +157,75 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                 </Box>
             ) : (
                 probDeclare && (
-                    <JsonView data={probDeclare}/>
-                    // <Grid2 size={6} columns={6}>
-                    //     <DeclareView rawData={
-                    //         probDeclare.constraints
-                    //             .filter(c => c.probability === 1)
-                    //             .map(c => c.template)
-                    //     }/>
-                    //     <DeclareView rawData={
-                    //         probDeclare.constraints
-                    //             .filter(c => c.probability < 1)
-                    //             .map(c => c.template)
-                    //     }/>
-                    // </Grid2>
+                    <TableContainer component={Paper}>
+                        <Table sx={{minWidth: 650}} size="small" aria-label="a dense table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Prob Declare
+                                        Id: {probDeclare.id} (generating: {probDeclare.generating ? "true" : "false"})</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>Declare Constraint</TableCell>
+                                    <TableCell align="right">Probability</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {probDeclare.constraints
+                                    .toSorted((a, b) => b.probability - a.probability)
+                                    .map((row) => (
+                                        <TableRow
+                                            key={row.declareTemplate}
+                                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                {row.declareTemplate}
+                                            </TableCell>
+                                            <TableCell align="right">{row.probability}</TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 )
             )}
             <Button
                 variant={'contained'}
-                onClick={abort}
-                disabled={aborting}
+                onClick={initModelGeneration}
+                disabled={aborting || initialized}
             >
-                abort
+                start
             </Button>
             <Button
                 variant={'contained'}
                 onClick={pause}
-                disabled={paused || aborting}
+                disabled={paused || aborting || !probDeclare?.generating}
             >
                 pause
             </Button>
             <Button
                 variant={'contained'}
                 onClick={resume}
-                disabled={!paused || aborting}
+                disabled={!paused || aborting || !probDeclare?.generating}
             >
                 resume
             </Button>
-        </Box>
+                <Button
+                    variant={'contained'}
+                    onClick={abort}
+                    disabled={aborting || !probDeclare?.generating}
+                >
+                    abort
+                </Button>
+                <Button
+                    variant={'contained'}
+                    onClick={close}
+                    disabled={aborting || probDeclare?.generating && !paused}
+                >
+                    close
+                </Button>
+            </Box>
+            <JsonView data={probDeclare}/>
+        </>
     );
 };
 

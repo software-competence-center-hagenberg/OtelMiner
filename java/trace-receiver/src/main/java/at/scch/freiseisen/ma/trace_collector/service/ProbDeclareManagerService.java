@@ -36,7 +36,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private final TraceCacheManager traceCacheManager;
     private final ObjectMapper objectMapper;
     private final ModelGenerationConfig modelGenerationConfig;
-    //FIXME refactor data types to (multiple) state objects
+
     private final ExecutorService declareConstraintGenerationExecutor;
     private final ExecutorService probDeclareModelUpdateExecutor;
     private final ConcurrentMap<String, CompletableFuture<ConversionResponse>> generating;
@@ -62,7 +62,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         this.objectMapper = objectMapper;
         this.modelGenerationConfig = modelGenerationConfig;
 
-        // TODO evaluate
         declareConstraintGenerationExecutor = Executors.newFixedThreadPool(modelGenerationConfig.getNrThreads());
         probDeclareModelUpdateExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r, "ModelUpdate-Worker");
@@ -87,20 +86,19 @@ public class ProbDeclareManagerService implements DisposableBean {
         finishGeneration(true);
     }
 
-    // FIXME currently handling only single trace --> adapt to handle multiple traces with extra rabbit listener
-    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}", concurrency = "1")
+    @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
         String model = new String(msg.getBody());
         log.info("received declare result: {}", model);
         try {
             ConversionResponse response = objectMapper.readValue(model, ConversionResponse.class);
             String traceId = response.traceId();
-            declareService.add(traceId, response.constraints());
             log.info("received result:\n\ttraceId: {}\n\tconstraints: {}", response.traceId(), response.constraints());
             if (generating.containsKey(traceId)) {
                 CompletableFuture<ConversionResponse> future = generating.remove(traceId);
                 future.complete(response);
             } else {
+                declareService.add(traceId, response.constraints());
                 log.info("traceId {}, not present in generation -> ONLY passing it on to declareService", traceId);
             }
         } catch (JsonProcessingException e) {
@@ -108,7 +106,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         }
     }
 
-    // TODO check if necessary or if better done directly in data service
     protected ProbDeclareModel getProbDeclareModel(String id) {
         return id.equals(currentId.get())
                 ? getCurrentModel()
@@ -116,7 +113,8 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces) {
-        if (currentExpectedTraces.get() == expectedTraces && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
+        if (currentExpectedTraces.get() == expectedTraces
+            && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
             return getCurrentModel();
         }
         clearCurrentState();
@@ -124,7 +122,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
         String id = UUID.randomUUID().toString();
         currentId.weakCompareAndSetAcquire(null, id);
-//        declareConstraintGenerationExecutor.submit(() -> initDeclareGeneration(sourceDetails, id));
         initDeclareGeneration(sourceDetails, id);
         return new ProbDeclareModel(id, new ArrayList<>(), true);
     }
@@ -181,10 +178,8 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.info("Starting generation task for model ID: {}", id);
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         try {
-//            generateDeclareConstraints(probDeclare.getId());
-//            declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
             for(int i = 0; i < modelGenerationConfig.getNrThreads(); i++) {
-                log.info("staring thread {}", i);
+                log.info("starting thread {}", i);
                 declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
             }
         } catch (Exception e) {
@@ -214,15 +209,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentNrTracesProcessed.set(0L);
         currentExpectedTraces.set(0L);
         constraints.clear();
-    }
-
-    private ProbDeclareModel getCurrentModel() {
-        List<ProbDeclareConstraint> model = constraints.values()
-                .stream()
-                .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
-                .toList();
-
-        return new ProbDeclareModel(currentId.get(), model, currentNrTracesProcessed.get() != currentExpectedTraces.get());
+        traceCacheManager.kill();
     }
 
     private void generateProbDeclareForNextTrace(String probDeclareId) {
@@ -234,7 +221,10 @@ public class ProbDeclareManagerService implements DisposableBean {
             throw new ModelGenerationException("exception occurred while accessing trace cache", e);
         }
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId))
+        future.thenAcceptAsync(
+                conversionResponse -> processResponse(conversionResponse, probDeclareId),
+                declareConstraintGenerationExecutor
+                )
                 .exceptionally(e -> {
                     log.error("exception occurred during response processing", e);
                     return null;
@@ -265,13 +255,29 @@ public class ProbDeclareManagerService implements DisposableBean {
             log.info("Currently no generation running --> aborting");
             return;
         }
-        probDeclareModelUpdateExecutor.submit(() -> updateModel(List.of(conversionResponse.constraints()), probDeclareId));
+        probDeclareModelUpdateExecutor.submit(
+                () -> updateModel(List.of(conversionResponse.constraints()), probDeclareId));
         if (!traceCacheManager.isCacheDone()) {
-            generateProbDeclareForNextTrace(probDeclareId);
+            declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclareId));
         } else if (isGenerationFinished()) {
             finishGeneration(false);
             log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
         }
+    }
+
+    private boolean isGenerationFinished() {
+        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire()
+               && traceCacheManager.isCacheDone();
+    }
+
+    // TODO move model + executor + model methods to dedicated ProbDeclareModelService
+    private ProbDeclareModel getCurrentModel() {
+        List<ProbDeclareConstraint> model = constraints.values()
+                .stream()
+                .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
+                .toList();
+        boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
+        return new ProbDeclareModel(currentId.get(), model, isGenerating);
     }
 
     private void updateModel(List<String> newConstraints, String probDeclareId) {
@@ -289,18 +295,23 @@ public class ProbDeclareManagerService implements DisposableBean {
         if (constraints.isEmpty()) {
             assert currentNrTraces == 0;
             initModelWithCrisps(newConstraints);
+            assert newConstraints.size() == constraints.size();
         } else {
+            assert currentNrTraces > 0;
             log.info("existing {} constraints so far --> updating model", constraints.size());
             List<String> visited = new ArrayList<>();
-            assert currentNrTraces > 0;
             log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
             currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
+            log.info("updating constraints found in trace...");
             newConstraints.forEach(nc -> {
                 updateOrAddConstraint(nc);
                 visited.add(nc);
             });
+            assert visited.size() == newConstraints.size();
+            log.info("updated {} constraints", visited.size());
+            log.info("updating constraints NOT found in trace...");
             updateConstraintsNotContainedInCurrentTrace(visited);
-            //FIXME evaluate
+            log.info("updated {} constraints", constraints.size() - visited.size());
             restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
         }
     }
@@ -308,9 +319,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private void initModelWithCrisps(List<String> newConstraints) {
         currentNrTracesProcessed.compareAndSet(0, 1);
         log.info("no constraints so far and no traces --> initializing crisps");
-        newConstraints.stream()
-                .filter(c -> !constraints.containsKey(c))
-                .forEach(c -> {
+        newConstraints.forEach(c -> {
                     log.debug("adding crisp constraint: {}", c);
                     constraints.put(c, new ProbDeclareConstraintModelEntry(c, 1d, 1L));
                 });
@@ -318,39 +327,40 @@ public class ProbDeclareManagerService implements DisposableBean {
 
     private void updateOrAddConstraint(String newConstraint) {
         log.debug("updating {}", newConstraint);
+        ProbDeclareConstraintModelEntry declare;
         if (constraints.containsKey(newConstraint)) {
             log.debug("constraint exists --> updating");
-            ProbDeclareConstraintModelEntry declare = constraints.get(newConstraint);
+            declare = constraints.get(newConstraint);
             declare.increment();
             if (declare.getProbability() != 1d) {
                 log.debug("constraint not crisp --> updating probability");
-                declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
+                updateProbability(declare);
             }
         } else {
-            log.debug("constraint does not exist --> updating probability");
-            ProbDeclareConstraintModelEntry declare = new ProbDeclareConstraintModelEntry(newConstraint, 1d, 1L);
-            declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
-            log.debug("adding to constraints: {}", declare);
+            log.debug("constraint does not exist --> creating new one");
+            declare = new ProbDeclareConstraintModelEntry(newConstraint, 1d, 1L);
+            log.debug("updating probability");
+            updateProbability(declare);
+            log.debug("adding to constraint: {}", newConstraint);
             constraints.put(declare.getConstraintTemplate(), declare);
         }
+        log.debug("updating done");
     }
 
-    private List<ProbDeclareConstraintModelEntry> updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
-        List<ProbDeclareConstraintModelEntry> declareList = new ArrayList<>();
+    private void updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
         constraints.keySet()
                 .stream()
                 .filter(c -> !visited.contains(c))
                 .forEach(c -> {
+                    log.info("updating {}", c);
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
-                    declare.setNr(declare.getNr() + 1);
-                    declare.setProbability(((double) declare.getNr()) / currentNrTracesProcessed.getAcquire());
-                    declareList.add(declare);
+                    updateProbability(declare);
                 });
-        return declareList;
     }
 
-    private boolean isGenerationFinished() {
-        // FIXME evaluate
-        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire() && traceCacheManager.isCacheDone();
+    private void updateProbability(ProbDeclareConstraintModelEntry declare) {
+        log.debug("updating probability of {} (old prob: {})", declare.getConstraintTemplate(), declare.getProbability());
+        declare.setProbability((double) declare.getNr() / currentNrTracesProcessed.getAcquire());
+        log.debug("new probability: {}", declare.getProbability());
     }
 }
