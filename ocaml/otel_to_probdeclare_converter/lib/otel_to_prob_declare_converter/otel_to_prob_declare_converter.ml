@@ -223,7 +223,7 @@ let convert_resource_spans (resource_spans : Trace.resource_spans list) :
 let convert_trace_spans_for_single_trace (trace_spans : Trace.span list) :
     Declare.t list =
   let span_tree =
-    Span_tree.generate_span_trees_from_spans_for_single_trace trace_spans
+    Span_tree.generate_span_tree_from_spans_for_single_trace trace_spans
   in
   map_to_declare span_tree
 

@@ -195,19 +195,6 @@ let extract_parent_span_id json =
       | Some ref -> ref |> member "spanID" |> to_string
       | None -> "")
 
-(*
-let extract_parent_span_id json =
-  let references = json |> member "references" in
-  match references with
-  | 'List lst ->
-    match lst with
-    | h :: t -> h |> member "refType" |> // FIXME!
-    | _ -> ""
-  | 'Null -> ""
-  let references = json |> member "references" |> to_option |> Option.value ~default:[] in
-  if references = [] then "" 
-  else *)
-
 let decode_jaeger_trace_span json =
   let trace_id = json |> member "traceID" |> to_string in
   let span_id = json |> member "spanID" |> to_string in
@@ -224,6 +211,34 @@ let decode_jaeger_trace_span json =
   in
   let start_time_unix_nano =
     json |> member "startTime" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let duration =
+    json |> member "duration" |> to_int_option |> Option.map Int64.of_int
+    |> Option.value ~default:Int64.zero
+  in
+  let end_time_unix_nano = Int64.add start_time_unix_nano duration in
+  (*let attributes = json |> member "attributes" |> decode_attributes in*)
+  Trace.default_span ~trace_id:(Bytes.of_string trace_id)
+    ~span_id:(Bytes.of_string span_id)
+    ~parent_span_id:(Bytes.of_string parent_span_id)
+    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano (*~attributes*)
+    ~events:[] ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
+    ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
+    ()
+
+let decode_dynatrace_span json =
+  let trace_id = json |> member "trace.id" |> to_string in
+  let span_id = json |> member "span.id" |> to_string in
+  let parent_span_id = "" in
+  let name = json |> member "endpoint.name" |> to_string in
+  let kind =
+    json |> member "kind" |> to_string_option
+    |> Option.map decode_span_kind
+    |> Option.value ~default:Trace.Span_kind_unspecified
+  in
+  let start_time_unix_nano =
+    json |> member "start_time" |> to_int_option |> Option.map Int64.of_int
     |> Option.value ~default:Int64.zero
   in
   let duration =
@@ -259,8 +274,7 @@ let decode_jaeger_spans_list_string json_string : Trace.span list =
   let trace_spans = json |> to_list in
   List.map decode_jaeger_trace_span trace_spans
 
-let decode (tt : trace_type) (json : Yojson.Basic.t) : Trace.span list
-    =
+let decode (tt : trace_type) (json : Yojson.Basic.t) : Trace.span list =
   match tt with
   | JAEGER_TRACE ->
       let jaeger_traces = json |> member "data" |> to_list in
@@ -271,6 +285,9 @@ let decode (tt : trace_type) (json : Yojson.Basic.t) : Trace.span list
   | OTEL_SPANS_LIST ->
       let trace_spans = json |> to_list in
       List.map decode_trace_span trace_spans
+  | DYNATRACE_SPANS_LIST ->
+      let trace_spans = json |> to_list in
+      List.map decode_dynatrace_span trace_spans
   | _ ->
       let type_string = trace_string_type_to_string tt in
       failwith (Printf.sprintf "decode: Type %s not supported" type_string)

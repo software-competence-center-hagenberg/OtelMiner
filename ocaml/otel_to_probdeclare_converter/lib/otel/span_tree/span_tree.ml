@@ -153,7 +153,7 @@ let build_span_trees_for_multiple_traces nodes roots =
   in
   build_span_trees_aux nodes roots []
 
-let generate_span_trees_from_spans_for_single_trace (spans : Trace.span list) :
+let generate_span_tree_from_spans_for_single_trace (spans : Trace.span list) :
     span_tree_node =
   let root, nodes = generate_nodes_for_single_trace spans in
   match root with

@@ -6,7 +6,7 @@ type span_tree_node = {
 val generate_span_trees_from_resource_spans :
   Opentelemetry_proto.Trace.resource_spans -> span_tree_node list
 
-val generate_span_trees_from_spans_for_single_trace :
+val generate_span_tree_from_spans_for_single_trace :
   Opentelemetry_proto.Trace.span list -> span_tree_node
 
 val generate_span_trees_from_spans_for_multiple_traces :
