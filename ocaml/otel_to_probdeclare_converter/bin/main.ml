@@ -65,6 +65,9 @@ let _ =
   Queue.declare channel "jaeger-trace-spans-list-queue"
   >>= fun jaeger_trace_spans_list_queue ->
   Log.info "Created jaeger trace spans list listener queue";
+  Queue.declare channel "dynatrace-spans-list-queue"
+  >>= fun dynatrace_spans_list_queue ->
+  Log.info "Created dynatrace spans list listener queue";
   Queue.declare channel "probd-result-queue" >>= fun probd_result_queue ->
   Log.info "Created result queue";
   (* setting up listener for resource spans *)
@@ -100,6 +103,15 @@ let _ =
   spawn
     (Pipe.iter reader
        ~f:(handler_single_trace JAEGER_SPANS_LIST channel probd_result_queue));
+  Log.info "Listening for traces";
+  (* setting up listener for dynatrace spans list for single trace *)
+  Queue.consume ~id:"accept-dynatrace-spans"
+    ~on_cancel:rabbitmq_consumer_cancelled ~no_ack:true ~exclusive:false channel
+    dynatrace_spans_list_queue
+  >>= fun (_consumer, reader) ->
+  spawn
+    (Pipe.iter reader
+       ~f:(handler_single_trace DYNATRACE_SPANS_LIST channel probd_result_queue));
   Log.info "Listening for traces";
   (* TODO add listener for multiple traces *)
   return ()
