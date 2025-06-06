@@ -65,10 +65,10 @@ public class CanonizedSpanTreeService {
         ).getCanonizedSpanTree();
     }
 
-    public String generateSpanTreesFromSpanList(String traceId, List<String> spans) {
+    public String generateSpanTreesFromSpanList(String traceId, List<String> spans, TraceDataType traceDataType) {
         log.info("generating canonized span trees for trace {}... deleting existing", traceId);
         restTemplate.delete(restConfig.canonizedSpanTreeUrl + "/" + traceId);
-        transformAndPipe(traceId, spans, TraceDataType.JAEGER_SPANS_LIST);
+        transformAndPipe(traceId, spans, traceDataType);
         return traceId;
     }
 

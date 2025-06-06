@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.init;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.ArchiveExtractor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.FileProcessor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.DynatraceTracesJsonParser;
@@ -48,7 +49,7 @@ public class Initializer {
         } else if (resourceLocation.endsWith(".zip")) {
             archiveExtractor.extractZip(archiveResource, extractionDirectory);
         }
-        fileProcessor.parseFiles(extractionDirectory, ".json", dynatraceTracesJsonParser);
+        fileProcessor.parseFiles(extractionDirectory, ".json", dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
         /*
         OLD:
         Resource archiveResource = resourceLoader.getResource("classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz");

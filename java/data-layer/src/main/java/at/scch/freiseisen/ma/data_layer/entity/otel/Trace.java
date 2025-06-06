@@ -45,7 +45,7 @@ import java.util.List;
 public class Trace extends BaseEntity<String> {
     private Integer nrNodes;
     private String sourceFile;
-    //FIXME add traceDataType!
+    private String traceDataType;
 
     @JsonManagedReference("s_t")
     @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = false)

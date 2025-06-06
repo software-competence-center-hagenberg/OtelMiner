@@ -30,10 +30,11 @@ public class TraceService extends BaseService<TraceRepository, Trace, String> {
         Page<Trace> tracesForSourceFile = buildPageableAndRequestBySourceFile(sourceDetails);
         List<TraceData> traces = tracesForSourceFile.getContent()
                 .stream()
-                .map(t -> new TraceData(t.getId(), t.getNrNodes(), t.getSpansAsJson()))
+                .map(t -> new TraceData(t.getId(), t.getNrNodes(), t.getSpansAsJson(), t.getTraceDataType()))
                 .toList();
         sourceDetails.setTraces(traces);
         sourceDetails.setTotalPages(tracesForSourceFile.getTotalPages());
+        sourceDetails.setTotalElements((int) tracesForSourceFile.getTotalElements());
         return sourceDetails;
     }
 

@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction.parsing;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.db_initializer.error.FileParsingException;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.dto_creation.DTOCreator;
@@ -24,7 +25,7 @@ public class DynatraceTracesJsonParser implements FileParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void parse(Path path, HashMap<String, Trace> traces) {
+    public void parse(Path path, HashMap<String, Trace> traces, TraceDataType traceDataType) {
         log.info("parsing {}", path);
         try {
             String content = Files.readString(path);
@@ -33,7 +34,7 @@ public class DynatraceTracesJsonParser implements FileParser {
                 String traceId = span.get("trace.id").asText();
                 String spanId = span.get("span.id").asText();
 //                String parentSpanId = extractParentSpanId(span);
-                dtoCreator.addSpan(traceId, spanId, "", path.toString(), span.toString(), traces);
+                dtoCreator.addSpan(traceId, spanId, "", path.toString(), span.toString(), traces, traceDataType);
             });
         } catch (IOException e) {
             throw new FileParsingException(path.toString());

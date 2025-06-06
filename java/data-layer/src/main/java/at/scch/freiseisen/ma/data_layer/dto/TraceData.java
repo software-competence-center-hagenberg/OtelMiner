@@ -13,4 +13,5 @@ public class TraceData {
     private String traceId;
     private int nrNodes;
     private List<String> spans;
+    private String traceDataType;
 }

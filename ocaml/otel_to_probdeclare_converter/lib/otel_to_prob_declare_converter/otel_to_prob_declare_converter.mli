@@ -10,6 +10,10 @@ val convert_resource_spans :
 val convert_trace_spans_for_single_trace :
   Opentelemetry_proto.Trace.span list -> Declare.t list
 
+
+val convert_trace_spans_for_single_trace_without_parent_span_ids :
+  Opentelemetry_proto.Trace.span list -> Declare.t list
+
 val convert_trace_spans_for_multiple_traces :
   Opentelemetry_proto.Trace.span list -> Declare.t list list
 

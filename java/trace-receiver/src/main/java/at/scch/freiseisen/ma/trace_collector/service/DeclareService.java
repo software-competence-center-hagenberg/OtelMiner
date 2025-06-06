@@ -3,7 +3,6 @@ package at.scch.freiseisen.ma.trace_collector.service;
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.trace_collector.configuration.OtelToProbdeclareConfiguration;
 import at.scch.freiseisen.ma.trace_collector.configuration.RestConfig;
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,11 +22,11 @@ public class DeclareService {
     private final OtelToProbdeclareConfiguration otelToProbdeclareConfiguration;
     private final Map<String, String[]> declarePerTrace = new ConcurrentHashMap<>();
 
-    public String generateFromSpanList(String traceId, List<String> spans) {
+    public String generateFromSpanList(String traceId, List<String> spans, TraceDataType traceDataType) {
         log.info("generating declare model for trace...");// {}... deleting existing", traceId);
 //        restTemplate.delete(restConfig.declareUrl + "/" + traceId); TODO delete assoc
         declarePerTrace.put(traceId, new String[]{});
-        transformAndPipe(traceId, spans, TraceDataType.JAEGER_SPANS_LIST);
+        transformAndPipe(traceId, spans, traceDataType);
         return traceId;
     }
 

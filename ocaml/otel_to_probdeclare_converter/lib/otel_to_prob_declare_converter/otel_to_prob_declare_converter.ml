@@ -227,6 +227,13 @@ let convert_trace_spans_for_single_trace (trace_spans : Trace.span list) :
   in
   map_to_declare span_tree
 
+let convert_trace_spans_for_single_trace_without_parent_span_ids (trace_spans : Trace.span list) :
+    Declare.t list =
+  let span_tree =
+    Span_tree.generate_span_tree_for_single_trace_without_parent_ids trace_spans
+  in
+  map_to_declare span_tree
+
 let convert_trace_spans_for_multiple_traces (trace_spans : Trace.span list) :
     Declare.t list list =
   let span_trees =

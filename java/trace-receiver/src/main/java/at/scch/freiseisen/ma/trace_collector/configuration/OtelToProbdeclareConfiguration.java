@@ -17,6 +17,8 @@ public class OtelToProbdeclareConfiguration {
     private String jaegerTraceQueue;
     @Value("${otel_to_probd.routing_key.out.jaeger_trace_spans_list_queue}")
     private String jaegerTraceSpansListQueue;
+    @Value("${otel_to_probd.routing_key.out.dynatrace_spans_list_queue}")
+    private String dynatraceSpansListQueue;
 
     public String determineRoutingKey(TraceDataType traceDataType) {
         return switch (traceDataType) {
@@ -24,6 +26,7 @@ public class OtelToProbdeclareConfiguration {
             case JAEGER_SPANS_LIST -> jaegerTraceSpansListQueue;
             case OTEL_SPANS_LIST -> traceSpansQueue;
             case RESOURCE_SPANS -> resourceSpansQueue;
+            case DYNATRACE_SPANS_LIST -> dynatraceSpansListQueue;
         };
     }
 }

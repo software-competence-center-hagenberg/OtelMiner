@@ -15,6 +15,7 @@ public class SourceDetails {
     private int page;
     private int size;
     private int totalPages;
+    private int totalElements;
     private String sort;
 
     public SourceDetails(String sourceFile, int page, int size, String sort) {

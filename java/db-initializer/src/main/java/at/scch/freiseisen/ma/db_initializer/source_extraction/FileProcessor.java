@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.service.SpanService;
@@ -34,12 +35,12 @@ public class FileProcessor {
         this.spanService = spanService;
     }
 
-    public void parseFiles(Path directory, String fileType, FileParser fileParser) throws IOException {
+    public void parseFiles(Path directory, String fileType, FileParser fileParser, TraceDataType traceDataType) throws IOException {
         log.info("parsing all '{}' files from {}", fileType, directory);
         try (Stream<Path> paths = Files.walk(directory)) {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(fileType))
-                    .forEach(path -> fileParser.parse(path, traces));
+                    .forEach(path -> fileParser.parse(path, traces, traceDataType));
         }
         traces.values().forEach(t -> {
             t.setSpans(t.getSpans().stream().distinct().toList());

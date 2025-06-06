@@ -16,7 +16,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DeclareView from "@/app/ui/DeclareView";
 import JsonView from "@/app/ui/json/JsonView";
-import {ColumnBase, defaultSourceDetails, SourceDetails, TraceDetails} from "@/app/lib/Util";
+import {ColumnBase, SourceDetails, TraceDetails} from "@/app/lib/Util";
 
 interface Column extends ColumnBase {
     id: "traceId" | "nrNodes";
@@ -32,7 +32,15 @@ interface TraceDetailsTableProps {
 }
 
 const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
-    const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
+    const [sourceDetails, setSourceDetails] = useState<SourceDetails>({
+        sourceFile: sourceFile,
+        traces: [],
+        page: 0,
+        size: 10,
+        totalPages: 1,
+        totalElements: 0,
+        sort: "sourceFile"
+    });//defaultSourceDetails(sourceFile));
     const [loadingPage, setLoadingPage] = useState<boolean>(false);
     const [loadingModel, setLoadingModel] = useState<boolean>(false);
     const [selectedRow, setSelectedRow] = useState<TraceDetails | undefined>(undefined);
@@ -42,14 +50,21 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
         setSelectedRow(undefined);
         setSelectedRowModel(undefined);
         setSourceDetails(
-            _prev => (defaultSourceDetails(sourceFile))
+            prev => ({
+                ...prev,
+                page: 0,
+                sourceFile: sourceFile
+            })
         );
     }, [sourceFile])
 
     const fetchSourceDetails = () => {
-        setLoadingPage(true)
+        setLoadingPage(() => true);
         RestService.post<SourceDetails, SourceDetails>('/details', sourceDetails)
-            .then((response) => setSourceDetails(() => response.data))
+            .then((response) => {
+                setSourceDetails(() => response.data);
+                console.log(response.data);
+            })
             .catch((error) => console.error('Error fetching source details:', error))
             .finally(() => setLoadingPage(false));
     };
@@ -98,7 +113,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                 try {
                     const response = await RestService.get<string>("/declare/" + traceId);
                     if (response.data !== '') {
-                        clearInterval(intervalId); // Stop polling
+                        clearInterval(intervalId);
                         console.log(response.data);
                         resolve(response.data);
                     }
@@ -107,7 +122,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                     clearInterval(intervalId)
                     reject(new Error("Error polling model"));
                 }
-            }, 2000); // Poll every 2 seconds
+            }, 2000);
         });
     };
 
@@ -169,7 +184,7 @@ const TraceDetailsView = ({sourceFile}: TraceDetailsTableProps) => {
                 <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
-                    count={sourceDetails.totalPages}
+                    count={sourceDetails.totalElements}
                     rowsPerPage={sourceDetails.size}
                     page={sourceDetails.page}
                     onPageChange={handlePageChange}
