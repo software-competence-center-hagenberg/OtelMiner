@@ -115,7 +115,9 @@ let build_tree ?(with_parent_ids : bool = true) root nodes =
   let find_children =
     if with_parent_ids then find_children
     else fun (_h : span_tree_node) (t : span_tree_node list) ->
-      (List.hd t :: [], List.tl t)
+      match t with
+      | [] -> ([], [])
+      | _ -> (List.hd t :: [], List.tl t)
   in
   let rec build_tree_aux root node nodes =
     let rec map_children root children nodes =
@@ -149,7 +151,7 @@ let build_span_tree_without_parent_ids (nodes : span_tree_node list) :
   let sorted =
     List.sort
       (fun a b ->
-        Int64.compare b.span.start_time_unix_nano a.span.start_time_unix_nano)
+        Int64.compare a.span.start_time_unix_nano b.span.start_time_unix_nano)
       nodes
   in
   let tree, n =

@@ -4,6 +4,7 @@ import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.ArchiveExtractor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.FileProcessor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.DynatraceTracesJsonParser;
+import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.FileParser;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.JaegerTracesJsonParser;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.OtelTxtParser;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Slf4j
 @Component
@@ -30,8 +30,10 @@ public class Initializer {
     private final OtelTxtParser otelTxtParser;
     private final JaegerTracesJsonParser jaegerTracesJsonParser;
     private final DynatraceTracesJsonParser dynatraceTracesJsonParser;
-    @Value("${test-data.file-paths}")
-    private String resourceLocation;
+    @Value("${test-data.file-paths.dynatrace}")
+    private String dynatraceData;
+    @Value("${test-data.file-paths.jaeger}")
+    private String jaegerData;
 
     /**
      * <pre>
@@ -42,6 +44,15 @@ public class Initializer {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws IOException {
+        log.info("Starting DB initialization...");
+        log.info("Loading Dynatrace traces...");
+        unpackDataAndPopupateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
+        log.info("Loading Jaeger traces...");
+        unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
+        log.info("... finished populating database.");
+    }
+
+    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType) throws IOException{
         Resource archiveResource = resourceLoader.getResource("classpath:" + resourceLocation);
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
@@ -49,16 +60,6 @@ public class Initializer {
         } else if (resourceLocation.endsWith(".zip")) {
             archiveExtractor.extractZip(archiveResource, extractionDirectory);
         }
-        fileProcessor.parseFiles(extractionDirectory, ".json", dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
-        /*
-        OLD:
-        Resource archiveResource = resourceLoader.getResource("classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz");
-        Resource extractionDirectoryResource = resourceLoader.getResource("classpath:test-data/");
-        Path extractionDirectory = Paths.get(extractionDirectoryResource.getURI());
-        archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
-        Resource targetDirectoryResource = resourceLoader.getResource("classpath:test-data/traces-jaeger/");
-        Path targetDirectory = Paths.get(targetDirectoryResource.getURI());
-        fileProcessor.parseFiles(targetDirectory, ".json", jaegerTracesJsonParser);
-         */
+        fileProcessor.parseFiles(extractionDirectory, ".json", parser, traceDataType);
     }
 }

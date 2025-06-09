@@ -5,7 +5,7 @@ FROM ocaml/opam:debian-12-ocaml-4.14-afl AS build
 WORKDIR /home/opam/otel_to_probdeclare_converter
 
 # Install dune and amqp-client-async, and build the project
-RUN opam install dune amqp-client-async opentelemetry yojson base64 ounit2
+RUN opam install dune amqp-client-async opentelemetry yojson base64 ounit2 timedesc
 
 FROM build
 

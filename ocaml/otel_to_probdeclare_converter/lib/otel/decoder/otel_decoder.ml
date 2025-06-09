@@ -1,6 +1,8 @@
+open Amqp_client_async
+open Thread
+open Util
 open Yojson.Basic.Util
 open Opentelemetry_proto
-open Util
 
 (* Decode an array_value from JSON *)
 let rec decode_array_value json =
@@ -41,7 +43,7 @@ let decode_attributes json =
          Common.make_key_value ~key:k ~value:(Some (decode_any_value v)) ())
 
 (* Decode a resource spans attribute to keyValue from JSON *)
-let decode_resource_spans_attribute json =
+let decode_resource_spans_attribute (json : Yojson.Basic.t) =
   Common.make_key_value
     ~key:(json |> member "key" |> to_string)
     ~value:
@@ -227,6 +229,20 @@ let decode_jaeger_trace_span json =
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
 
+let map_iso_8601_date_to_int64 (date : string) =
+  match Timedesc.Timestamp.of_iso8601 date with
+  | Ok timestamp -> (
+    let s,ns = Timedesc.Timestamp.to_s_ns timestamp in
+    Log.info "seconds: %s, nano seconds: %d" (Int64.to_string s) ns;
+    let unix_time =Int64.add (Int64.mul s 1_000_000_000L) (Int64.of_int ns) in
+    Log.info "unix nanos: %s" (Int64.to_string unix_time);
+    Some (unix_time)
+  )
+  | Error _ -> (
+    Log.info "no conversion possible";
+    None
+  )
+
 let decode_dynatrace_span json =
   let trace_id = json |> member "trace.id" |> to_string in
   let span_id = json |> member "span.id" |> to_string in
@@ -238,11 +254,11 @@ let decode_dynatrace_span json =
     |> Option.value ~default:Trace.Span_kind_unspecified
   in
   let start_time_unix_nano =
-    json |> member "start_time" |> to_int_option |> Option.map Int64.of_int
+    json |> member "start_time" |> to_string |> map_iso_8601_date_to_int64 |> Option.map (fun x -> x) (*Int64.of_string*)
     |> Option.value ~default:Int64.zero
   in
   let duration =
-    json |> member "duration" |> to_int_option |> Option.map Int64.of_int
+    json |> member "duration" |> to_string_option |> Option.map Int64.of_string
     |> Option.value ~default:Int64.zero
   in
   let end_time_unix_nano = Int64.add start_time_unix_nano duration in

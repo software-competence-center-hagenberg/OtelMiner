@@ -231,6 +231,7 @@ public class ProbDeclareManagerService implements DisposableBean {
                 });
         generating.put(trace.getId(), future);
 
+        TraceDataType traceDataType = TraceDataType.valueOf(trace.getTraceDataType());
         if (isPaused.getAcquire()) {
             log.info("model generation is currently paused --> setting out next trace({}) until resume is requested"
                     , trace.getId());
@@ -238,10 +239,10 @@ public class ProbDeclareManagerService implements DisposableBean {
                     .add(() -> {
                         log.debug("resuming with trace {}", trace.getId());
                         declareService.transformAndPipe(
-                                trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
+                                trace.getId(), trace.getSpansAsJson(), traceDataType);
                     });
         } else {
-            declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), TraceDataType.JAEGER_SPANS_LIST);
+            declareService.transformAndPipe(trace.getId(), trace.getSpansAsJson(), traceDataType);
         }
     }
 

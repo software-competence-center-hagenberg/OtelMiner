@@ -66,5 +66,9 @@ public class FileProcessor {
             }
         });
         log.info("#################################################");
+        log.info("cleaning up state");
+        traces.clear();
+        tracesByNrNodes.clear();
+        log.info("state cleaned up");
     }
 }
