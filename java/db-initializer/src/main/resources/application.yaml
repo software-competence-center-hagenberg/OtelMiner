@@ -23,4 +23,4 @@ test-data:
   file-paths:
     dynatrace: /test-data/traces_spans.zip
     jaeger: /test-data/traces-jaeger.zip
-    sample: /test-data/train-ticket-sample-00.tar.gz, /test-data/train-ticket-sample-01.tar.gz, /test-data/train-ticket-sample-02.tar.gz, /test-data/train-ticket-sample-03.tar.gz, /test-data/train-ticket-sample-04.tar.gz
+    sample: /test-data/train-ticket-sample-00.tar.gz, /test-data/train-ticket-sample-01.tar.gz, /test-data/train-ticket-sample-02.tar.gz, /test-data/train-ticket-sample-03.tar.gz
