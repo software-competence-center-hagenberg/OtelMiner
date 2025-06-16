@@ -45,25 +45,35 @@ public class Initializer {
      * </pre>
      */
     @EventListener(ApplicationReadyEvent.class)
-    public void start() throws IOException {
+    public void start() {
         log.info("Starting DB initialization...");
         log.info("Loading Dynatrace traces...");
-        unpackDataAndPopupateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
-        log.info("Loading Jaeger traces...");
-        unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
-        log.info("Creating Sample for train-ticket system...");
-        for (int i = 0; i < sampledData.length; i++) {
-            log.info("processing sample archive {} ...", i);
-            unpackDataAndPopupateDatabase(sampledData[i], jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST, true);
+        try {
+            unpackDataAndPopupateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
+            // log.info("Loading Jaeger traces...");
+            // unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser,
+            // TraceDataType.JAEGER_SPANS_LIST);
+            // log.info("Creating Sample for train-ticket system...");
+            // for (int i = 0; i < sampledData.length; i++) {
+            // log.info("processing sample archive {} ...", i);
+            // unpackDataAndPopupateDatabase(sampledData[i], jaegerTracesJsonParser,
+            // TraceDataType.JAEGER_SPANS_LIST, true);
+            // }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         log.info("... finished populating database.");
+        log.info("exiting ...");
+        System.exit(0);
     }
 
-    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType) throws IOException{
+    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType)
+            throws IOException {
         unpackDataAndPopupateDatabase(resourceLocation, parser, traceDataType, false);
     }
 
-    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType, boolean sample) throws IOException{
+    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
+            boolean sample) throws IOException {
         Resource archiveResource = resourceLoader.getResource("classpath:" + resourceLocation);
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {

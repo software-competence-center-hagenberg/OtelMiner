@@ -8,14 +8,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -33,8 +31,9 @@ public class DynatraceTracesJsonParser implements FileParser {
             jaegerTrace.get("records").forEach(span -> {
                 String traceId = span.get("trace.id").asText();
                 String spanId = span.get("span.id").asText();
-//                String parentSpanId = extractParentSpanId(span);
-                dtoCreator.addSpan(traceId, spanId, "", path.toString(), span.toString(), traces, traceDataType);
+                String parentSpanId = extractParentSpanId(span);
+                dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces,
+                        traceDataType);
             });
         } catch (IOException e) {
             throw new FileParsingException(path.toString());
@@ -42,17 +41,16 @@ public class DynatraceTracesJsonParser implements FileParser {
         log.info("parsing done");
     }
 
-//    private String extractParentSpanId(JsonNode span) {
-//        AtomicReference<String> parentSpanId = new AtomicReference<>(StringUtils.EMPTY);
-//        if (span.has("references")) {
-//            span.get("references").forEach(reference -> {
-//                if (reference.has("refType")
-//                    && reference.get("refType").asText().equals("CHILD_OF")
-//                    && reference.has("spanID")) {
-//                    parentSpanId.set(reference.get("spanID").asText());
-//                }
-//            });
-//        }
-//        return parentSpanId.get();
-//    }
+    private String extractParentSpanId(JsonNode span) {
+        if (!isRoot(span) && span.has("span.parent_id")) {
+            return span.get("span.parent_id").asText();
+        }
+
+        return "";
+    }
+
+    private boolean isRoot(JsonNode span) {
+        return span.has("request.is_root_span")
+                && span.get("request.is_root_span").asBoolean();
+    }
 }
