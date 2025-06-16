@@ -231,48 +231,64 @@ let decode_jaeger_trace_span json =
 
 let map_iso_8601_date_to_int64 (date : string) =
   match Timedesc.Timestamp.of_iso8601 date with
-  | Ok timestamp -> (
-    let s,ns = Timedesc.Timestamp.to_s_ns timestamp in
-    Log.info "seconds: %s, nano seconds: %d" (Int64.to_string s) ns;
-    let unix_time =Int64.add (Int64.mul s 1_000_000_000L) (Int64.of_int ns) in
-    Log.info "unix nanos: %s" (Int64.to_string unix_time);
-    Some (unix_time)
-  )
-  | Error _ -> (
-    Log.info "no conversion possible";
-    None
-  )
+  | Ok timestamp ->
+      let s, ns = Timedesc.Timestamp.to_s_ns timestamp in
+      Log.info "seconds: %s, nano seconds: %d" (Int64.to_string s) ns;
+      let unix_time =
+        Int64.add (Int64.mul s 1_000_000_000L) (Int64.of_int ns)
+      in
+      Log.info "unix nanos: %s" (Int64.to_string unix_time);
+      Some unix_time
+  | Error _ ->
+      Log.info "no conversion possible";
+      None
 
 let decode_dynatrace_span json =
+  let is_root json =
+    json
+    |> member "request.is_root_span"
+    |> to_bool_option
+    (* |> Option.map (fun x -> x) *)
+    |> Option.value ~default:false
+  in
+  let extract_parent_id json =
+    if is_root json then None |> Option.value ~default:""
+    else
+      json |> member "span.parent_id" |> to_string_option
+      (* |> Option.map (fun x -> x) *)
+      |> Option.value ~default:""
+  in
   let trace_id = json |> member "trace.id" |> to_string in
   let span_id = json |> member "span.id" |> to_string in
-  let parent_span_id = "" in
-  let name = json |> member "endpoint.name" |> to_string in
+  let parent_span_id = extract_parent_id json in
+  let name = json |> member "span.name" |> to_string in
   let kind =
     json |> member "kind" |> to_string_option
     |> Option.map decode_span_kind
     |> Option.value ~default:Trace.Span_kind_unspecified
   in
   let start_time_unix_nano =
-    json |> member "start_time" |> to_string |> map_iso_8601_date_to_int64 |> Option.map (fun x -> x) (*Int64.of_string*)
+    json |> member "start_time" |> to_string |> map_iso_8601_date_to_int64
+    (* |> Option.map (fun x -> x) *)
     |> Option.value ~default:Int64.zero
   in
-  let duration =
+  let end_time_unix_nano =
+    json |> member "end_time" |> to_string |> map_iso_8601_date_to_int64
+    |> Option.map (fun x -> x)
+    |> Option.value ~default:Int64.zero
+  in
+  (* let duration =
     json |> member "duration" |> to_string_option |> Option.map Int64.of_string
     |> Option.value ~default:Int64.zero
   in
-  let end_time_unix_nano = Int64.add start_time_unix_nano duration in
-  (*let attributes = json |> member "attributes" |> decode_attributes in*)
+  let end_time_unix_nano = Int64.add start_time_unix_nano duration in *)
   Trace.default_span ~trace_id:(Bytes.of_string trace_id)
     ~span_id:(Bytes.of_string span_id)
     ~parent_span_id:(Bytes.of_string parent_span_id)
-    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano (*~attributes*)
-    ~events:[] ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
+    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano ~events:[] ~links:[]
+    ~dropped_attributes_count:(Int32.of_int 0)
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
-
-(* let decode_jaeger_trace_span_string json = *)
-(*  decode_jaeger_trace_span (Yojson.Basic.from_string (json |> to_string)) *)
 
 let decode_jaeger_trace json =
   let jaeger_trace_spans = json |> member "spans" |> to_list in

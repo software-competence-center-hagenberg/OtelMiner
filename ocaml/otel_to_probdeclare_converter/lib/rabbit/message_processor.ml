@@ -35,9 +35,9 @@ let decode_and_convert_trace_spans_for_single_trace (tt : trace_type)
   match tt with
   | RESOURCE_SPANS ->
       failwith "RESOURECE_SPANS must be handled in other function!"
-  | DYNATRACE_SPANS_LIST ->
+  (* | DYNATRACE_SPANS_LIST ->
       Otel_to_prob_declare_converter
-      .convert_trace_spans_for_single_trace_without_parent_span_ids decoded
+      .convert_trace_spans_for_single_trace_without_parent_span_ids decoded *)
   | _ ->
       Otel_to_prob_declare_converter.convert_trace_spans_for_single_trace
         decoded
