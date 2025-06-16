@@ -25,6 +25,7 @@ SPRING=false
 DB_SERVICE=false
 TRACE_RECEIVER=false
 TS=false
+DETACH=true
 
 # Parse command-line options
 while getopts "hbaojdrte" opt; do
@@ -38,6 +39,7 @@ while getopts "hbaojdrte" opt; do
         r) echo "enabling trace-receiver..."; TRACE_RECEIVER=true ;;
         t) echo "enabling all typescript processes..."; TS=true ;;
         e) echo "enabling all backend processes..."; OCAML=true; SPRING=true ;;
+        l) echo "log enabled -> not detaching..."; DETACH=false ;;
         *) echo "Invalid option: -$OPTARG" >&2; show_help; exit 1 ;;
     esac
 done
@@ -50,15 +52,17 @@ docker compose up --detach rabbitmq-server database
 start_service() {
     local service=$1
     local build_flag=""
+    local detach_flag=""
 
     # Add build flag if building is enabled
     [ "$BUILD" = true ] && build_flag="--build"
+    [ "$DETACH" = true ] && detach_flag="--detach"
 
-    docker compose up --detach $build_flag $service
+    docker compose up $detach_flag $build_flag $service
 }
 
 # Start services based on flags
-[ "$OCAML" = true ] && start_service otel-to-probdeclare-converter
+[ "$OCAML" = true ] && start_service otel-to-declare-converter
 [ "$SPRING" = true ] && start_service "db-service trace-receiver"
 [ "$DB_SERVICE" = true ] && start_service db-service
 [ "$TRACE_RECEIVER" = true ] && start_service trace-receiver
