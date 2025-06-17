@@ -13,8 +13,6 @@ let rec find_next_a_or_b a b = function
 
 (*
  *------------------------------------------------------------------------------
- * FIXME check if find_next_function is really necessary or if it is better to traverse the whole list and only apply an abortion and continuation predicate after every miss.
- *------------------------------------------------------------------------------
  * Generic function to determine if a and b are in a relation.
  * General algorithm a and b are occuring the same list and in order to find if
  * they fulfill a specific relation the list needs to be traversed and apply
