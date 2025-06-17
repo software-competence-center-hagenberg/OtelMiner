@@ -148,6 +148,8 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.info("pausing generation of model {}", probDeclareId);
         traceCacheManager.pause();
         isPaused.compareAndSet(false, true);
+        log.info("updating model in db");
+        restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
         return isPaused.getAcquire();
     }
 
@@ -196,7 +198,10 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.debug("Finishing generation task for model ID: {}", currentId.get());
         declareService.clear();
         generating.clear();
-        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId); // FIXME change to POST
+        if (!abort) {
+            restTemplate.postForLocation(restConfig.declareUrl + "/" + currentId.get(), constraints.values());
+        }
+        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId.get()); // FIXME change to POST
         if (abort) {
             clearCurrentState();
         }
@@ -260,14 +265,15 @@ public class ProbDeclareManagerService implements DisposableBean {
                 () -> updateModel(List.of(conversionResponse.constraints()), probDeclareId));
         if (!traceCacheManager.isCacheDone()) {
             declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclareId));
-        } else if (isGenerationFinished()) {
-            finishGeneration(false);
-            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
         }
+//        else if (isGenerationFinished()) {
+//            finishGeneration(false);
+//            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
+//        }
     }
 
     private boolean isGenerationFinished() {
-        return currentExpectedTraces.getAcquire() == currentNrTracesProcessed.getAcquire()
+        return currentExpectedTraces.get() == currentNrTracesProcessed.get()
                && traceCacheManager.isCacheDone();
     }
 
@@ -299,21 +305,11 @@ public class ProbDeclareManagerService implements DisposableBean {
             assert newConstraints.size() == constraints.size();
         } else {
             assert currentNrTraces > 0;
-            log.info("existing {} constraints so far --> updating model", constraints.size());
-            List<String> visited = new ArrayList<>();
-            log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
-            currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
-            log.info("updating constraints found in trace...");
-            newConstraints.forEach(nc -> {
-                updateOrAddConstraint(nc);
-                visited.add(nc);
-            });
-            assert visited.size() == newConstraints.size();
-            log.info("updated {} constraints", visited.size());
-            log.info("updating constraints NOT found in trace...");
-            updateConstraintsNotContainedInCurrentTrace(visited);
-            log.info("updated {} constraints", constraints.size() - visited.size());
-            restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
+            updateConstraints(newConstraints, currentNrTraces);
+        }
+        if (isGenerationFinished()) {
+            finishGeneration(false);
+            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
         }
     }
 
@@ -321,9 +317,26 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentNrTracesProcessed.compareAndSet(0, 1);
         log.info("no constraints so far and no traces --> initializing crisps");
         newConstraints.forEach(c -> {
-                    log.debug("adding crisp constraint: {}", c);
-                    constraints.put(c, new ProbDeclareConstraintModelEntry(c, 1d, 1L));
-                });
+            log.debug("adding crisp constraint: {}", c);
+            constraints.put(c, new ProbDeclareConstraintModelEntry(c, 1d, 1L));
+        });
+    }
+
+    private void updateConstraints(List<String> newConstraints, long currentNrTraces) {
+        log.info("existing {} constraints so far --> updating model", constraints.size());
+        List<String> visited = new ArrayList<>();
+        log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
+        currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
+        log.info("updating constraints found in trace...");
+        newConstraints.forEach(nc -> {
+            updateOrAddConstraint(nc);
+            visited.add(nc);
+        });
+        assert visited.size() == newConstraints.size();
+        log.info("updated {} constraints", visited.size());
+        log.info("updating constraints NOT found in trace...");
+        updateConstraintsNotContainedInCurrentTrace(visited);
+        log.info("updated {} constraints", constraints.size() - visited.size());
     }
 
     private void updateOrAddConstraint(String newConstraint) {
@@ -353,7 +366,7 @@ public class ProbDeclareManagerService implements DisposableBean {
                 .stream()
                 .filter(c -> !visited.contains(c))
                 .forEach(c -> {
-                    log.info("updating {}", c);
+                    log.debug("updating {}", c);
                     ProbDeclareConstraintModelEntry declare = constraints.get(c);
                     updateProbability(declare);
                 });

@@ -124,12 +124,12 @@ public class TraceCacheManager implements DisposableBean {
         log.info("trying to cache next page");
         if (!isDead.getAcquire()) {
             Page<Trace> page = retrieveNextPage();
+            sourceDetails.setPage(Math.min(page.getNumber() + 1, page.getTotalPages()));
             log.info("caching next page");
             if (!isDead.getAcquire()) {
                 queue.addAll(page.getContent());
                 sourceDetails.setTotalPages(page.getTotalPages());
-                if (page.getNumber() < page.getTotalPages() - 1 && !isPaused.get()) {
-                    sourceDetails.setPage(page.getNumber() + 1);
+                if (page.getNumber() < page.getTotalPages() && !isPaused.get()) {
                     log.info("page not last and cache not paused --> submitting next cache cycle");
                     executor.submit(this::cache);
                 } else {
