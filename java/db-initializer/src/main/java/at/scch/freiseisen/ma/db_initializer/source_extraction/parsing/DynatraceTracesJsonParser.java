@@ -35,10 +35,11 @@ public class DynatraceTracesJsonParser implements FileParser {
                 dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces,
                         traceDataType);
             });
+            log.info("parsing done -> deleting temp file");
+            Files.delete(path);
         } catch (IOException e) {
             throw new FileParsingException(path.toString());
         }
-        log.info("parsing done");
     }
 
     private String extractParentSpanId(JsonNode span) {

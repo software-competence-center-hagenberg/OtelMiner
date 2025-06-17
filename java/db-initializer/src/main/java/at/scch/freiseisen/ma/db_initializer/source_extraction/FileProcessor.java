@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,8 +38,19 @@ public class FileProcessor {
         try (Stream<Path> paths = Files.walk(directory)) {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(fileType))
-                    .forEach(path -> fileParser.parse(path, traces, traceDataType));
+                    .forEach(path -> {
+                        fileParser.parse(path, traces, traceDataType);
+                        process(sample);
+                    });
         }
+        log.info("cleaning up state");
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+        log.info("state cleaned up");
+    }
+
+    private void process(boolean sample) {
         traces.values().forEach(t -> {
             t.setSpans(t.getSpans().stream().distinct().toList());
             int nrNodes = t.getSpans().size();
@@ -60,11 +72,9 @@ public class FileProcessor {
                 processAndSample(traces);
             }
         });
-        log.info("#################################################");
-        log.info("cleaning up state");
         traces.clear();
         tracesByNrNodes.clear();
-        log.info("state cleaned up");
+        log.info("#################################################");
     }
 
     private void processAndSample(List<Trace> traces) {
@@ -76,6 +86,7 @@ public class FileProcessor {
                 sampled.put(key, trace);
             }
         });
+        log.info("persisting {} sampled traces", sampled.size());
         processNormaly(new ArrayList<>(sampled.values()));
     }
 
