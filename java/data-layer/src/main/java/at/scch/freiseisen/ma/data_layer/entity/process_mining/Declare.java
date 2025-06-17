@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.data_layer.entity.process_mining;
 
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraintModelEntry;
 import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -59,7 +60,16 @@ public class Declare {
         this.constraintTemplate = constraintTemplate;
         this.probDeclare = probDeclareToTrace.getProbDeclare();
 //        this.trace = probDeclareToTrace.getTrace();
-        this.updateDate = LocalDateTime.now();
         this.insertDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
+    }
+
+    public Declare(ProbDeclareConstraintModelEntry e, ProbDeclare probDeclare) {
+        this.probability = e.getProbability();
+        this.nr = e.getNr();
+        this.constraintTemplate = e.getConstraintTemplate();
+        this.insertDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
+        this.probDeclare = probDeclare;
     }
 }
