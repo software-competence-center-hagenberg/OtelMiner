@@ -63,11 +63,11 @@ public class DeclareController {
         return service.findAllByConstraintTemplateInAndProbDeclare(constraintTemplates, probDeclareId);
     }
 
-    @PostMapping("/add-constraints/{prob-declare-id}")
-    public List<ProbDeclareConstraintModelEntry> postAddConstraints(
-            @RequestBody ConversionResponse conversionResponse,
-            @PathVariable("prob-declare-id") String probDeclareId
-    ){
-        return service.addNewlyConverted(conversionResponse, probDeclareId);
-    }
+//    @PostMapping("/add-constraints/{prob-declare-id}")
+//    public List<ProbDeclareConstraintModelEntry> postAddConstraints(
+//            @RequestBody ConversionResponse conversionResponse,
+//            @PathVariable("prob-declare-id") String probDeclareId
+//    ){
+//        return service.addNewlyConverted(conversionResponse, probDeclareId);
+//    }
 }

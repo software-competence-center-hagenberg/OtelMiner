@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -45,6 +46,7 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
     public void stopGeneration(@PathVariable("id") String id) {
         ProbDeclare probDeclare = service.findById(id);
         probDeclare.setGenerating(false);
+        probDeclare.setUpdateDate(LocalDateTime.now());
         service.save(probDeclare);
     }
 
