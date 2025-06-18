@@ -59,10 +59,10 @@ let generate_nodes_for_single_trace (spans : Trace.span list) :
   gen_aux spans None (fun x -> x)
 
 (*
-    * Creates a span_tree_node for every span and builds a list of roots and nodes.
-    * returns (r, n) where r is a list of roots and n is a list of non-root nodes.
-    * Note: The original order of spans is kept.
-    *)
+ * Creates a span_tree_node for every span and builds a list of roots and nodes.
+ * returns (r, n) where r is a list of roots and n is a list of non-root nodes.
+ * Note: The original order of spans is kept.
+ *)
 let generate_nodes_for_multiple_traces (spans : Trace.span list) =
   let rec gen_aux (spans : Trace.span list) fr fn =
     match spans with
@@ -115,9 +115,7 @@ let build_tree ?(with_parent_ids : bool = true) root nodes =
   let find_children =
     if with_parent_ids then find_children
     else fun (_h : span_tree_node) (t : span_tree_node list) ->
-      match t with
-      | [] -> ([], [])
-      | _ -> (List.hd t :: [], List.tl t)
+      match t with [] -> ([], []) | _ -> (List.hd t :: [], List.tl t)
   in
   let rec build_tree_aux root node nodes =
     let rec map_children root children nodes =
@@ -199,7 +197,7 @@ let generate_span_trees_from_spans_for_multiple_traces (spans : Trace.span list)
   let roots, nodes = generate_nodes_for_multiple_traces spans in
   build_span_trees_for_multiple_traces nodes roots
 
-(* 
+(*
  * Takes resources_spans object. 
  * Extracts all spans contained in its scope_spans.
  * Generates (root) nodes out of them and
