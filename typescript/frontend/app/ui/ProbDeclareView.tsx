@@ -165,8 +165,8 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                                         Id: {probDeclare.id} (generating: {probDeclare.generating ? "true" : "false"})</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>Declare Constraint</TableCell>
                                     <TableCell align="right">Probability</TableCell>
+                                    <TableCell>Declare Constraint</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -177,10 +177,10 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                                             key={row.declareTemplate}
                                             sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                         >
+                                            <TableCell align="right">{row.probability}</TableCell>
                                             <TableCell component="th" scope="row">
                                                 {row.declareTemplate}
                                             </TableCell>
-                                            <TableCell align="right">{row.probability}</TableCell>
                                         </TableRow>
                                     ))}
                             </TableBody>
