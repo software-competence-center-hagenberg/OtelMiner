@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class TraceCacheManager implements DisposableBean {
     private final RestTemplate restTemplate;
     private final RestConfig restConfig;
+    private final PersistenceService persistenceService;
     private final LinkedBlockingQueue<Trace> queue;
     private final ExecutorService executor;
     private final AtomicBoolean isPaused;
@@ -36,9 +37,10 @@ public class TraceCacheManager implements DisposableBean {
     private SourceDetails sourceDetails;
     private String probDeclareId;
 
-    public TraceCacheManager(RestConfig restConfig, RestTemplate restTemplate) {
+    public TraceCacheManager(RestConfig restConfig, RestTemplate restTemplate, PersistenceService persistenceService) {
         this.restConfig = restConfig;
         this.restTemplate = restTemplate;
+        this.persistenceService = persistenceService;
         queue = new LinkedBlockingQueue<>();
         executor = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r, "TraceCacheManager-Worker");
@@ -162,7 +164,7 @@ public class TraceCacheManager implements DisposableBean {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Page<Trace> page = Objects.requireNonNull(response.getBody());
-            createAndPersistProbDeclareToTrace(probDeclareId, page.getContent());
+            persistenceService.createAndPersistProbDeclareToTrace(probDeclareId, page.getContent());
             log.info("retrieval successful ({}/{})", page.getNumber() + 1, page.getTotalPages());
             return page;
         }
@@ -174,12 +176,5 @@ public class TraceCacheManager implements DisposableBean {
 
         log.error(errorMessage);
         throw new TraceCacheException(errorMessage);
-    }
-
-    // TODO move to persistanceManager
-    private void createAndPersistProbDeclareToTrace(String probDeclareId, List<Trace> traces) {
-        log.debug("creating association between prob declare model {} and trace ids: {}",
-                probDeclareId, traces.stream().map(Trace::getId).collect(Collectors.joining(", ")));
-        restTemplate.postForLocation(restConfig.probDeclareToTraceUrl + "/" + probDeclareId, traces);
     }
 }

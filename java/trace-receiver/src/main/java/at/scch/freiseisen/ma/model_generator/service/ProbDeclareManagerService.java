@@ -36,6 +36,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private final TraceCacheManager traceCacheManager;
     private final ObjectMapper objectMapper;
     private final ModelGenerationConfig modelGenerationConfig;
+    private final PersistenceService persistenceService;
 
     private final ExecutorService declareConstraintGenerationExecutor;
     private final ExecutorService probDeclareModelUpdateExecutor;
@@ -54,13 +55,15 @@ public class ProbDeclareManagerService implements DisposableBean {
             DeclareService declareService,
             TraceCacheManager traceCacheManager,
             ObjectMapper objectMapper,
-            ModelGenerationConfig modelGenerationConfig) {
+            ModelGenerationConfig modelGenerationConfig,
+            PersistenceService persistenceService) {
         this.restTemplate = restTemplate;
         this.restConfig = restConfig;
         this.declareService = declareService;
         this.traceCacheManager = traceCacheManager;
         this.objectMapper = objectMapper;
         this.modelGenerationConfig = modelGenerationConfig;
+        this.persistenceService = persistenceService;
 
         declareConstraintGenerationExecutor = Executors.newFixedThreadPool(modelGenerationConfig.getNrThreads());
         probDeclareModelUpdateExecutor = Executors.newSingleThreadExecutor(r -> {
@@ -109,7 +112,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     protected ProbDeclareModel getProbDeclareModel(String id) {
         return id.equals(currentId.get())
                 ? getCurrentModel()
-                : restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
+                : persistenceService.getProbDeclareModel(id);
     }
 
     protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces) {
@@ -149,7 +152,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         traceCacheManager.pause();
         isPaused.compareAndSet(false, true);
         log.info("updating model in db");
-        restTemplate.postForLocation(restConfig.declareUrl + "/" + probDeclareId, constraints.values());
+        persistenceService.persistConstraints(constraints.values(), probDeclareId);
         return isPaused.getAcquire();
     }
 
@@ -171,12 +174,8 @@ public class ProbDeclareManagerService implements DisposableBean {
         return true;
     }
 
-    private ProbDeclare persist(ProbDeclare probDeclare) {
-        return restTemplate.postForObject(restConfig.probDeclareUrl + "/one", probDeclare, ProbDeclare.class);
-    }
-
     private void initDeclareGeneration(SourceDetails sourceDetails, String id) {
-        ProbDeclare probDeclare = persist(new ProbDeclare(id));
+        ProbDeclare probDeclare = persistenceService.persistProbDeclare(new ProbDeclare(id));
         log.info("Starting generation task for model ID: {}", id);
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         try {
@@ -195,17 +194,18 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     private void finishGeneration(boolean abort) {
-        log.debug("Finishing generation task for model ID: {}", currentId.get());
+        String probDeclareId = currentId.get();
+        log.debug("Finishing generation task for model ID: {}", probDeclareId);
         declareService.clear();
         generating.clear();
         if (!abort) {
-            restTemplate.postForLocation(restConfig.declareUrl + "/" + currentId.get(), constraints.values());
+            persistenceService.persistConstraints(constraints.values(), probDeclareId);
         }
-        restTemplate.delete(restConfig.probDeclareUrl + "/stop-generation/" + currentId.get()); // FIXME change to POST
+        persistenceService.stopProbDeclareGeneration(probDeclareId);
         if (abort) {
             clearCurrentState();
         }
-        log.info("Finished generation task for model ID: {}", currentId.get());
+        log.info("Finished generation task for model ID: {}", probDeclareId);
     }
 
     private void clearCurrentState() {
@@ -266,10 +266,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         if (!traceCacheManager.isCacheDone()) {
             declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclareId));
         }
-//        else if (isGenerationFinished()) {
-//            finishGeneration(false);
-//            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
-//        }
     }
 
     private boolean isGenerationFinished() {
@@ -277,7 +273,6 @@ public class ProbDeclareManagerService implements DisposableBean {
                && traceCacheManager.isCacheDone();
     }
 
-    // TODO move model + executor + model methods to dedicated ProbDeclareModelService
     private ProbDeclareModel getCurrentModel() {
         List<ProbDeclareConstraint> model = constraints.values()
                 .stream()

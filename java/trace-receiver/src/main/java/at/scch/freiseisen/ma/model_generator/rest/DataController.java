@@ -38,7 +38,8 @@ public class DataController {
     }
 
     @PostMapping("/prob-declare/generate")
-    public ProbDeclareModel generateProbDeclareModel(@RequestParam("expected-traces") int expectedTraces, @RequestBody SourceDetails sourceDetails) {
+    public ProbDeclareModel generateProbDeclareModel(
+            @RequestParam("expected-traces") int expectedTraces, @RequestBody SourceDetails sourceDetails) {
         return dataService.generateProbDeclareModel(sourceDetails, expectedTraces);
     }
 
