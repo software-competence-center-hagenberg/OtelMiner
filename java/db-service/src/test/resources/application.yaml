@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: db-user
+    password: super-secure-12345
+    driverClassName: org.postgresql.Driver
+logging:
+  level:
+    at.scch: DEBUG

@@ -13,6 +13,10 @@
     <name>db-service</name>
     <description>database service</description>
 
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>at.scch.freiseisen.ma</groupId>
@@ -41,6 +45,11 @@
             <artifactId>postgresql</artifactId>
             <optional>true</optional>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

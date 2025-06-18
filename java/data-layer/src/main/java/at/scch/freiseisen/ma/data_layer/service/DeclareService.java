@@ -44,19 +44,6 @@ public class DeclareService {
                 ).toList();
     }
 
-//    public List<ProbDeclareConstraintModelEntry> addNewlyConverted(ConversionResponse response, String probDeclareId) {
-//        log.info("retrieving prob declare with id {}", probDeclareId);
-//
-//        ProbDeclareToTraceId probDeclareToTraceId = new ProbDeclareToTraceId(probDeclareId, response.traceId());
-//        ProbDeclareToTrace probDeclareToTrace = probDeclareToTraceService.safeFindById(probDeclareToTraceId);
-//
-//        List<Declare> entities = Arrays.stream(response.constraints())
-//                .map(c -> new Declare(probDeclareToTrace, c))
-//                .toList();
-//
-//        return mapToModel(saveAll(entities));
-//    }
-
     public List<Declare> update(List<ProbDeclareConstraintModelEntry> modelEntries, String probDeclareId) {
         Map<DeclareId, ProbDeclareConstraintModelEntry> map = modelEntries.stream()
                 .collect(Collectors.toMap(pme -> new DeclareId(probDeclareId, pme.getConstraintTemplate()), Function.identity()));
@@ -104,5 +91,9 @@ public class DeclareService {
     public Declare save(Declare entity) {
         log.debug("persisting entity {}-{}", entity.getProbDeclare().getId(), entity.getConstraintTemplate());
         return repository.saveAndFlush(entity);
+    }
+
+    public List<Declare> findAllByProbDeclare(ProbDeclare probDeclare) {
+        return repository.findAllByProbDeclare(probDeclare);
     }
 }

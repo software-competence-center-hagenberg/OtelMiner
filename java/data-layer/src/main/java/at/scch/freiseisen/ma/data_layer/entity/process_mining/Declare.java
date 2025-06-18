@@ -26,14 +26,10 @@ public class Declare {
     private String probDeclareId;
 
     @Id
-    @Column(name = "constraint_template")
+    @Column(name = "constraint_template", length = 500)
     private String constraintTemplate;
 
-//    @OneToOne
-//    @JoinColumn(name = "trace_id")
-//    private Trace trace; // FIXME add DeclareToTrace Join Table
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("probDeclareId")
     @JoinColumn(name = "prob_declare_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("d_pd")
@@ -57,6 +53,7 @@ public class Declare {
         this.insertDate = LocalDateTime.now();
         this.updateDate = LocalDateTime.now();
         this.probDeclare = probDeclare;
+        this.probDeclareId = probDeclare.getId();
     }
 
     @Override
