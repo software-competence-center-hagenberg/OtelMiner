@@ -183,28 +183,24 @@ let decode_trace_string json_string : Trace.span list =
   let trace_spans = json |> to_list in
   List.map decode_trace_span trace_spans
 
-let extract_parent_span_id json =
-  match json |> member "references" with
-  | `Null -> ""
-  | refs -> (
-      let refs_list = refs |> to_list in
-      let child_of_ref =
-        List.find_opt
-          (fun ref -> ref |> member "refType" |> to_string = "CHILD_OF")
-          refs_list
-      in
-      match child_of_ref with
-      | Some ref -> ref |> member "spanID" |> to_string
-      | None -> "")
-
 let decode_jaeger_trace_span json =
+  let extract_parent_span_id json =
+    match json |> member "references" with
+    | `Null -> ""
+    | refs -> (
+        let refs_list = refs |> to_list in
+        let child_of_ref =
+          List.find_opt
+            (fun ref -> ref |> member "refType" |> to_string = "CHILD_OF")
+            refs_list
+        in
+        match child_of_ref with
+        | Some ref -> ref |> member "spanID" |> to_string
+        | None -> "")
+  in
   let trace_id = json |> member "traceID" |> to_string in
   let span_id = json |> member "spanID" |> to_string in
-  let parent_span_id =
-    (*json |> member "parentSpanID" |> to_string_option
-      |> Option.value ~default:""*)
-    extract_parent_span_id json
-  in
+  let parent_span_id = extract_parent_span_id json in
   let name = json |> member "operationName" |> to_string in
   let kind =
     json |> member "kind" |> to_string_option
@@ -220,12 +216,11 @@ let decode_jaeger_trace_span json =
     |> Option.value ~default:Int64.zero
   in
   let end_time_unix_nano = Int64.add start_time_unix_nano duration in
-  (*let attributes = json |> member "attributes" |> decode_attributes in*)
   Trace.default_span ~trace_id:(Bytes.of_string trace_id)
     ~span_id:(Bytes.of_string span_id)
     ~parent_span_id:(Bytes.of_string parent_span_id)
-    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano (*~attributes*)
-    ~events:[] ~links:[] ~dropped_attributes_count:(Int32.of_int 0)
+    ~name ~kind ~start_time_unix_nano ~end_time_unix_nano ~events:[] ~links:[]
+    ~dropped_attributes_count:(Int32.of_int 0)
     ~dropped_events_count:(Int32.of_int 0) ~dropped_links_count:(Int32.of_int 0)
     ()
 
@@ -248,20 +243,24 @@ let decode_dynatrace_span json =
     json
     |> member "request.is_root_span"
     |> to_bool_option
-    (* |> Option.map (fun x -> x) *)
     |> Option.value ~default:false
   in
   let extract_parent_id json =
     if is_root json then None |> Option.value ~default:""
     else
       json |> member "span.parent_id" |> to_string_option
-      (* |> Option.map (fun x -> x) *)
       |> Option.value ~default:""
+  in
+  (* remove args from url in span.name *)
+  let prune_name name =
+    match String.index_opt name '?' with
+    | Some index -> String.sub name 0 index
+    | None -> name
   in
   let trace_id = json |> member "trace.id" |> to_string in
   let span_id = json |> member "span.id" |> to_string in
   let parent_span_id = extract_parent_id json in
-  let name = json |> member "span.name" |> to_string in
+  let name = json |> member "span.name" |> to_string |> prune_name in
   let kind =
     json |> member "kind" |> to_string_option
     |> Option.map decode_span_kind
@@ -269,7 +268,6 @@ let decode_dynatrace_span json =
   in
   let start_time_unix_nano =
     json |> member "start_time" |> to_string |> map_iso_8601_date_to_int64
-    (* |> Option.map (fun x -> x) *)
     |> Option.value ~default:Int64.zero
   in
   let end_time_unix_nano =
@@ -277,11 +275,6 @@ let decode_dynatrace_span json =
     |> Option.map (fun x -> x)
     |> Option.value ~default:Int64.zero
   in
-  (* let duration =
-    json |> member "duration" |> to_string_option |> Option.map Int64.of_string
-    |> Option.value ~default:Int64.zero
-  in
-  let end_time_unix_nano = Int64.add start_time_unix_nano duration in *)
   Trace.default_span ~trace_id:(Bytes.of_string trace_id)
     ~span_id:(Bytes.of_string span_id)
     ~parent_span_id:(Bytes.of_string parent_span_id)
