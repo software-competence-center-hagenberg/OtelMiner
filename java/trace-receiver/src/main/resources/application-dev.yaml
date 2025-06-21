@@ -7,4 +7,8 @@ db-service:
 
 logging:
   level:
-    at.scch: DEBUG
+    at.scch: INFO
+
+evaluation:
+  nr-segments: 4
+  segment-size: 310

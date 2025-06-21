@@ -9,7 +9,7 @@ spring:
     name: trace-receiver
   rabbitmq:
     port: 5672
-    host: rabbitmq-server
+    host: localhost
 open_telemetry:
   exporter:
     routing_key:
@@ -27,14 +27,13 @@ otel_to_probd:
     in:
       declare: probd-result-queue
       span_trees: span-tree-result-queue
-      trace: trace-receive-queue
 model_generation:
   nr_threads: 10
   batch_size: 10
 server:
   port: 4020
 db-service:
-  base-url: http://db-service:4242/v1
+  base-url: http://localhost:4242/v1
   traces:
     url: /traces
     endpoints:
@@ -52,4 +51,3 @@ db-service:
     url: /prob-declare-to-trace
   canonized-span-tree:
     url: /canonized-span-tree
-

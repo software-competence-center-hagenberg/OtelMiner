@@ -9,10 +9,12 @@ import at.scch.freiseisen.ma.model_generator.configuration.RestConfig;
 import at.scch.freiseisen.ma.model_generator.error.ModelGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -40,14 +42,31 @@ public class ProbDeclareManagerService implements DisposableBean {
 
     private final ExecutorService declareConstraintGenerationExecutor;
     private final ExecutorService probDeclareModelUpdateExecutor;
+    @Getter
     private final ConcurrentMap<String, CompletableFuture<ConversionResponse>> generating;
+    @Getter
     private final ConcurrentMap<String, ProbDeclareConstraintModelEntry> constraints;
+    @Getter
     private final AtomicReference<String> currentId;
+    @Getter
     private final AtomicReference<String> currentSourceFile;
+    @Getter
     private final AtomicLong currentNrTracesProcessed;
+    @Getter
     private final AtomicLong currentExpectedTraces;
+    private final AtomicLong currentNrTracesTakenFromCache;
+    @Getter
     private final AtomicBoolean isPaused;
+    //    @Getter
+//    private final AtomicBoolean isLive;
+    @Getter
     private final AtomicReference<List<Runnable>> pausedGeneration;
+
+    // constants for data set evaluation
+    @Value("${evaluation.nr-segments:0}")
+    private int nrSegments;
+    @Value("${evaluation.segment-size:-1}")
+    private int segmentSize;
 
     public ProbDeclareManagerService(
             RestTemplate restTemplate,
@@ -78,7 +97,9 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentSourceFile = new AtomicReference<>(null);
         currentNrTracesProcessed = new AtomicLong(0);
         currentExpectedTraces = new AtomicLong(0);
+        currentNrTracesTakenFromCache = new AtomicLong(0);
         isPaused = new AtomicBoolean(false);
+//        isLive = new AtomicBoolean(false);
         pausedGeneration = new AtomicReference<>(new ArrayList<>());
     }
 
@@ -88,6 +109,42 @@ public class ProbDeclareManagerService implements DisposableBean {
         probDeclareModelUpdateExecutor.shutdownNow();
         finishGeneration(true);
     }
+
+//    @RabbitListener(queues = "${otel_to_probd.routing_key.in.trace}")
+//    public void receiveLiveTrace(Trace trace) {
+//        log.info("trace received: {}", trace);
+//        boolean isGenerationActive = this.currentId.get() != null;
+//        log.info("model generation active: {}", isGenerationActive);
+//        if (isGenerationActive && !isLive.get()) {
+//            throw new ModelGenerationException("received live trace during active non-live generation!");
+//        }
+//        if (!isGenerationActive) {
+//            initLiveGeneration();
+//        }
+//        CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
+//        future.thenAcceptAsync(conversionResponse ->
+//                probDeclareModelUpdateExecutor.submit(
+//                        () -> updateModel(List.of(conversionResponse.constraints()), currentId.get())
+//                ),
+//                declareConstraintGenerationExecutor
+//        ).exceptionally(e -> {
+//            log.error("exception occurred during response processing", e);
+//            return null;
+//        });
+//        generating.put(trace.getId(), future);
+//        sendTraceToWorker(trace);
+//    }
+//
+//    private void initLiveGeneration() {
+//        SourceDetails sourceDetails = new SourceDetails();
+//        sourceDetails.setPage(0);
+//        sourceDetails.setSize(100);
+//        currentExpectedTraces.compareAndSet(0, -1);
+//        isLive.set(true);
+//        String id = UUID.randomUUID().toString();
+//        currentId.set(id);
+//        persistenceService.persistProbDeclare(new ProbDeclare(id));
+//    }
 
     @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
@@ -141,6 +198,10 @@ public class ProbDeclareManagerService implements DisposableBean {
         return true;
     }
 
+    private boolean pause() {
+        return pause(currentId.get());
+    }
+
     protected boolean pause(String probDeclareId) {
         log.info("pause of generation of model {} requested...", probDeclareId);
         String cId = currentId.getAcquire();
@@ -148,11 +209,13 @@ public class ProbDeclareManagerService implements DisposableBean {
             log.info("but currentId ({}) is unequal --> not pausing", cId);
             return false;
         }
-        log.info("pausing generation of model {}", probDeclareId);
-        traceCacheManager.pause();
-        isPaused.compareAndSet(false, true);
-        log.info("updating model in db");
-        persistenceService.persistConstraints(constraints.values(), probDeclareId);
+        if (!isPaused.get()) {
+            log.info("pausing generation of model {}", probDeclareId);
+            traceCacheManager.pause();
+            isPaused.compareAndSet(false, true);
+            log.info("updating model in db");
+            persistenceService.persistConstraints(constraints.values(), probDeclareId);
+        }
         return isPaused.getAcquire();
     }
 
@@ -200,8 +263,8 @@ public class ProbDeclareManagerService implements DisposableBean {
         generating.clear();
         if (!abort) {
             persistenceService.persistConstraints(constraints.values(), probDeclareId);
+            persistenceService.stopProbDeclareGeneration(probDeclareId);
         }
-        persistenceService.stopProbDeclareGeneration(probDeclareId);
         if (abort) {
             clearCurrentState();
         }
@@ -213,14 +276,17 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentSourceFile.set(null);
         currentNrTracesProcessed.set(0L);
         currentExpectedTraces.set(0L);
+        currentNrTracesTakenFromCache.set(0L);
         constraints.clear();
         traceCacheManager.kill();
     }
 
     private void generateProbDeclareForNextTrace(String probDeclareId) {
         Trace trace;
+        long nrTracesTaken;
         try {
             trace = traceCacheManager.take();
+            nrTracesTaken = currentNrTracesTakenFromCache.incrementAndGet();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ModelGenerationException("exception occurred while accessing trace cache", e);
@@ -235,7 +301,20 @@ public class ProbDeclareManagerService implements DisposableBean {
                     return null;
                 });
         generating.put(trace.getId(), future);
+        sendTraceToWorker(trace);
 
+        // ONLY for evaluation
+        if (nrSegments > 0
+            && segmentSize != -1
+            && nrTracesTaken >= segmentSize
+            && nrTracesTaken % segmentSize == 0) {
+            log.error("ATTENTION -> PAUSING because nrTracesTaken % segmentSize == 0");
+            pause();
+        }
+
+    }
+
+    private void sendTraceToWorker(Trace trace) {
         TraceDataType traceDataType = TraceDataType.valueOf(trace.getTraceDataType());
         if (isPaused.getAcquire()) {
             log.info("model generation is currently paused --> setting out next trace({}) until resume is requested"
