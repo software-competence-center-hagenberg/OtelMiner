@@ -1,10 +1,7 @@
 package at.scch.freiseisen.ma.model_generator.rest;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
-import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
-import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
-import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
-import at.scch.freiseisen.ma.data_layer.dto.TraceData;
+import at.scch.freiseisen.ma.data_layer.dto.*;
 import at.scch.freiseisen.ma.model_generator.service.CanonizedSpanTreeService;
 import at.scch.freiseisen.ma.model_generator.service.DataService;
 import at.scch.freiseisen.ma.model_generator.service.DeclareService;
@@ -39,8 +36,16 @@ public class DataController {
 
     @PostMapping("/prob-declare/generate")
     public ProbDeclareModel generateProbDeclareModel(
-            @RequestParam("expected-traces") int expectedTraces, @RequestBody SourceDetails sourceDetails) {
-        return dataService.generateProbDeclareModel(sourceDetails, expectedTraces);
+            @RequestParam("expected-traces") int expectedTraces,
+            @RequestParam("nr-segments") int nrSegments,
+            @RequestParam("segment-size") int segmentSize,
+            @RequestBody SourceDetails sourceDetails) {
+        return dataService.generateProbDeclareModel(sourceDetails, expectedTraces, nrSegments, segmentSize);
+    }
+
+    @GetMapping("/prob-declare/existing")
+    public ProbDeclareInfo[] generateProbDeclareModel(@RequestParam("source-file") String sourceFile) {
+        return dataService.retrieveExistingProbDeclareModels(sourceFile);
     }
 
     @GetMapping("/prob-declare/abort/{prob-declare-id}")

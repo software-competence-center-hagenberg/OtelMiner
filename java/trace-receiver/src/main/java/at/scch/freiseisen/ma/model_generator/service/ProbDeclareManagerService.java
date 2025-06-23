@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -57,16 +56,13 @@ public class ProbDeclareManagerService implements DisposableBean {
     private final AtomicLong currentNrTracesTakenFromCache;
     @Getter
     private final AtomicBoolean isPaused;
-    //    @Getter
-//    private final AtomicBoolean isLive;
     @Getter
     private final AtomicReference<List<Runnable>> pausedGeneration;
 
-    // constants for data set evaluation
-    @Value("${evaluation.nr-segments:0}")
+    // only for evaluation -> NOT thread safe
     private int nrSegments;
-    @Value("${evaluation.segment-size:-1}")
     private int segmentSize;
+    private int startPage;
 
     public ProbDeclareManagerService(
             RestTemplate restTemplate,
@@ -99,7 +95,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentExpectedTraces = new AtomicLong(0);
         currentNrTracesTakenFromCache = new AtomicLong(0);
         isPaused = new AtomicBoolean(false);
-//        isLive = new AtomicBoolean(false);
         pausedGeneration = new AtomicReference<>(new ArrayList<>());
     }
 
@@ -109,42 +104,6 @@ public class ProbDeclareManagerService implements DisposableBean {
         probDeclareModelUpdateExecutor.shutdownNow();
         finishGeneration(true);
     }
-
-//    @RabbitListener(queues = "${otel_to_probd.routing_key.in.trace}")
-//    public void receiveLiveTrace(Trace trace) {
-//        log.info("trace received: {}", trace);
-//        boolean isGenerationActive = this.currentId.get() != null;
-//        log.info("model generation active: {}", isGenerationActive);
-//        if (isGenerationActive && !isLive.get()) {
-//            throw new ModelGenerationException("received live trace during active non-live generation!");
-//        }
-//        if (!isGenerationActive) {
-//            initLiveGeneration();
-//        }
-//        CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-//        future.thenAcceptAsync(conversionResponse ->
-//                probDeclareModelUpdateExecutor.submit(
-//                        () -> updateModel(List.of(conversionResponse.constraints()), currentId.get())
-//                ),
-//                declareConstraintGenerationExecutor
-//        ).exceptionally(e -> {
-//            log.error("exception occurred during response processing", e);
-//            return null;
-//        });
-//        generating.put(trace.getId(), future);
-//        sendTraceToWorker(trace);
-//    }
-//
-//    private void initLiveGeneration() {
-//        SourceDetails sourceDetails = new SourceDetails();
-//        sourceDetails.setPage(0);
-//        sourceDetails.setSize(100);
-//        currentExpectedTraces.compareAndSet(0, -1);
-//        isLive.set(true);
-//        String id = UUID.randomUUID().toString();
-//        currentId.set(id);
-//        persistenceService.persistProbDeclare(new ProbDeclare(id));
-//    }
 
     @RabbitListener(queues = "${otel_to_probd.routing_key.in.declare}")
     public void receiveDeclare(Message msg) {
@@ -172,14 +131,20 @@ public class ProbDeclareManagerService implements DisposableBean {
                 : persistenceService.getProbDeclareModel(id);
     }
 
-    protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces) {
+    protected ProbDeclareModel generate(SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
         if (currentExpectedTraces.get() == expectedTraces
-            && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())) {
+            && sourceDetails.getSourceFile().equals(currentSourceFile.getAcquire())
+            && nrSegments == this.nrSegments
+            && segmentSize == this.segmentSize
+            && sourceDetails.getPage() == this.startPage) {
             return getCurrentModel();
         }
         clearCurrentState();
         currentExpectedTraces.compareAndSet(0, expectedTraces);
         currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
+        this.nrSegments = nrSegments;
+        this.segmentSize = segmentSize;
+        this.startPage = sourceDetails.getPage();
         String id = UUID.randomUUID().toString();
         currentId.weakCompareAndSetAcquire(null, id);
         initDeclareGeneration(sourceDetails, id);
@@ -279,6 +244,10 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentNrTracesTakenFromCache.set(0L);
         constraints.clear();
         traceCacheManager.kill();
+        // evaluation only
+        nrSegments = -1;
+        segmentSize = -1;
+        startPage = 0;
     }
 
     private void generateProbDeclareForNextTrace(String probDeclareId) {

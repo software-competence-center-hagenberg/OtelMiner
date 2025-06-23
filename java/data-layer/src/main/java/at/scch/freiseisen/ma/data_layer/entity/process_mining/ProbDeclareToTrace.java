@@ -24,13 +24,13 @@ public class ProbDeclareToTrace {
     @Column(name = "trace_id")
     private String traceId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("probDeclareId")
     @JoinColumn(name = "prob_declare_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_pd")
     private ProbDeclare probDeclare;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("traceId")
     @JoinColumn(name = "trace_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_t")

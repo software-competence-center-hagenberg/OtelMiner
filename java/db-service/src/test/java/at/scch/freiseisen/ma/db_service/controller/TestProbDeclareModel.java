@@ -38,7 +38,8 @@ class TestProbDeclareModel {
 
     void testDynatraceModelEquality() {
         String id1 = "82530a30-f0b0-4b99-aa2c-9656875cc032";
-        String id2 = "11d8cd1b-7be5-4a06-8609-eb6829898ceb";
+//        String id2 = "11d8cd1b-7be5-4a06-8609-eb6829898ceb";
+        String id2 = "bbc86809-157b-4f80-8a77-b9e86406f0a9";
         testProbDeclareModelEquality(id1, id2);
     }
 

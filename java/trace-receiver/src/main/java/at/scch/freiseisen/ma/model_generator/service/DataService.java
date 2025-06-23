@@ -1,6 +1,7 @@
 package at.scch.freiseisen.ma.model_generator.service;
 
 import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareInfo;
 import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
 import at.scch.freiseisen.ma.model_generator.configuration.RestConfig;
@@ -42,9 +43,8 @@ public class DataService {
         return Objects.requireNonNull(response.getBody());
     }
 
-    // FIXME change again so only source file is received in request and manage rest with pages in manager service!
-    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails, int expectedTraces) {
-        return probDeclareManagerService.generate(sourceDetails, expectedTraces);
+    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
+        return probDeclareManagerService.generate(sourceDetails, expectedTraces, nrSegments, segmentSize);
     }
 
     public ProbDeclareModel getProbDeclareModel(String id) {
@@ -61,5 +61,9 @@ public class DataService {
 
     public boolean resumeProbDeclareModelGeneration(String probDeclareId) {
         return probDeclareManagerService.resume(probDeclareId);
+    }
+
+    public ProbDeclareInfo[] retrieveExistingProbDeclareModels(String sourceFile) {
+        return restTemplate.getForObject(restConfig.probDeclareUrl + "/existing?source-file=" + sourceFile, ProbDeclareInfo[].class);
     }
 }
