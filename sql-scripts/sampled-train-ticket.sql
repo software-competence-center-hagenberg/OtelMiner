@@ -86,6 +86,8 @@ ORDER BY
     constraint_template_group;
 
 ---------------------------------------------------------------------------------
+select * from declare where constraint_template like '%GET%' and prob_declare_id  = 'a4be77f3-70aa-40bb-b789-747cad8318e1';
+---------------------------------------------------------------------------------
 
 --select * from prob_declare pd where pd.id = '79e82494-14f1-412a-ba39-b8264b5bf135';
 

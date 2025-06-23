@@ -1,4 +1,5 @@
---select lo_get("json") from span s where s.trace_id = '56bf4e52c33fdea04387db466c2f2e9f';
+select lo_get("json") from span s where s.trace_id = 'c3e60e42d6b5784492e7b44ab7ad9791';
+-----------------------------------------------------------------------------------------
 delete from "declare" where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
 delete from prob_declare_to_trace where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
 delete from prob_declare where id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
@@ -97,10 +98,14 @@ ORDER BY
     constraint_template_group;
 
 ---------------------------------------------------------------------------------
+select * from "declare" d where d.probability >= 0.2 and d.prob_declare_id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7';
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+select * from "declare" d where d.constraint_template like 'EXISTENCE(GET /%' and d.prob_declare_id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7';
 
 --select * from prob_declare pd where pd.id = '79e82494-14f1-412a-ba39-b8264b5bf135';
 
 --select * from declare d where d.prob_declare_id = '79e82494-14f1-412a-ba39-b8264b5bf135';
-
+select count(*) from trace where trace_data_type like '%DYNATRACE%';
 --DELETE FROM prob_declare_to_trace;
 --DELETE FROM prob_declare ;
