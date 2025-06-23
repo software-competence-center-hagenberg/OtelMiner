@@ -10,6 +10,7 @@ import at.scch.freiseisen.ma.model_generator.error.ModelGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -142,13 +143,65 @@ public class ProbDeclareManagerService implements DisposableBean {
         clearCurrentState();
         currentExpectedTraces.compareAndSet(0, expectedTraces);
         currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
+        this.startPage = sourceDetails.getPage();
         this.nrSegments = nrSegments;
         this.segmentSize = segmentSize;
-        this.startPage = sourceDetails.getPage();
         String id = UUID.randomUUID().toString();
         currentId.weakCompareAndSetAcquire(null, id);
-        initDeclareGeneration(sourceDetails, id);
+        ProbDeclare probDeclare = persistenceService.persistProbDeclare(new ProbDeclare(id));
+        traceCacheManager.start(sourceDetails, probDeclare.getId());
+        initDeclareGeneration(id);
         return new ProbDeclareModel(id, new ArrayList<>(), true);
+    }
+
+    public ProbDeclareModel loadAndResume(String probDeclareId, SourceDetails sourceDetails, int nrSegments, int segmentSize) {
+        log.info("loading and resuming generation of prob declare model {}", probDeclareId);
+        if (probDeclareId.equals(currentId.get())) {
+            log.info("model already in memory, nothing to do");
+            return getCurrentModel();
+        }
+        clearCurrentState();
+        currentNrTracesProcessed.compareAndSet(0 , -1);
+        this.nrSegments = nrSegments;
+        this.segmentSize = segmentSize;
+        log.info("retrieveing model from db-service");
+        ProbDeclareModel probDeclareModel = getProbDeclareModel(probDeclareId);
+        log.info("submitting repopulation job");
+        currentId.set(probDeclareId);
+        probDeclareModelUpdateExecutor.submit(() -> populateFromExistingModelAndResume(probDeclareModel, sourceDetails));
+        return probDeclareModel;
+    }
+
+    @SneakyThrows
+    private void populateFromExistingModelAndResume(ProbDeclareModel probDeclareModel, SourceDetails sourceDetails) {
+        log.info("repopulating...");
+        probDeclareModel.constraints().forEach(constraint ->
+                constraints.put(constraint.declareTemplate(),
+                        new ProbDeclareConstraintModelEntry(constraint.declareTemplate(), constraint.probability(),
+                                constraint.nr())));
+        log.info("... repopulation done");
+        if (!probDeclareModel.generating()) {
+            log.info("model generation already finished, not resuming");
+            return;
+        }
+        long nrTracesProcessed = persistenceService.retrieveNumberTracesForProbDeclare(probDeclareModel.id());
+        log.info("nr traces already processed: {}", nrTracesProcessed);
+        currentNrTracesProcessed.compareAndSet(-1, nrTracesProcessed);
+        int page = Math.toIntExact(nrTracesProcessed / sourceDetails.getSize());
+        log.info("page to continue from: {}", page);
+        int startIndex = Math.toIntExact(nrTracesProcessed - page * sourceDetails.getSize());
+        log.info("start index: {}", startIndex);
+        sourceDetails.setPage(page);
+        currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
+        this.startPage = sourceDetails.getPage();
+
+        traceCacheManager.start(sourceDetails, probDeclareModel.id());
+        if (startIndex > 1) {
+            List<Trace> tracesToBeIgnored = traceCacheManager.take(startIndex);
+            log.info("dumping traces to be ignored: {}", tracesToBeIgnored);
+        }
+        log.info("resuming declare generation");
+        initDeclareGeneration(probDeclareModel.id());
     }
 
     protected boolean abort() {
@@ -202,14 +255,12 @@ public class ProbDeclareManagerService implements DisposableBean {
         return true;
     }
 
-    private void initDeclareGeneration(SourceDetails sourceDetails, String id) {
-        ProbDeclare probDeclare = persistenceService.persistProbDeclare(new ProbDeclare(id));
-        log.info("Starting generation task for model ID: {}", id);
-        traceCacheManager.start(sourceDetails, probDeclare.getId());
+    private void initDeclareGeneration(String id) {
+        log.info("Starting generation tasks for model ID: {}", id);
         try {
             for(int i = 0; i < modelGenerationConfig.getNrThreads(); i++) {
                 log.info("starting thread {}", i);
-                declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(probDeclare.getId()));
+                declareConstraintGenerationExecutor.submit(() -> generateProbDeclareForNextTrace(id));
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -226,8 +277,8 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.debug("Finishing generation task for model ID: {}", probDeclareId);
         declareService.clear();
         generating.clear();
+        persistenceService.persistConstraints(constraints.values(), probDeclareId);
         if (!abort) {
-            persistenceService.persistConstraints(constraints.values(), probDeclareId);
             persistenceService.stopProbDeclareGeneration(probDeclareId);
         }
         if (abort) {
@@ -237,6 +288,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     private void clearCurrentState() {
+        log.info("cleaering current state");
         currentId.set(null);
         currentSourceFile.set(null);
         currentNrTracesProcessed.set(0L);
@@ -324,7 +376,9 @@ public class ProbDeclareManagerService implements DisposableBean {
     private ProbDeclareModel getCurrentModel() {
         List<ProbDeclareConstraint> model = constraints.values()
                 .stream()
-                .map(declare -> new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate()))
+                .map(declare ->
+                        new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate(),
+                                declare.getNr()))
                 .toList();
         boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
         return new ProbDeclareModel(currentId.get(), model, isGenerating);

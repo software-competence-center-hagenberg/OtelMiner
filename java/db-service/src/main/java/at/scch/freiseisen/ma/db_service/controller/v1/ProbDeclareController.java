@@ -50,7 +50,7 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
     public ProbDeclareModel retrieveModel(@PathVariable("id") String id) {
         ProbDeclare probDeclare = service.findById(id);
         List<ProbDeclareConstraint> constraints = probDeclare.getDeclareList().stream()
-                .map(d -> new ProbDeclareConstraint(d.getProbability(), d.getConstraintTemplate()))
+                .map(d -> new ProbDeclareConstraint(d.getProbability(), d.getConstraintTemplate(), d.getNr()))
                 .toList();
         return new ProbDeclareModel(probDeclare.getId(), constraints, probDeclare.isGenerating());
     }

@@ -43,7 +43,8 @@ public class DataService {
         return Objects.requireNonNull(response.getBody());
     }
 
-    public ProbDeclareModel generateProbDeclareModel(SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
+    public ProbDeclareModel generateProbDeclareModel(
+            SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
         return probDeclareManagerService.generate(sourceDetails, expectedTraces, nrSegments, segmentSize);
     }
 
@@ -64,6 +65,11 @@ public class DataService {
     }
 
     public ProbDeclareInfo[] retrieveExistingProbDeclareModels(String sourceFile) {
-        return restTemplate.getForObject(restConfig.probDeclareUrl + "/existing?source-file=" + sourceFile, ProbDeclareInfo[].class);
+        return restTemplate.getForObject(restConfig.probDeclareUrl + "/existing?source-file=" + sourceFile,
+                ProbDeclareInfo[].class);
+    }
+
+    public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int nrSegments, int segmentSize) {
+        return probDeclareManagerService.loadAndResume(probDeclareId, sourceDetails, nrSegments, segmentSize);
     }
 }

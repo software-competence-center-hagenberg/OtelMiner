@@ -85,6 +85,7 @@ public class TraceCacheManager implements DisposableBean {
         if (!isDead.getAcquire()) {
             kill();
         }
+        log.info("Starting trace cache manager");
         this.probDeclareId = probDeclareId;
         this.sourceDetails = sourceDetails;
         queue.clear();

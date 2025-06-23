@@ -42,6 +42,18 @@ interface ProbDeclareInfo {
     updateDate: Date,
     generating: boolean
 }
+// @ts-ignore
+function formatDateArray(date): string {
+    const [year, month, day, hour, minute, second, nanoseconds] = date;
+
+    return (day < 10 ? '0' : '') + day + '.' +
+        (month < 10 ? '0' : '') + month + '.' +
+        year + ' ' +
+        (hour < 10 ? '0' : '') + hour + ':' +
+        (minute < 10 ? '0' : '') + minute + ':' +
+        (second < 10 ? '0' : '') + second + ':' +
+        nanoseconds;
+}
 
 const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -55,10 +67,12 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
     const [segmentSize, setSegmentSize] = useState<number>(-1);
     const [existingModels, setExistingModels] = useState<ProbDeclareInfo[]>([]);
     const [loadingExistingModels, setLoadingExistingModels] = useState<boolean>(false);
+    const [selectedProbDeclareInfo, setSelectedProbDeclareInfo] = useState<ProbDeclareInfo | null>(null);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
+        setInitialized(true);
         const probDeclare: ProbDeclare = response.data;
         setProbDeclare((prev) => (prev ? {
             ...prev,
@@ -78,13 +92,21 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             + "&nr-segments=" + nrSegments
             + "&segment-size=" + segmentSize
             , sourceDetails)
-            .then((response) => {
-                setInitialized(true);
-                handleProbDeclareResponse(response);
-            })
+            .then((response) => handleProbDeclareResponse(response))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoading(() => false));
     };
+
+    const loadExistingModel = () => {
+        setLoading(true);
+        RestService.post<SourceDetails, ProbDeclare>("/prob-declare/load/" + selectedProbDeclareInfo?.id! + "?expected-traces=" + actualExpectedTraces
+            + "&nr-segments=" + nrSegments
+            + "&segment-size=" + segmentSize
+            , sourceDetails)
+            .then((response) => handleProbDeclareResponse(response))
+            .catch((error) => console.error('Error fetching prob declare model', error))
+            .finally(() => setLoading(() => false));
+    }
 
     const clearTimer = () => {
         if (timerRef.current) {
@@ -155,14 +177,15 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             RestService.get<void>("/prob-declare/abort/" + probDeclare?.id)
                 .then(close)
                 .catch((error) => console.error('Error aborting generation of prob declare model', error));
-        } else {
-            console.debug("model NOT initialized --> aborting in callback.")
-            // abortCallback();
         }
     }
     const close = () => {
         reset();
         abortCallback();
+    }
+
+    function mapBoolToString(b: boolean) {
+        return b ? "true" : "false";
     }
 
     function onStartPageChanged(event: React.ChangeEvent<HTMLInputElement>) {
@@ -200,11 +223,13 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
         setLoadingExistingModels(true);
         RestService.get<ProbDeclareInfo[]>(
             "/prob-declare/existing?source-file=" + sourceFile)
-            .then((response) =>
-                setExistingModels(() => response.data!))
+            .then((response) => setExistingModels(() => response.data!))
             .catch((error) => console.error('Error fetching prob declare model', error))
             .finally(() => setLoadingExistingModels(() => false));
     }
+    const handleRowClick = (row: ProbDeclareInfo) => {
+        setSelectedProbDeclareInfo(() => row);
+    };
 
     const renderExistingModels = () => {
         return loadingExistingModels ? (renderLoadingIndicator()) : (existingModels && (
@@ -225,18 +250,19 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                     </TableHead>
                     <TableBody>
                         {existingModels.map((row:ProbDeclareInfo) => (
-                                <TableRow key={row.id} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                            <TableRow key={row.id} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                      onClick={() => handleRowClick(row)}>
                                     <TableCell component="th" scope="row">
                                         {row.id}
                                     </TableCell>
                                     <TableCell>
-                                        {row.insertDate.toString()}
+                                        {formatDateArray(row.insertDate)}
                                     </TableCell>
                                     <TableCell>
                                         {row.updateDate.toString()}
                                     </TableCell>
                                     <TableCell>
-                                        {row.generating}
+                                        {mapBoolToString(row.generating)}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -253,7 +279,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                Prob Declare Id: {probDeclare.id} (generating: {probDeclare.generating ? "true" : "false"})
+                                Prob Declare Id: {probDeclare.id} (generating: {mapBoolToString(probDeclare.generating)})
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -298,6 +324,10 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                     <Button variant={'contained'} onClick={showExistingModels}>
                         show existing models
                     </Button>
+                    <Button variant={'contained'} onClick={loadExistingModel}
+                            disabled={selectedProbDeclareInfo === null}>
+                        load existing model
+                    </Button>
                     {renderExistingModels()}
                 </Box>
                 <Box>
@@ -314,7 +344,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                         resume
                     </Button>
                     <Button variant={'contained'} onClick={abort}
-                            disabled={aborting /*|| !probDeclare?.generating*/}>
+                            disabled={aborting || !initialized/*|| !probDeclare?.generating*/}>
                         abort
                     </Button>
                     <Button variant={'contained'} onClick={close}

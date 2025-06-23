@@ -17,7 +17,7 @@ public interface ProbDeclareToTraceRepository extends JpaRepository<ProbDeclareT
 
     @Query("SELECT DISTINCT pdt.probDeclare FROM ProbDeclareToTrace pdt WHERE pdt.trace.sourceFile = :sourceFile")
     List<ProbDeclare> findDistinctProbDeclareByTraceSourceFile(@Param("sourceFile") String sourceFile);
-//    @Query("SELECT DISTINCT new at.scch.freiseisen.ma.data_layer.dto.ProbDeclareInfo(pdt.probDeclare.id, pdt.probDeclare.insertDate, pdt.probDeclare.updateDate, pdt.probDeclare.generating) " +
-//           "FROM ProbDeclareToTrace pdt WHERE pdt.trace.sourceFile = :sourceFile")
-//    List<ProbDeclareInfo> findDistinctProbDeclareInfoByTraceSourceFile(@Param("sourceFile") String sourceFile);
+
+    @Query("SELECT COUNT(pdt) FROM ProbDeclareToTrace pdt WHERE pdt.probDeclare.id = :probDeclareId")
+    long countTraces(@Param("probDeclareId") String probDeclareId);
 }

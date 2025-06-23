@@ -42,4 +42,8 @@ public class PersistenceService {
     public ProbDeclareModel getProbDeclareModel(String id) {
         return restTemplate.getForObject(restConfig.probDeclareUrl + "/model/" + id, ProbDeclareModel.class);
     }
+
+    public long retrieveNumberTracesForProbDeclare(String probDeclareId) {
+        return restTemplate.getForObject(restConfig.probDeclareToTraceUrl + "/" + probDeclareId + "/nr-traces", Long.class );
+    }
 }

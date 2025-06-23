@@ -48,6 +48,15 @@ public class DataController {
         return dataService.retrieveExistingProbDeclareModels(sourceFile);
     }
 
+    @PostMapping("/prob-declare/load/{id}")
+    public ProbDeclareModel load(
+            @PathVariable("id") String probDeclareId,
+            @RequestParam("nr-segments") int nrSegments,
+            @RequestParam("segment-size") int segmentSize,
+            @RequestBody SourceDetails sourceDetails) {
+        return dataService.load(probDeclareId, sourceDetails, nrSegments, segmentSize);
+    }
+
     @GetMapping("/prob-declare/abort/{prob-declare-id}")
     public ResponseEntity<Void> abortProbDeclareModelGeneration(@PathVariable("prob-declare-id") String probDeclareId) {
         log.info("aborting generation of model {}", probDeclareId);

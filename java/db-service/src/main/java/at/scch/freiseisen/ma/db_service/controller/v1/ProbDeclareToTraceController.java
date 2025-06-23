@@ -36,4 +36,9 @@ public class ProbDeclareToTraceController {
                 .toList();
         service.saveAll(entities);
     }
+
+    @GetMapping("/{prob-declare-id}/nr-traces")
+    public long retrieveNrTraces(@PathVariable("prob-declare-id") String probDeclareId) {
+        return service.countTraces(probDeclareId);
+    }
 }
