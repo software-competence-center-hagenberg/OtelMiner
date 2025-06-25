@@ -135,7 +135,7 @@ const DataOverview: React.FC = () => {
             <Grid2 size={"grow"}>
                 <Box height="100%">
                     {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
-                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} expectedTraces={nrTraces!} abortCallback={() => setGeneratingProbDeclare(false)}/>}
+                    {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} expectedTraces={nrTraces!} closeCallBack={() => setGeneratingProbDeclare(false)}/>}
                 </Box>
             </Grid2>
         </Grid2>

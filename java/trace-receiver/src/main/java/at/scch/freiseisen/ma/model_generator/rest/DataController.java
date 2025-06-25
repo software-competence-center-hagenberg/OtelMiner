@@ -51,10 +51,11 @@ public class DataController {
     @PostMapping("/prob-declare/load/{id}")
     public ProbDeclareModel load(
             @PathVariable("id") String probDeclareId,
+            @RequestParam("expected-traces") int expectedTraces,
             @RequestParam("nr-segments") int nrSegments,
             @RequestParam("segment-size") int segmentSize,
             @RequestBody SourceDetails sourceDetails) {
-        return dataService.load(probDeclareId, sourceDetails, nrSegments, segmentSize);
+        return dataService.load(probDeclareId, sourceDetails, expectedTraces, nrSegments, segmentSize);
     }
 
     @GetMapping("/prob-declare/abort/{prob-declare-id}")

@@ -69,7 +69,8 @@ public class DataService {
                 ProbDeclareInfo[].class);
     }
 
-    public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int nrSegments, int segmentSize) {
-        return probDeclareManagerService.loadAndResume(probDeclareId, sourceDetails, nrSegments, segmentSize);
+    public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int expectedTraces, int nrSegments,
+                                 int segmentSize) {
+        return probDeclareManagerService.load(probDeclareId, sourceDetails, expectedTraces, nrSegments, segmentSize);
     }
 }

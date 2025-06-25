@@ -151,10 +151,10 @@ public class ProbDeclareManagerService implements DisposableBean {
         ProbDeclare probDeclare = persistenceService.persistProbDeclare(new ProbDeclare(id));
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         initDeclareGeneration(id);
-        return new ProbDeclareModel(id, new ArrayList<>(), true);
+        return new ProbDeclareModel(id, new ArrayList<>(), true, isPaused.getAcquire());
     }
 
-    public ProbDeclareModel loadAndResume(String probDeclareId, SourceDetails sourceDetails, int nrSegments, int segmentSize) {
+    public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
         log.info("loading and resuming generation of prob declare model {}", probDeclareId);
         if (probDeclareId.equals(currentId.get())) {
             log.info("model already in memory, nothing to do");
@@ -164,16 +164,17 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentNrTracesProcessed.compareAndSet(0 , -1);
         this.nrSegments = nrSegments;
         this.segmentSize = segmentSize;
+        currentExpectedTraces.compareAndSet(0, expectedTraces);
         log.info("retrieveing model from db-service");
         ProbDeclareModel probDeclareModel = getProbDeclareModel(probDeclareId);
         log.info("submitting repopulation job");
         currentId.set(probDeclareId);
-        probDeclareModelUpdateExecutor.submit(() -> populateFromExistingModelAndResume(probDeclareModel, sourceDetails));
+        probDeclareModelUpdateExecutor.submit(() -> populateFromExistingModel(probDeclareModel, sourceDetails));
         return probDeclareModel;
     }
 
     @SneakyThrows
-    private void populateFromExistingModelAndResume(ProbDeclareModel probDeclareModel, SourceDetails sourceDetails) {
+    private void populateFromExistingModel(ProbDeclareModel probDeclareModel, SourceDetails sourceDetails) {
         log.info("repopulating...");
         probDeclareModel.constraints().forEach(constraint ->
                 constraints.put(constraint.declareTemplate(),
@@ -200,7 +201,9 @@ public class ProbDeclareManagerService implements DisposableBean {
             List<Trace> tracesToBeIgnored = traceCacheManager.take(startIndex);
             log.info("dumping traces to be ignored: {}", tracesToBeIgnored);
         }
+        currentNrTracesTakenFromCache.compareAndSet(0, nrTracesProcessed);
         log.info("resuming declare generation");
+        isPaused.compareAndSet(false, true);
         initDeclareGeneration(probDeclareModel.id());
     }
 
@@ -380,8 +383,8 @@ public class ProbDeclareManagerService implements DisposableBean {
                         new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate(),
                                 declare.getNr()))
                 .toList();
-        boolean isGenerating = currentNrTracesProcessed.get() != currentExpectedTraces.get();
-        return new ProbDeclareModel(currentId.get(), model, isGenerating);
+        boolean isGenerating = !isGenerationFinished();
+        return new ProbDeclareModel(currentId.get(), model, isGenerating, isPaused.getAcquire());
     }
 
     private void updateModel(List<String> newConstraints, String probDeclareId) {

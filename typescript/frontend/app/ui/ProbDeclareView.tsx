@@ -21,7 +21,7 @@ import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
 interface ProbDeclareViewProps {
     sourceFile: string;
     expectedTraces: number;
-    abortCallback: () => void;
+    closeCallBack: () => void;
 }
 
 interface DeclareConstraint {
@@ -32,6 +32,7 @@ interface DeclareConstraint {
 interface ProbDeclare {
     id: string;
     generating: boolean;
+    paused: boolean,
     constraints: DeclareConstraint[];
     traces: string[];
 }
@@ -40,7 +41,7 @@ interface ProbDeclareInfo {
     id: string,
     insertDate: Date,
     updateDate: Date,
-    generating: boolean
+    generating: boolean,
 }
 // @ts-ignore
 function formatDateArray(date): string {
@@ -55,12 +56,11 @@ function formatDateArray(date): string {
         nanoseconds;
 }
 
-const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclareViewProps) => {
+const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
     const [aborting, setAborting] = useState<boolean>(false);
-    const [paused, setPaused] = useState<boolean>(false);
     const [sourceDetails, setSourceDetails] = useState<SourceDetails>(defaultSourceDetails(sourceFile));
     const [actualExpectedTraces, setActualExpectedTraces] = useState<number>(expectedTraces);
     const [nrSegments, setNrSegments] = useState<number>(0);
@@ -71,6 +71,14 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+    const setPaused = (paused: boolean) => {
+        setProbDeclare((prev) => ({
+            ...prev!,
+                paused: paused
+            }
+        ));
+    }
+
     const handleProbDeclareResponse = (response: AxiosResponse<any, ProbDeclare>) => {
         setInitialized(true);
         const probDeclare: ProbDeclare = response.data;
@@ -78,6 +86,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             ...prev,
             constraints: probDeclare.constraints,
             generating: probDeclare.generating,
+            paused: probDeclare.paused,
         } : probDeclare));
 
         if (aborting) {
@@ -99,7 +108,10 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
 
     const loadExistingModel = () => {
         setLoading(true);
-        RestService.post<SourceDetails, ProbDeclare>("/prob-declare/load/" + selectedProbDeclareInfo?.id! + "?expected-traces=" + actualExpectedTraces
+        setProbDeclare(() => null);
+        RestService.post<SourceDetails, ProbDeclare>("/prob-declare/load/"
+            + selectedProbDeclareInfo?.id!
+            + "?expected-traces=" + actualExpectedTraces
             + "&nr-segments=" + nrSegments
             + "&segment-size=" + segmentSize
             , sourceDetails)
@@ -127,7 +139,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
     }
 
     const updateModel = () => {
-        if (paused || aborting || !initialized) {
+        if (probDeclare?.paused || aborting || !initialized) {
             return;
         }
         if (probDeclare?.generating) {
@@ -136,18 +148,23 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
     }
 
     const reset = () => {
-        clearTimer();
-        if (paused || probDeclare?.generating) {
-            setPaused(false);
+        if (probDeclare?.paused || probDeclare?.generating) {
             abort();
         } else {
-            setInitialized(false);
-            setProbDeclare(null);
+            setAborting(false);
+            clearTimer();
         }
+        setInitialized(false);
+        setProbDeclare(null);
+        setLoading(false);
+        setSourceDetails(defaultSourceDetails(sourceFile));
+        setActualExpectedTraces(expectedTraces);
+        setNrSegments(0);
+        setSegmentSize(-1);
     }
 
     useMemo(reset, [sourceFile])
-    useMemo(updateModel, [probDeclare?.constraints, probDeclare?.generating]);
+    useMemo(updateModel, [probDeclare]);
 
     const pause = () => {
         console.debug("model initialized --> sending pause request.")
@@ -175,13 +192,16 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
         if (initialized) {
             console.debug("model initialized --> sending abort request to backend.")
             RestService.get<void>("/prob-declare/abort/" + probDeclare?.id)
-                .then(close)
+                .then(() => {
+                    setAborting(false);
+                    reset();
+                })
                 .catch((error) => console.error('Error aborting generation of prob declare model', error));
         }
     }
     const close = () => {
         reset();
-        abortCallback();
+        closeCallBack();
     }
 
     function mapBoolToString(b: boolean) {
@@ -228,6 +248,8 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
             .finally(() => setLoadingExistingModels(() => false));
     }
     const handleRowClick = (row: ProbDeclareInfo) => {
+        console.log("row selected:");
+        console.log(row);
         setSelectedProbDeclareInfo(() => row);
     };
 
@@ -336,19 +358,22 @@ const ProbDeclareView = ({sourceFile, expectedTraces, abortCallback}: ProbDeclar
                         start
                     </Button>
                     <Button variant={'contained'} onClick={pause}
-                            disabled={paused || aborting || !probDeclare?.generating}>
+                            disabled={probDeclare?.paused || aborting || !probDeclare?.generating}>
                         pause
                     </Button>
                     <Button variant={'contained'} onClick={resume}
-                            disabled={!paused || aborting || !probDeclare?.generating}>
+                            disabled={!probDeclare?.paused || aborting || !probDeclare?.generating}>
                         resume
                     </Button>
                     <Button variant={'contained'} onClick={abort}
                             disabled={aborting || !initialized/*|| !probDeclare?.generating*/}>
                         abort
                     </Button>
+                    <Button variant={'contained'} onClick={reset}>
+                        reset
+                    </Button>
                     <Button variant={'contained'} onClick={close}
-                            disabled={aborting || probDeclare?.generating && !paused}>
+                            disabled={aborting || probDeclare?.generating && !probDeclare?.paused}>
                         close
                     </Button>
                 </Box>

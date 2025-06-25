@@ -52,7 +52,7 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
         List<ProbDeclareConstraint> constraints = probDeclare.getDeclareList().stream()
                 .map(d -> new ProbDeclareConstraint(d.getProbability(), d.getConstraintTemplate(), d.getNr()))
                 .toList();
-        return new ProbDeclareModel(probDeclare.getId(), constraints, probDeclare.isGenerating());
+        return new ProbDeclareModel(probDeclare.getId(), constraints, probDeclare.isGenerating(), false);
     }
 
     @DeleteMapping("/stop-generation/{id}")

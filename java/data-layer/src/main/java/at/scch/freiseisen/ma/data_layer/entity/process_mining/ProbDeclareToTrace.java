@@ -54,14 +54,12 @@ public class ProbDeclareToTrace {
         if (o == null || getClass() != o.getClass()) return false;
         ProbDeclareToTrace that = (ProbDeclareToTrace) o;
         return Objects.equals(getProbDeclareId(), that.getProbDeclareId())
-               && Objects.equals(getTraceId(), that.getTraceId())
-               && Objects.equals(getProbDeclare(), that.getProbDeclare())
-               && Objects.equals(getTrace(), that.getTrace());
+               && Objects.equals(getTraceId(), that.getTraceId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getProbDeclareId(), getTraceId(), getProbDeclare(), getTrace());
+        return Objects.hash(getProbDeclareId(), getTraceId());
     }
 
 }
