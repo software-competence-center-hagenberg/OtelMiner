@@ -7,10 +7,13 @@ import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace
 import at.scch.freiseisen.ma.data_layer.service.ProbDeclareService;
 import at.scch.freiseisen.ma.data_layer.service.ProbDeclareToTraceService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("v1/prob-declare-to-trace")
@@ -31,10 +34,22 @@ public class ProbDeclareToTraceController {
     @PostMapping("/{pb-id}")
     public void post(@PathVariable("pb-id") String probDeclareId, @RequestBody List<Trace> traces) {
         ProbDeclare probDeclare = probDeclareService.findById(probDeclareId);
-        List<ProbDeclareToTrace> entities = traces.stream()
-                .map(t -> new ProbDeclareToTrace(probDeclare, t))
-                .toList();
-        service.saveAll(entities);
+        List<ProbDeclareToTrace> toBePersisted = new ArrayList<>();
+        List<ProbDeclareToTraceId> ids = new ArrayList<>();
+        traces.forEach(t -> {
+            ProbDeclareToTrace pdt = new ProbDeclareToTrace(probDeclare, t);
+            toBePersisted.add(pdt);
+            ids.add(new ProbDeclareToTraceId(pdt.getProbDeclareId(), pdt.getTraceId()));
+        });
+        List<ProbDeclareToTrace> toBeChecked = service.findAllById(ids);
+        toBeChecked.forEach(pdt -> {
+            log.error("ProbDeclareToTrace entity with with probDeclareId {} and traceId {}, already exists!",
+                    pdt.getProbDeclareId(),
+                    pdt.getTraceId());
+            log.error("not persisting...");
+            toBePersisted.remove(pdt);
+        });
+        service.saveAll(toBePersisted);
     }
 
     @GetMapping("/{prob-declare-id}/nr-traces")

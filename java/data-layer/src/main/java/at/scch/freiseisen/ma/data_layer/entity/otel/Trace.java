@@ -52,7 +52,7 @@ public class Trace extends BaseEntity<String> {
     private List<Span> spans;
 
     @JsonManagedReference("pdt_t")
-    @OneToMany(mappedBy = "trace", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = false)
+    @OneToMany(mappedBy = "trace", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE}, orphanRemoval = false)
     private List<ProbDeclareToTrace> probDeclareToTraces;
 
     @JsonIgnore

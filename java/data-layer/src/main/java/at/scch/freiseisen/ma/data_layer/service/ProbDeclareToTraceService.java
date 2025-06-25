@@ -46,5 +46,9 @@ public class ProbDeclareToTraceService {
     public long countTraces(String id) {
         return repository.countTraces(id);
     }
+
+    public List<ProbDeclareToTrace> findAllById(List<ProbDeclareToTraceId> ids) {
+        return repository.findAllById(ids);
+    }
 }
 

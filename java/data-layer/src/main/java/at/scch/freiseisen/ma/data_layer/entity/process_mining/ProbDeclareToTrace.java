@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -46,6 +47,21 @@ public class ProbDeclareToTrace {
         this.insertDate = LocalDateTime.now();
         this.probDeclareId = probDeclare.getId();
         this.traceId = trace.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProbDeclareToTrace that = (ProbDeclareToTrace) o;
+        return Objects.equals(getProbDeclareId(), that.getProbDeclareId())
+               && Objects.equals(getTraceId(), that.getTraceId())
+               && Objects.equals(getProbDeclare(), that.getProbDeclare())
+               && Objects.equals(getTrace(), that.getTrace());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getProbDeclareId(), getTraceId(), getProbDeclare(), getTrace());
     }
 
 }

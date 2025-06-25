@@ -95,12 +95,18 @@ public class TraceCacheManager implements DisposableBean {
 
     public Trace take() throws InterruptedException {
         log.info("retrieving trace from cache");
-        return queue.take();
+        Trace trace = queue.take();
+        persistenceService.createAndPersistProbDeclareToTrace(probDeclareId, List.of(trace));
+        return trace;
     }
 
     /**
-     * Retrieves up to n elements from the queue. The first element is retrieved with a blocking call,
-     * the rest non-blocking.
+     * <pre>
+     *     Retrieves up to n elements from the queue. The first element is retrieved with a blocking call,
+     *     the rest non-blocking.
+     *     NOTE: this does not create ProbDeclareToTrace entries and is currently only used for removing the first
+     *           n elements of a page which already have been processed!
+     * </pre>
      *
      * @param n maximum elements to retrieve
      * @return (up to) the first n elements of the queue
@@ -165,7 +171,6 @@ public class TraceCacheManager implements DisposableBean {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Page<Trace> page = Objects.requireNonNull(response.getBody());
-            persistenceService.createAndPersistProbDeclareToTrace(probDeclareId, page.getContent());
             log.info("retrieval successful ({}/{})", page.getNumber() + 1, page.getTotalPages());
             return page;
         }

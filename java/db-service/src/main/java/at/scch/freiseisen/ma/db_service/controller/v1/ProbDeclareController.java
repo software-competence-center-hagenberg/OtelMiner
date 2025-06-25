@@ -58,6 +58,9 @@ public class ProbDeclareController extends BaseController<ProbDeclareService, Pr
     @DeleteMapping("/stop-generation/{id}")
     public void stopGeneration(@PathVariable("id") String id) {
         ProbDeclare probDeclare = service.findById(id);
+        if (!probDeclare.isGenerating()) {
+            return;
+        }
         probDeclare.setGenerating(false);
         probDeclare.setUpdateDate(LocalDateTime.now());
         service.save(probDeclare);
