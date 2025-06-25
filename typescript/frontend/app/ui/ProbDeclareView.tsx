@@ -1,5 +1,6 @@
 import React, {useMemo, useRef, useState} from "react";
 import {
+    Box,
     Button,
     CircularProgress,
     Paper,
@@ -9,14 +10,16 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextareaAutosize,
     TextField
 } from "@mui/material";
 import RestService from "@/app/lib/RestService";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import JsonView from "@/app/ui/json/JsonView";
 import {AxiosResponse} from "axios";
 import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
+import Statistics from "@/app/ui/Statistics";
+import {DeclareConstraint, ProbDeclare, ProbDeclareInfo} from "@/app/lib/probDeclare";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
@@ -24,25 +27,6 @@ interface ProbDeclareViewProps {
     closeCallBack: () => void;
 }
 
-interface DeclareConstraint {
-    probability: number;
-    declareTemplate: string;
-}
-
-interface ProbDeclare {
-    id: string;
-    generating: boolean;
-    paused: boolean,
-    constraints: DeclareConstraint[];
-    traces: string[];
-}
-
-interface ProbDeclareInfo {
-    id: string,
-    insertDate: Date,
-    updateDate: Date,
-    generating: boolean,
-}
 // @ts-ignore
 function formatDateArray(date): string {
     const [year, month, day, hour, minute, second, nanoseconds] = date;
@@ -68,6 +52,17 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const [existingModels, setExistingModels] = useState<ProbDeclareInfo[]>([]);
     const [loadingExistingModels, setLoadingExistingModels] = useState<boolean>(false);
     const [selectedProbDeclareInfo, setSelectedProbDeclareInfo] = useState<ProbDeclareInfo | null>(null);
+    const [showGenerationOptions, setShowGenerationOptions] = useState<boolean>(false);
+    const [showStatistics, setShowStatistics] = useState<boolean>(false);
+    const [showSeedView, setShowSeedView] = useState<boolean>(false);
+    const [seed, setSeed] = useState<string>("");
+    const [nrTracesSeed, setNrTracesSeed] = useState<number>(1);
+    const [calculatingSeededResult, setCalculatingSeededResult] = useState<boolean>(false);
+    const [expectedSeededResult, setExpectedSeededResult] = useState<DeclareConstraint[]>([]);
+    const [showExpectedSeededResult, setShowExpectedSeededResult] = useState<boolean>(false);
+    const [seedingInProgress, setSeedingInProgress] = useState<boolean>(false);
+    const [seedingResultReady, setSeedingResultReady] = useState<boolean>(false);
+    const [showRawData, setShowRawData] = useState<boolean>(false);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -84,7 +79,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         const probDeclare: ProbDeclare = response.data;
         setProbDeclare((prev) => (prev ? {
             ...prev,
-            constraints: probDeclare.constraints,
+            constraints: probDeclare.constraints, //.toSorted((a, b) => b.probability - a.probability),
             generating: probDeclare.generating,
             paused: probDeclare.paused,
         } : probDeclare));
@@ -161,6 +156,16 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         setActualExpectedTraces(expectedTraces);
         setNrSegments(0);
         setSegmentSize(-1);
+        setShowGenerationOptions(false);
+        setShowStatistics(false);
+        setShowSeedView(false);
+        setSeed("");
+        setNrTracesSeed(1);
+        setCalculatingSeededResult(false);
+        setExpectedSeededResult([]);
+        setShowExpectedSeededResult(false);
+        setSeedingInProgress(false);
+        setSeedingResultReady(false);
     }
 
     useMemo(reset, [sourceFile])
@@ -252,6 +257,67 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         console.log(row);
         setSelectedProbDeclareInfo(() => row);
     };
+
+
+    function onSeedChanged(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        console.log("probDeclareView: changing seed to " + event.target.value)
+        setSeed(() => event.target.value);
+    }
+
+    function onNrTracesSeedChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        setNrTracesSeed(event.target.valueAsNumber);
+    }
+
+    const addDeclare = (clone: DeclareConstraint[], cloneTracesProcessed: number, declareTemplate: string) => {
+        let found = false;
+        clone.forEach(c => {
+            if (c.declareTemplate === declareTemplate) {
+                c.nr += nrTracesSeed;
+                found = true;
+            }
+            c.probability = c.nr / cloneTracesProcessed;
+        })
+        if (!found) {
+            clone.push({declareTemplate, nr: nrTracesSeed, probability: nrTracesSeed / cloneTracesProcessed})
+        }
+    }
+
+    const calculateExpectedSeededResult = () => {
+        if (!probDeclare) {
+            console.error("no prob declare model present");
+            return;
+        }
+        setCalculatingSeededResult(true);
+        setExpectedSeededResult([]);
+        if (!probDeclare.paused && probDeclare.generating) {
+            console.error("generation active -> pause or finish first!");
+            return;
+        }
+        const s = seed.trim();
+        let clone: DeclareConstraint[] = probDeclare?.constraints.map(c => ({...c}));
+        let cloneTracesProcessed = probDeclare.tracesProcessed;
+        cloneTracesProcessed += nrTracesSeed;
+        if (s.startsWith("[")) {
+            if (!s.endsWith("]")) {
+                console.error("error in seed array");
+                setCalculatingSeededResult(false);
+                return;
+            }
+            const declareTemplatesToAdd = s.slice(1, -1).split(",").map(d => d.trim());
+            declareTemplatesToAdd.forEach(dt => addDeclare(clone, cloneTracesProcessed, dt));
+        } else {
+            addDeclare(clone, cloneTracesProcessed, s);
+        }
+
+        setExpectedSeededResult(clone);
+        setCalculatingSeededResult(false);
+    }
+
+    const initSeeding = () => {
+        // TODO implement
+        const s = seed.trim();
+        // send seed to backend and start polling again in callback
+    }
 
     const renderExistingModels = () => {
         return loadingExistingModels ? (renderLoadingIndicator()) : (existingModels && (
@@ -377,28 +443,88 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                         close
                     </Button>
                 </Box>
-                <Box>
-                    <Typography variant="h5">Paging Options</Typography>
-                    <TextField id={'start_page'} label={'Start Page (>=0)'} defaultValue={sourceDetails.page}
-                               type={'number'}
-                               variant={'standard'} onChange={onStartPageChanged} disabled={probDeclare !== null}/>
-                    <TextField id={'page_size'} label={'Page Size'} defaultValue={sourceDetails.size} type={'number'}
-                               variant={'standard'} onChange={onPageSizeChanged} disabled={probDeclare !== null}/>
-                    <TextField id={'expected_traces'} label={'Expected Traces'} defaultValue={expectedTraces}
-                               type={'number'}
-                               variant={'standard'} onChange={onActualExpectedTracesChanged}
-                               disabled={probDeclare !== null}/>
-                </Box>
-                <Box>
-                    <Typography variant="h5">Segmentation (Evaluation only)</Typography>
-                    <TextField id={'nr_segments'} label={'Nr Segments'} defaultValue={nrSegments} type={'number'}
-                               variant={'standard'} onChange={onNrSegmentsChanged} disabled={probDeclare !== null}/>
-                    <TextField id={'segment_size'} label={'Segment Size'} defaultValue={segmentSize} type={'number'}
-                               variant={'standard'} onChange={onSegmentSizeChanged} disabled={probDeclare !== null}/>
-                </Box>
+                <Button variant={'contained'} onClick={() => setShowGenerationOptions(!showGenerationOptions)}>
+                    show generation options
+                </Button>
+                {showGenerationOptions && (
+                    <>
+                        <Box>
+                            <Typography variant="h5">Paging Options</Typography>
+                            <TextField id={'start_page'} label={'Start Page (>=0)'} defaultValue={sourceDetails.page}
+                                       type={'number'} variant={'standard'} onChange={onStartPageChanged}
+                                       disabled={probDeclare !== null}/>
+                            <TextField id={'page_size'} label={'Page Size'} defaultValue={sourceDetails.size}
+                                       type={'number'} variant={'standard'} onChange={onPageSizeChanged}
+                                       disabled={probDeclare !== null}/>
+                            <TextField id={'expected_traces'} label={'Expected Traces'} defaultValue={expectedTraces}
+                                       type={'number'} variant={'standard'} onChange={onActualExpectedTracesChanged}
+                                       disabled={probDeclare !== null}/>
+
+                        </Box>
+                        <Box>
+                            <Typography variant="h5">Segmentation (Evaluation only)</Typography>
+                            <TextField id={'nr_segments'} label={'Nr Segments'} defaultValue={nrSegments}
+                                       type={'number'} variant={'standard'} onChange={onNrSegmentsChanged}
+                                       disabled={probDeclare !== null}/>
+                            <TextField id={'segment_size'} label={'Segment Size'} defaultValue={segmentSize}
+                                       type={'number'} variant={'standard'} onChange={onSegmentSizeChanged}
+                                       disabled={probDeclare !== null}/>
+                        </Box>
+                    </>
+                )}
+                <Button variant={'contained'} onClick={() => setShowStatistics(!showStatistics)}>
+                    show statistics
+                </Button>
+                {showStatistics &&
+                    <Box>
+                        <Typography variant="h5">Statistics</Typography>
+                        {probDeclare?.constraints! && <Statistics constraints={probDeclare.constraints}/>}
+                    </Box>}
+                <Button variant={'contained'} onClick={() => setShowSeedView(!showSeedView)}>
+                    show seeding options
+                </Button>
+                {showSeedView &&
+                    <Box>
+                        <Typography variant="h5">Seed Model</Typography>
+                        <TextareaAutosize
+                            aria-label="minimum height"
+                            minRows={5}
+                            placeholder="Enter Declare Constraint(s)"
+                            style={{width: 255}}
+                            onChange={onSeedChanged}
+                            disabled={calculatingSeededResult}
+                        />
+                        <TextField id={'nr-traces-seed'} label={'Nr. Traces'} defaultValue={nrTracesSeed}
+                                   type={'number'} variant={'standard'} onChange={onNrTracesSeedChanged}
+                                   disabled={calculatingSeededResult}/>
+                        <Button variant={'contained'} onClick={calculateExpectedSeededResult}
+                                disabled={calculatingSeededResult}>
+                            calculate expected result
+                        </Button>
+                        <Button variant={'contained'}
+                                onClick={() => setShowExpectedSeededResult(!showExpectedSeededResult)}>
+                            show expected seeded result
+                        </Button>
+                        {showExpectedSeededResult && <JsonView data={expectedSeededResult}/>}
+                        <Button variant={'contained'} onClick={initSeeding}
+                                disabled={expectedSeededResult.length === 0}>
+                            seed
+                        </Button>
+                        {seedingResultReady && <Typography>
+                            Expected === Actual:
+                            {expectedSeededResult
+                                .toSorted((a, b) => b.probability - a.probability)
+                            === probDeclare?.constraints!
+                                .toSorted((a, b) => b.probability - a.probability)
+                                ? "true" : "false"}
+                        </Typography>}
+                    </Box>}
                 {loading && probDeclare === null ? (renderLoadingIndicator()) : (renderProbDeclare())}
             </Box>
-            <JsonView data={probDeclare}/>
+            <Button variant={'contained'} onClick={() => setShowRawData(!showRawData)}>
+                show raw data
+            </Button>
+            {showRawData && <JsonView data={probDeclare}/>}
         </>
     );
 };
