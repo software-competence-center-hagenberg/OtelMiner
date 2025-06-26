@@ -23,7 +23,6 @@ function parseRawData (rawData: string[]): Map<string, string[]> {
     return model;
 }
 
-// FIXME rewrite or create new component to handle DeclareConstraint[]!
 const DeclareView = ({ rawData }: DeclareViewProps) => {
     const [model, setModel] = useState<Map<string, string[]>>(new Map<string, string[]>());
 

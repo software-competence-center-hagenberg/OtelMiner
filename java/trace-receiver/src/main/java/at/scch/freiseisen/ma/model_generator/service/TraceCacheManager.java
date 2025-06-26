@@ -2,9 +2,11 @@ package at.scch.freiseisen.ma.model_generator.service;
 
 import at.scch.freiseisen.ma.commons.RestPageImpl;
 import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
+import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.model_generator.configuration.RestConfig;
 import at.scch.freiseisen.ma.model_generator.error.TraceCacheException;
+import at.scch.freiseisen.ma.model_generator.model.Seed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +35,7 @@ public class TraceCacheManager implements DisposableBean {
     private final ExecutorService executor;
     private final AtomicBoolean isPaused;
     private final AtomicBoolean isDead;
+    private final AtomicBoolean isSeeded;
     private SourceDetails sourceDetails;
     private String probDeclareId;
 
@@ -50,6 +52,7 @@ public class TraceCacheManager implements DisposableBean {
         });
         isPaused = new AtomicBoolean(false);
         isDead = new AtomicBoolean(false);
+        isSeeded = new AtomicBoolean(false);
     }
 
     @Override
@@ -66,6 +69,10 @@ public class TraceCacheManager implements DisposableBean {
     }
 
     public void resume() {
+        if (isSeeded.get()) {
+            log.info("cache is seeded -> not retrieving pages");
+            return;
+        }
         if (isDead.get()) {
             throw new TraceCacheException("Cannot resume the cache because the cache is dead");
         }
@@ -96,7 +103,9 @@ public class TraceCacheManager implements DisposableBean {
     public Trace take() throws InterruptedException {
         log.info("retrieving trace from cache");
         Trace trace = queue.take();
-        persistenceService.createAndPersistProbDeclareToTrace(probDeclareId, List.of(trace));
+        if (!isSeeded.get()) {
+            persistenceService.createAndPersistProbDeclareToTrace(probDeclareId, List.of(trace));
+        }
         return trace;
     }
 
@@ -120,21 +129,44 @@ public class TraceCacheManager implements DisposableBean {
 
         queue.drainTo(traces, n - 1);
 
-        log.info("Retrieved {} traces from cache", traces.size());
+        log.info("Retrieved {} traceData from cache", traces.size());
         return traces;
+    }
+
+    public void addSeed(Seed seed) {
+        queue.clear();
+        List<Trace> seededTraces = new ArrayList<>(seed.nrTraces());
+        List<Span> spans = new ArrayList<>(seed.nrTraces());
+        seed.traceData().getSpans().forEach(span -> {
+            spans.add(Span.builder().json(span).build());
+        });
+        Trace t;
+        for (int i = 0; i < seed.nrTraces(); i++) {
+            t = Trace.builder()
+                    .id(seed.traceData().getTraceId() + i)
+                    .traceDataType(seed.traceData().getTraceDataType())
+                    .nrNodes(seed.traceData().getNrNodes())
+                    .spans(List.copyOf(spans))
+                    .build();
+            seededTraces.add(t);
+        }
+        queue.addAll(seededTraces);
+        isDead.set(false);
+        isSeeded.set(true);
     }
 
     public boolean isCacheDone() {
         return isDead.getAcquire()
-               || sourceDetails != null && sourceDetails.getPage() == sourceDetails.getTotalPages() && queue.isEmpty();
+               || sourceDetails != null && sourceDetails.getPage() == sourceDetails.getTotalPages() && queue.isEmpty()
+               || isSeeded.getAcquire() && queue.isEmpty();
     }
 
     private void cache() {
         log.info("trying to cache next page");
-        if (!isDead.getAcquire()) {
+        if (!isDead.getAcquire() && !isSeeded.getAcquire()) {
             Page<Trace> page = retrieveNextPage();
             log.info("caching next page");
-            if (!isDead.getAcquire()) {
+            if (!isDead.getAcquire() && !isSeeded.getAcquire()) {
                 queue.addAll(page.getContent());
                 sourceDetails.setTotalPages(page.getTotalPages());
                 sourceDetails.setPage(Math.min(page.getNumber() + 1, page.getTotalPages()));

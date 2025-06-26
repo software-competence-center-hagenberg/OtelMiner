@@ -1,4 +1,4 @@
-export interface DeclareConstraint {
+export interface ProbDeclareConstraint {
     probability: number;
     declareTemplate: string;
     nr: number
@@ -9,7 +9,7 @@ export interface ProbDeclare {
     generating: boolean;
     paused: boolean,
     tracesProcessed: number,
-    constraints: DeclareConstraint[];
+    constraints: ProbDeclareConstraint[];
     traces: string[];
 }
 

@@ -2,6 +2,7 @@ package at.scch.freiseisen.ma.model_generator.rest;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.dto.*;
+import at.scch.freiseisen.ma.model_generator.model.Seed;
 import at.scch.freiseisen.ma.model_generator.service.CanonizedSpanTreeService;
 import at.scch.freiseisen.ma.model_generator.service.DataService;
 import at.scch.freiseisen.ma.model_generator.service.DeclareService;
@@ -48,9 +49,16 @@ public class DataController {
         return dataService.retrieveExistingProbDeclareModels(sourceFile);
     }
 
-    @PostMapping("/prob-declare/load/{id}")
+    @PostMapping("/prob-declare/seed/{prob-declare-id}")
+    public ProbDeclareModel seed(
+            @PathVariable("prob-declare-id") String probDeclareId,
+            @RequestBody Seed seed) {
+        return dataService.seed(probDeclareId, seed);
+    }
+
+    @PostMapping("/prob-declare/load/{prob-declare-id}")
     public ProbDeclareModel load(
-            @PathVariable("id") String probDeclareId,
+            @PathVariable("prob-declare-id") String probDeclareId,
             @RequestParam("expected-traces") int expectedTraces,
             @RequestParam("nr-segments") int nrSegments,
             @RequestParam("segment-size") int segmentSize,

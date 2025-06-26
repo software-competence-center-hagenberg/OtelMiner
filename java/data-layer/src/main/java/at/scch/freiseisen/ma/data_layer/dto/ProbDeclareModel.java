@@ -6,6 +6,7 @@ public record ProbDeclareModel(
         String id,
         List<ProbDeclareConstraint> constraints,
         boolean generating,
-        boolean paused
+        boolean paused,
+        long tracesProcessed
 ) {
 }

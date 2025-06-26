@@ -43,8 +43,8 @@ public class ProbDeclareToTraceService {
         return repository.findDistinctProbDeclareByTraceSourceFile(sourceFile);
     }
 
-    public long countTraces(String id) {
-        return repository.countTraces(id);
+    public long countTraces(String probDeclareId) {
+        return repository.countTraces(probDeclareId);
     }
 
     public List<ProbDeclareToTrace> findAllById(List<ProbDeclareToTraceId> ids) {

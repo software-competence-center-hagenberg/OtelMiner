@@ -7,6 +7,8 @@ import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.model_generator.configuration.ModelGenerationConfig;
 import at.scch.freiseisen.ma.model_generator.configuration.RestConfig;
 import at.scch.freiseisen.ma.model_generator.error.ModelGenerationException;
+import at.scch.freiseisen.ma.model_generator.error.SeedingException;
+import at.scch.freiseisen.ma.model_generator.model.Seed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -151,7 +153,7 @@ public class ProbDeclareManagerService implements DisposableBean {
         ProbDeclare probDeclare = persistenceService.persistProbDeclare(new ProbDeclare(id));
         traceCacheManager.start(sourceDetails, probDeclare.getId());
         initDeclareGeneration(id);
-        return new ProbDeclareModel(id, new ArrayList<>(), true, isPaused.getAcquire());
+        return new ProbDeclareModel(id, new ArrayList<>(), true, isPaused.getAcquire(), currentNrTracesProcessed.get());
     }
 
     public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int expectedTraces, int nrSegments, int segmentSize) {
@@ -167,10 +169,32 @@ public class ProbDeclareManagerService implements DisposableBean {
         currentExpectedTraces.compareAndSet(0, expectedTraces);
         log.info("retrieveing model from db-service");
         ProbDeclareModel probDeclareModel = getProbDeclareModel(probDeclareId);
+        currentNrTracesProcessed.compareAndSet(-1, probDeclareModel.tracesProcessed());
+        currentNrTracesTakenFromCache.compareAndSet(0, probDeclareModel.tracesProcessed());
         log.info("submitting repopulation job");
         currentId.set(probDeclareId);
+        currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
         probDeclareModelUpdateExecutor.submit(() -> populateFromExistingModel(probDeclareModel, sourceDetails));
         return probDeclareModel;
+    }
+
+    public ProbDeclareModel seed(String probDeclareId, Seed seed) {
+        if (!probDeclareId.equals(currentId.get())) {
+            throw new SeedingException("SEEDING ERROR: prob declare ID (" + probDeclareId + ") NOT matching!");
+        }
+        if (!isPaused.get() && !isGenerationFinished()) {
+            throw new SeedingException("SEEDING ERROR: generation NOT finished and NOT PAUSED");
+        }
+
+        currentExpectedTraces.set(currentNrTracesProcessed.get() + seed.nrTraces());
+//        currentNrTracesTakenFromCache
+        generating.clear();
+        pausedGeneration.set(new ArrayList<>());
+        traceCacheManager.addSeed(seed);
+        isPaused.set(true);
+        probDeclareModelUpdateExecutor.submit(() -> initDeclareGeneration(probDeclareId));
+
+        return getCurrentModel();
     }
 
     @SneakyThrows
@@ -185,24 +209,19 @@ public class ProbDeclareManagerService implements DisposableBean {
             log.info("model generation already finished, not resuming");
             return;
         }
-        long nrTracesProcessed = persistenceService.retrieveNumberTracesForProbDeclare(probDeclareModel.id());
-        log.info("nr traces already processed: {}", nrTracesProcessed);
-        currentNrTracesProcessed.compareAndSet(-1, nrTracesProcessed);
-        int page = Math.toIntExact(nrTracesProcessed / sourceDetails.getSize());
+        int page = Math.toIntExact(probDeclareModel.tracesProcessed() / sourceDetails.getSize());
         log.info("page to continue from: {}", page);
-        int startIndex = Math.toIntExact(nrTracesProcessed - page * sourceDetails.getSize());
+        int startIndex = Math.toIntExact(probDeclareModel.tracesProcessed() - (long) page * sourceDetails.getSize());
         log.info("start index: {}", startIndex);
         sourceDetails.setPage(page);
-        currentSourceFile.compareAndSet(null, sourceDetails.getSourceFile());
         this.startPage = sourceDetails.getPage();
 
         traceCacheManager.start(sourceDetails, probDeclareModel.id());
         if (startIndex > 1) {
             List<Trace> tracesToBeIgnored = traceCacheManager.take(startIndex);
-            log.info("dumping traces to be ignored: {}", tracesToBeIgnored);
+            log.info("dumping traceData to be ignored: {}", tracesToBeIgnored);
         }
-        currentNrTracesTakenFromCache.compareAndSet(0, nrTracesProcessed);
-        log.info("resuming declare generation");
+        log.info("pausing and initializing further declare generation");
         isPaused.compareAndSet(false, true);
         initDeclareGeneration(probDeclareModel.id());
     }
@@ -280,9 +299,11 @@ public class ProbDeclareManagerService implements DisposableBean {
         log.debug("Finishing generation task for model ID: {}", probDeclareId);
         declareService.clear();
         generating.clear();
-        persistenceService.persistConstraints(constraints.values(), probDeclareId);
-        if (!abort) {
-            persistenceService.stopProbDeclareGeneration(probDeclareId);
+        if (probDeclareId != null) {
+            persistenceService.persistConstraints(constraints.values(), probDeclareId);
+            if (!abort) {
+                persistenceService.stopProbDeclareGeneration(probDeclareId);
+            }
         }
         if (abort) {
             clearCurrentState();
@@ -316,10 +337,8 @@ public class ProbDeclareManagerService implements DisposableBean {
             throw new ModelGenerationException("exception occurred while accessing trace cache", e);
         }
         CompletableFuture<ConversionResponse> future = new CompletableFuture<>();
-        future.thenAcceptAsync(
-                conversionResponse -> processResponse(conversionResponse, probDeclareId),
-                declareConstraintGenerationExecutor
-                )
+        future.thenAcceptAsync(conversionResponse -> processResponse(conversionResponse, probDeclareId),
+                declareConstraintGenerationExecutor)
                 .exceptionally(e -> {
                     log.error("exception occurred during response processing", e);
                     return null;
@@ -377,14 +396,14 @@ public class ProbDeclareManagerService implements DisposableBean {
     }
 
     private ProbDeclareModel getCurrentModel() {
-        List<ProbDeclareConstraint> model = constraints.values()
-                .stream()
-                .map(declare ->
-                        new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate(),
-                                declare.getNr()))
-                .toList();
-        boolean isGenerating = !isGenerationFinished();
-        return new ProbDeclareModel(currentId.get(), model, isGenerating, isPaused.getAcquire());
+        List<ProbDeclareConstraint> model = new ArrayList<>();
+        constraints.values().forEach(declare ->
+                model.add(new ProbDeclareConstraint(declare.getProbability(), declare.getConstraintTemplate(),
+                        declare.getNr())
+                )
+        );
+        return new ProbDeclareModel(currentId.get(), model, !isGenerationFinished(), isPaused.getAcquire(),
+                currentNrTracesProcessed.get());
     }
 
     private void updateModel(List<String> newConstraints, String probDeclareId) {
@@ -396,8 +415,8 @@ public class ProbDeclareManagerService implements DisposableBean {
             throw new ModelGenerationException("Error! received empty list of declare constraints");
         }
         if (constraints.isEmpty() && currentNrTraces > 0) {
-            log.error("nr traces > 0 but no constraints exist!");
-            throw new ModelGenerationException("Error! nr traces > 0 but no constraints exist!");
+            log.error("nr traceData > 0 but no constraints exist!");
+            throw new ModelGenerationException("Error! nr traceData > 0 but no constraints exist!");
         }
         if (constraints.isEmpty()) {
             assert currentNrTraces == 0;
@@ -409,13 +428,13 @@ public class ProbDeclareManagerService implements DisposableBean {
         }
         if (isGenerationFinished()) {
             finishGeneration(false);
-            log.info("GENERATION COMPLETE! No more traces found for probDeclareId: {}", probDeclareId);
+            log.info("GENERATION COMPLETE! No more traceData found for probDeclareId: {}", probDeclareId);
         }
     }
 
     private void initModelWithCrisps(List<String> newConstraints) {
         currentNrTracesProcessed.compareAndSet(0, 1);
-        log.info("no constraints so far and no traces --> initializing crisps");
+        log.info("no constraints so far and no traceData --> initializing crisps");
         newConstraints.forEach(c -> {
             log.debug("adding crisp constraint: {}", c);
             constraints.put(c, new ProbDeclareConstraintModelEntry(c, 1d, 1L));
@@ -425,7 +444,7 @@ public class ProbDeclareManagerService implements DisposableBean {
     private void updateConstraints(List<String> newConstraints, long currentNrTraces) {
         log.info("existing {} constraints so far --> updating model", constraints.size());
         List<String> visited = new ArrayList<>();
-        log.info("updating nr traces ({} -> {})", currentNrTraces, currentNrTraces + 1);
+        log.info("updating nr traceData ({} -> {})", currentNrTraces, currentNrTraces + 1);
         currentNrTracesProcessed.compareAndSet(currentNrTraces, currentNrTraces + 1);
         log.info("updating constraints found in trace...");
         newConstraints.forEach(nc -> {

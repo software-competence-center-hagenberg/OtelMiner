@@ -1,6 +1,6 @@
-import {Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis} from "recharts";
+import {Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
 import React, {useMemo} from "react";
-import {DeclareConstraint} from "@/app/lib/probDeclare";
+import {ProbDeclareConstraint} from "@/app/lib/probDeclare";
 import {Box} from "@mui/material";
 import Typography from "@mui/material/Typography";
 
@@ -10,7 +10,7 @@ export interface MyValue {
 }
 
 export interface StatisticsProps {
-    constraints: DeclareConstraint[]
+    constraints: ProbDeclareConstraint[]
 }
 
 function createEmptyThreshholdList() {
@@ -42,7 +42,7 @@ const ranges = [
     {min: 0.9, max: 1, index: 9},
 ];
 
-function mapConstraintsByNrBundled(constraints: DeclareConstraint[]) {
+function mapConstraintsByNrBundled(constraints: ProbDeclareConstraint[]) {
     const values: MyValue[] = createEmptyThreshholdList();
     constraints.forEach(c => {
         ranges.forEach(range => {
@@ -73,7 +73,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const truncateLabel = (label: string, maxLength: number = 25) => {
     if (label.length <= maxLength) return label;
-    return label.substring(0, maxLength) + '...';
+    return ''+label+''.substring(0, maxLength) + '...';
 };
 
 const CustomXAxisTick = (props: any) => {
@@ -102,7 +102,7 @@ const Statistics = ({constraints}: StatisticsProps) => {
     return (
         <Box>
             <Typography variant="h6">Every Trace by Probability</Typography>
-            <BarChart width={1200} height={500} data={constraints}
+            <LineChart width={1200} height={500} data={constraints}
                       margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
             >
                 <CartesianGrid strokeDasharray={"3 3"}/>
@@ -117,8 +117,9 @@ const Statistics = ({constraints}: StatisticsProps) => {
                 <YAxis dataKey={"probability"}/>
                 <Tooltip content={<CustomTooltip />} />
                 <Legend/>
-                <Bar dataKey={"probability"} fill={"#8884d8"} name={"Probability"}/>
-            </BarChart>
+                {/*<Bar dataKey={"probability"} fill={"#8884d8"} name={"Probability"}/>*/}
+                <Line type="monotone" dataKey={"probability"} fill={"#8884d8"} name={"Probability"}/>
+            </LineChart>
             <Typography variant={"h6"}>Nr by Threshold</Typography>
             <BarChart width={1200} height={250} data={constraintsByNrBundled}>
                 <CartesianGrid strokeDasharray={"3 3"}/>

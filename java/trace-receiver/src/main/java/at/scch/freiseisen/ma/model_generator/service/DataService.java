@@ -1,10 +1,8 @@
 package at.scch.freiseisen.ma.model_generator.service;
 
-import at.scch.freiseisen.ma.data_layer.dto.DataOverview;
-import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareInfo;
-import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareModel;
-import at.scch.freiseisen.ma.data_layer.dto.SourceDetails;
+import at.scch.freiseisen.ma.data_layer.dto.*;
 import at.scch.freiseisen.ma.model_generator.configuration.RestConfig;
+import at.scch.freiseisen.ma.model_generator.model.Seed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -72,5 +70,9 @@ public class DataService {
     public ProbDeclareModel load(String probDeclareId, SourceDetails sourceDetails, int expectedTraces, int nrSegments,
                                  int segmentSize) {
         return probDeclareManagerService.load(probDeclareId, sourceDetails, expectedTraces, nrSegments, segmentSize);
+    }
+
+    public ProbDeclareModel seed(String probDeclareId, Seed seed) {
+        return probDeclareManagerService.seed(probDeclareId, seed);
     }
 }

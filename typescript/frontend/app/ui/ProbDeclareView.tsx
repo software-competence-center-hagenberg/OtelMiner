@@ -2,7 +2,7 @@ import React, {useMemo, useRef, useState} from "react";
 import {
     Box,
     Button,
-    CircularProgress,
+    CircularProgress, Grid2,
     Paper,
     Table,
     TableBody,
@@ -19,12 +19,26 @@ import JsonView from "@/app/ui/json/JsonView";
 import {AxiosResponse} from "axios";
 import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
 import Statistics from "@/app/ui/Statistics";
-import {DeclareConstraint, ProbDeclare, ProbDeclareInfo} from "@/app/lib/probDeclare";
+import {ProbDeclare, ProbDeclareConstraint, ProbDeclareInfo} from "@/app/lib/probDeclare";
+import DeclareView from "@/app/ui/DeclareView";
+import {sort} from "next/dist/build/webpack/loaders/css-loader/src/utils";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
     expectedTraces: number;
     closeCallBack: () => void;
+}
+
+interface SeedTraceDetails {
+    traceId: string;
+    nrNodes: number;
+    spans: string[];
+    traceDataType: string;
+}
+
+interface Seed {
+    traceData: SeedTraceDetails;
+    nrTraces: number;
 }
 
 // @ts-ignore
@@ -55,13 +69,18 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const [showGenerationOptions, setShowGenerationOptions] = useState<boolean>(false);
     const [showStatistics, setShowStatistics] = useState<boolean>(false);
     const [showSeedView, setShowSeedView] = useState<boolean>(false);
-    const [seed, setSeed] = useState<string>("");
-    const [nrTracesSeed, setNrTracesSeed] = useState<number>(1);
+    const [seed, setSeed] = useState<Seed | undefined>(undefined);
+    const [seedSpans, setSeedSpans] = useState<string>("");
+    const [seedNrTraces, setSeedNrTraces] = useState<number>(1);
+    const [seedTraceId, setSeedTraceId] = useState<string>("");
     const [calculatingSeededResult, setCalculatingSeededResult] = useState<boolean>(false);
-    const [expectedSeededResult, setExpectedSeededResult] = useState<DeclareConstraint[]>([]);
+    const [expectedSeededResult, setExpectedSeededResult] = useState<ProbDeclareConstraint[]>([]);
     const [showExpectedSeededResult, setShowExpectedSeededResult] = useState<boolean>(false);
     const [seedingInProgress, setSeedingInProgress] = useState<boolean>(false);
     const [seedingResultReady, setSeedingResultReady] = useState<boolean>(false);
+    const [calculatingSeededDeclareModel, setCalculatingSeededDeclareModel] = useState<boolean>(false);
+    const [seedingEvaluationSuccessful, setSeedingEvaluationSuccessful] = useState<boolean>(false);
+    const [seededDeclareModel, setSeededDeclareModel] = useState<string[] | undefined>(undefined);
     const [showRawData, setShowRawData] = useState<boolean>(false);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -79,9 +98,10 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         const probDeclare: ProbDeclare = response.data;
         setProbDeclare((prev) => (prev ? {
             ...prev,
-            constraints: probDeclare.constraints, //.toSorted((a, b) => b.probability - a.probability),
+            constraints: probDeclare.constraints,
             generating: probDeclare.generating,
             paused: probDeclare.paused,
+            tracesProcessed: probDeclare.tracesProcessed
         } : probDeclare));
 
         if (aborting) {
@@ -159,13 +179,18 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         setShowGenerationOptions(false);
         setShowStatistics(false);
         setShowSeedView(false);
-        setSeed("");
-        setNrTracesSeed(1);
+        setSeed(undefined);
+        setSeedSpans("");
+        setSeedNrTraces(1);
+        setSeedTraceId("");
         setCalculatingSeededResult(false);
         setExpectedSeededResult([]);
         setShowExpectedSeededResult(false);
         setSeedingInProgress(false);
         setSeedingResultReady(false);
+        setCalculatingSeededDeclareModel(false);
+        setSeedingEvaluationSuccessful(false);
+        setSeededDeclareModel(undefined);
     }
 
     useMemo(reset, [sourceFile])
@@ -187,7 +212,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             .then((_) => {
                 setPaused(false);
             })
-            .catch((error) => console.error('Error pausing generation of prob declare model', error))
+            .catch((error) => console.error('Error resuming generation of prob declare model', error))
             .finally(fetchModel);
     }
 
@@ -214,7 +239,6 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     }
 
     function onStartPageChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        console.log("probDeclareView: changing start page to " + event.target.valueAsNumber)
         setSourceDetails(prev => ({
             ...prev,
             page: event.target.valueAsNumber
@@ -222,7 +246,6 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     }
 
     function onPageSizeChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        console.log("probDeclareView: changing page size to " + event.target.valueAsNumber)
         setSourceDetails(prev => ({
             ...prev,
             size: event.target.valueAsNumber
@@ -230,17 +253,14 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     }
 
     function onActualExpectedTracesChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        console.log("probDeclareView: changing expected traces to " + event.target.valueAsNumber)
         setActualExpectedTraces(() => event.target.valueAsNumber);
     }
 
     function onNrSegmentsChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        console.log("probDeclareView: changing nr segments to " + event.target.valueAsNumber)
         setNrSegments(() => event.target.valueAsNumber);
     }
 
     function onSegmentSizeChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        console.log("probDeclareView: changing segment size to " + event.target.valueAsNumber)
         setSegmentSize(() => event.target.valueAsNumber);
     }
 
@@ -259,32 +279,35 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     };
 
 
-    function onSeedChanged(event: React.ChangeEvent<HTMLTextAreaElement>) {
-        console.log("probDeclareView: changing seed to " + event.target.value)
-        setSeed(() => event.target.value);
+    function onSeedSpansChanged(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        setSeedSpans(() => event.target.value);
     }
 
-    function onNrTracesSeedChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        setNrTracesSeed(event.target.valueAsNumber);
+    function onSeedNrTracesChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        setSeedNrTraces(event.target.valueAsNumber);
     }
 
-    const addDeclare = (clone: DeclareConstraint[], cloneTracesProcessed: number, declareTemplate: string) => {
+    function onSeedTraceIdChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        setSeedTraceId(event.target.value);
+    }
+
+    const addDeclare = (clone: ProbDeclareConstraint[], cloneTracesProcessed: number, declareTemplate: string) => {
         let found = false;
         clone.forEach(c => {
             if (c.declareTemplate === declareTemplate) {
-                c.nr += nrTracesSeed;
+                c.nr += seedNrTraces;
                 found = true;
             }
             c.probability = c.nr / cloneTracesProcessed;
         })
         if (!found) {
-            clone.push({declareTemplate, nr: nrTracesSeed, probability: nrTracesSeed / cloneTracesProcessed})
+            clone.push({declareTemplate, nr: seedNrTraces, probability: seedNrTraces / cloneTracesProcessed})
         }
     }
 
     const calculateExpectedSeededResult = () => {
-        if (!probDeclare) {
-            console.error("no prob declare model present");
+        if (!probDeclare || !seededDeclareModel) {
+            console.error("no prob declare or seeded declare model present");
             return;
         }
         setCalculatingSeededResult(true);
@@ -293,31 +316,118 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             console.error("generation active -> pause or finish first!");
             return;
         }
-        const s = seed.trim();
-        let clone: DeclareConstraint[] = probDeclare?.constraints.map(c => ({...c}));
+        let clone: ProbDeclareConstraint[] = probDeclare?.constraints.map(c => ({...c}));
         let cloneTracesProcessed = probDeclare.tracesProcessed;
-        cloneTracesProcessed += nrTracesSeed;
-        if (s.startsWith("[")) {
-            if (!s.endsWith("]")) {
-                console.error("error in seed array");
-                setCalculatingSeededResult(false);
-                return;
-            }
-            const declareTemplatesToAdd = s.slice(1, -1).split(",").map(d => d.trim());
-            declareTemplatesToAdd.forEach(dt => addDeclare(clone, cloneTracesProcessed, dt));
-        } else {
-            addDeclare(clone, cloneTracesProcessed, s);
-        }
+        cloneTracesProcessed += seedNrTraces;
+        seededDeclareModel.forEach(dt => addDeclare(clone, cloneTracesProcessed, dt));
 
         setExpectedSeededResult(clone);
         setCalculatingSeededResult(false);
     }
 
     const initSeeding = () => {
-        // TODO implement
-        const s = seed.trim();
-        // send seed to backend and start polling again in callback
+        if (!seed) {
+            console.error("no seed present!");
+            return;
+        }
+        setSeedingInProgress(true)
+        RestService.post<Seed, ProbDeclare>("/prob-declare/seed/" + probDeclare?.id!, seed)
+            .then((_response) => resume())
+            .catch((error) => console.error('Error seeding', error))
+            .finally(() => setSeedingInProgress(false));
     }
+
+    const evaluateSeedingResult = () => {
+        const sortFn = (a:ProbDeclareConstraint, b:ProbDeclareConstraint) => b.declareTemplate.localeCompare(a.declareTemplate);
+        const expected = expectedSeededResult.toSorted(sortFn);
+        const actual = probDeclare!.constraints!.toSorted(sortFn);
+        if (expected.length !== actual.length) {
+            setSeedingEvaluationSuccessful(false);
+            return;
+        }
+
+        const diff: {actual: ProbDeclareConstraint, expected: ProbDeclareConstraint}[] = [];
+        for (let i = 0; i < expected.length; i++) {
+            if (expected[i].probability !== actual[i].probability
+                || expected[i].nr !== actual[i].nr
+                || expected[i].declareTemplate !== actual[i].declareTemplate) {
+                // console.log("expected != actual! constraint nr. " + i + ":");
+                // console.log("expected:");
+                // console.log(expected[i]);
+                // console.log("actual:");
+                // console.log(actual[i]);
+                diff.push({expected: expected[i], actual: actual[i]})
+            }
+        }
+        console.log("diff:");
+        console.log(diff);
+        setSeedingEvaluationSuccessful(diff.length === 0);
+    }
+
+
+    const pollSeedDeclareModel = async (traceId: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const intervalId = setInterval(async () => {
+                try {
+                    const response = await RestService.get<string>("/declare/" + traceId);
+                    if (response.data !== '') {
+                        clearInterval(intervalId);
+                        console.log(response.data);
+                        resolve(response.data);
+                    }
+                } catch (error) {
+                    console.error('Error polling model:', error);
+                    clearInterval(intervalId)
+                    reject(new Error("Error polling model"));
+                }
+            }, 2000);
+        });
+    };
+
+    const onClickGenerateDeclareModelForSeed = async () => {
+        if (!seedSpans) {
+            console.error("no seed spans present!");
+            return;
+        }
+        if (seedTraceId.length === 0) {
+            console.error("no trace Id present!");
+            return;
+        }
+        let s = seedSpans;
+        if (s.startsWith("[")) {
+            s = s.substring(1);
+            if (s.endsWith("]")) {
+                s = s.substring(0, s.length - 1);
+            }
+        }
+        let spanList = s.replace(/\s+/g, '').split("},");
+        for (let i = 0; i < spanList.length - 1; i++) {
+            spanList[i] += "}"
+        }
+        let seedTraceDetails: SeedTraceDetails = {
+            traceId: seedTraceId,
+            nrNodes: spanList.length,
+            spans: spanList,
+            traceDataType: "DYNATRACE_SPANS_LIST"
+        }
+
+        setSeed(() => ({
+            traceData: seedTraceDetails,
+            nrTraces: seedNrTraces
+        }));
+
+        try {
+            setCalculatingSeededDeclareModel(true)
+            const response = await RestService.post<SeedTraceDetails, string>("/declare/generate", seedTraceDetails);
+            const model = await pollSeedDeclareModel(response.data);
+            const seededDeclareModel: string[] = JSON.parse(JSON.stringify(model));
+            setSeededDeclareModel(seededDeclareModel);
+        } catch (error) {
+            console.error('Error generating model:', error);
+        } finally {
+            setCalculatingSeededDeclareModel(false);
+        }
+    };
 
     const renderExistingModels = () => {
         return loadingExistingModels ? (renderLoadingIndicator()) : (existingModels && (
@@ -403,6 +513,66 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
         );
     }
 
+    const renderSeedView = () => {
+        return (
+            <Box>
+                <Box>
+                    <Typography variant="h5">Seed Model</Typography>
+                    <TextField id={'nr-traces-seed'} label={'Nr. Traces'} defaultValue={seedNrTraces}
+                               type={'number'} variant={'standard'} onChange={onSeedNrTracesChanged}
+                               disabled={calculatingSeededResult}/>
+                    <TextField id={'trace-id-seed'} label={'Trace Id'} defaultValue={seedTraceId}
+                               variant={'standard'} onChange={onSeedTraceIdChanged}
+                               disabled={calculatingSeededResult}/>
+                    <Button variant={"contained"} onClick={onClickGenerateDeclareModelForSeed}>
+                        generate declare Model
+                    </Button>
+                </Box>
+                <Grid2 container columns={2}>
+                    <TextareaAutosize
+                        aria-label="minimum height"
+                        minRows={20}
+                        placeholder="Enter Spans List"
+                        style={{width: "50%"}}
+                        onChange={onSeedSpansChanged}
+                        disabled={calculatingSeededResult}
+                    />
+                    <Box width={"50%"}>
+                        {seededDeclareModel && <DeclareView rawData={seededDeclareModel}/>}
+                    </Box>
+                </Grid2>
+                <Box>
+                    <Button variant={'contained'} onClick={calculateExpectedSeededResult}
+                            disabled={calculatingSeededResult}>
+                        calculate expected result
+                    </Button>
+                    <Button variant={'contained'}
+                            onClick={() => setShowExpectedSeededResult(!showExpectedSeededResult)}>
+                        show expected seeded result
+                    </Button>
+                    {showExpectedSeededResult && <JsonView data={expectedSeededResult}/>}
+                    <Button variant={'contained'} onClick={initSeeding}
+                            disabled={expectedSeededResult.length === 0}>
+                        seed
+                    </Button> {/*TODO move up*/}
+                    <Button variant={'contained'} onClick={evaluateSeedingResult}
+                            disabled={expectedSeededResult.length === 0}>
+                        evaluate seeding result
+                    </Button> {/*TODO move up*/}
+                    <Typography>seeding evaluation result: {seedingEvaluationSuccessful ? "SUCCESS" : "FAILURE"}</Typography>
+                    {seedingResultReady && <Typography>
+                        Expected === Actual:
+                        {expectedSeededResult
+                            .toSorted((a, b) => b.probability - a.probability)
+                        === probDeclare?.constraints!
+                            .toSorted((a, b) => b.probability - a.probability)
+                            ? "true" : "false"}
+                    </Typography>}
+                </Box>
+            </Box>
+        )
+    }
+
     return (
         <>
             <Box>
@@ -483,42 +653,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                 <Button variant={'contained'} onClick={() => setShowSeedView(!showSeedView)}>
                     show seeding options
                 </Button>
-                {showSeedView &&
-                    <Box>
-                        <Typography variant="h5">Seed Model</Typography>
-                        <TextareaAutosize
-                            aria-label="minimum height"
-                            minRows={5}
-                            placeholder="Enter Declare Constraint(s)"
-                            style={{width: 255}}
-                            onChange={onSeedChanged}
-                            disabled={calculatingSeededResult}
-                        />
-                        <TextField id={'nr-traces-seed'} label={'Nr. Traces'} defaultValue={nrTracesSeed}
-                                   type={'number'} variant={'standard'} onChange={onNrTracesSeedChanged}
-                                   disabled={calculatingSeededResult}/>
-                        <Button variant={'contained'} onClick={calculateExpectedSeededResult}
-                                disabled={calculatingSeededResult}>
-                            calculate expected result
-                        </Button>
-                        <Button variant={'contained'}
-                                onClick={() => setShowExpectedSeededResult(!showExpectedSeededResult)}>
-                            show expected seeded result
-                        </Button>
-                        {showExpectedSeededResult && <JsonView data={expectedSeededResult}/>}
-                        <Button variant={'contained'} onClick={initSeeding}
-                                disabled={expectedSeededResult.length === 0}>
-                            seed
-                        </Button>
-                        {seedingResultReady && <Typography>
-                            Expected === Actual:
-                            {expectedSeededResult
-                                .toSorted((a, b) => b.probability - a.probability)
-                            === probDeclare?.constraints!
-                                .toSorted((a, b) => b.probability - a.probability)
-                                ? "true" : "false"}
-                        </Typography>}
-                    </Box>}
+                {showSeedView && renderSeedView()}
                 {loading && probDeclare === null ? (renderLoadingIndicator()) : (renderProbDeclare())}
             </Box>
             <Button variant={'contained'} onClick={() => setShowRawData(!showRawData)}>

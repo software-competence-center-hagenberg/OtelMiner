@@ -262,7 +262,7 @@ let decode_dynatrace_span json =
   let parent_span_id = extract_parent_id json in
   let name = json |> member "span.name" |> to_string |> prune_name in
   let kind =
-    json |> member "kind" |> to_string_option
+    json |> member "span.kind" |> to_string_option
     |> Option.map decode_span_kind
     |> Option.value ~default:Trace.Span_kind_unspecified
   in
