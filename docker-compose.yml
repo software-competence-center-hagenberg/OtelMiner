@@ -80,7 +80,7 @@ services:
     build:
       context: ocaml
       dockerfile: ./Dockerfile
-    restart: on-failure
+    restart: no #on-failure
     depends_on:
       - rabbitmq-server
     deploy:
