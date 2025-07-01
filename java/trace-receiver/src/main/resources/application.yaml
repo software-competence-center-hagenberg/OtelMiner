@@ -29,7 +29,7 @@ otel_to_probd:
       span_trees: span-tree-result-queue
       trace: trace-receive-queue
 model_generation:
-  nr_threads: 10
+  nr_threads: ${NR_THREADS}
   batch_size: 10
 server:
   port: 4020

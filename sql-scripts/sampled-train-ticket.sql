@@ -15,13 +15,26 @@ WHERE
 
 ---------------------------------------------------------------------------------
 SELECT 
-    FLOOR(EXTRACT(EPOCH FROM (update_date - insert_date)) / 60) AS difference_minutes,
-    FLOOR(EXTRACT(EPOCH FROM (update_date - insert_date)) % 60) AS difference_seconds,
-    FLOOR((EXTRACT(EPOCH FROM (update_date - insert_date)) * 1000) % 1000) AS difference_milliseconds
-from prob_declare;
-
-select count(*) from declare where prob_declare_id = 'a4be77f3-70aa-40bb-b789-747cad8318e1';
-
+    id,
+    insert_date,
+    update_date,
+    (update_date - insert_date) AS duration,
+    EXTRACT(EPOCH FROM (update_date - insert_date)) AS duration_seconds
+FROM prob_declare pd
+WHERE NOT generating
+  AND EXISTS (
+      SELECT 1 
+      FROM prob_declare_to_trace pdt
+      INNER JOIN trace t ON pdt.trace_id = t.id
+      WHERE pdt.prob_declare_id = pd.id
+        AND t.source_file = 'sampled-train-ticket'
+  )
+ORDER BY insert_date ASC;
+---------------------------------------------------------------------------------
+select count(*) from trace where source_file = 'sampled-train-ticket';
+select count(*) from span where trace_id in (select id from trace where source_file = 'sampled-train-ticket');
+select count(*) from declare where prob_declare_id = '9e247532-7958-4dae-a054-d76a5e916255';
+---------------------------------------------------------------------------------
 SELECT 
     CASE 
         WHEN probability < 0.1 THEN '< 0.1'

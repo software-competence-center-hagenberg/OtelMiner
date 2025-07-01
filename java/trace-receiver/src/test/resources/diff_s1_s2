@@ -1,0 +1,394 @@
+
+Differences in common constraints (based on 'constraintTemplate')
+DeclareTemplate           | Prob1      | Prob2      | Nr1        | Nr2       
+-------------------------+------------+------------+------------+------------
+CHAIN_SUCCESSION({closure}, calculate-quote) | 0.013333333333333334 | 0.016666666666666666 | 4          | 10        
+CHAIN_SUCCESSION(GET /api/cart, executing api route (pages) /api/cart) | 0.08666666666666667 | 0.056666666666666664 | 26         | 34        
+CHAIN_SUCCESSION(GET /api/currency, executing api route (pages) /api/currency) | 0.08970099667774087 | 0.05333333333333334 | 27         | 32        
+CHAIN_SUCCESSION(GET /api/data, executing api route (pages) /api/data) | 0.2159468438538206 | 0.24166666666666667 | 65         | 145       
+CHAIN_SUCCESSION(GET /api/products/1YMWWN1N4O, executing api route (pages) /api/products/[productId]) | 0.01       | 0.011666666666666667 | 3          | 7         
+CHAIN_SUCCESSION(GET /api/products/2ZYFJ3GM2N, executing api route (pages) /api/products/[productId]) | 0.006644518272425249 | 0.0066555740432612314 | 2          | 4         
+CHAIN_SUCCESSION(GET /api/products/66VCHSJNUP, executing api route (pages) /api/products/[productId]) | 0.006666666666666667 | 0.013333333333333334 | 2          | 8         
+CHAIN_SUCCESSION(GET /api/products, executing api route (pages) /api/products) | 0.09333333333333334 | 0.17803660565723795 | 28         | 107       
+CHAIN_SUCCESSION(GET /api/products/L9ECAV7KIM, executing api route (pages) /api/products/[productId]) | 0.0033333333333333335 | 0.006666666666666667 | 1          | 4         
+CHAIN_SUCCESSION(GET /api/products/LS4PSXUNUM, executing api route (pages) /api/products/[productId]) | 0.009966777408637873 | 0.011666666666666667 | 3          | 7         
+CHAIN_SUCCESSION(GET /api/products/OLJCESPC7Z, executing api route (pages) /api/products/[productId]) | 0.0033333333333333335 | 0.008333333333333333 | 1          | 5         
+CHAIN_SUCCESSION(GET /api/shipping, executing api route (pages) /api/shipping) | 0.09302325581395349 | 0.06821963394342762 | 28         | 41        
+CHAIN_SUCCESSION(GET, GET /api/cart) | 0.08666666666666667 | 0.056666666666666664 | 26         | 34        
+CHAIN_SUCCESSION(GET, GET /api/currency) | 0.09       | 0.05333333333333334 | 27         | 32        
+CHAIN_SUCCESSION(GET, GET /api/data) | 0.21666666666666667 | 0.24166666666666667 | 65         | 145       
+CHAIN_SUCCESSION(GET, GET /api/products) | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+CHAIN_SUCCESSION(GET, GET /api/products/1YMWWN1N4O) | 0.01       | 0.011666666666666667 | 3          | 7         
+CHAIN_SUCCESSION(GET, GET /api/products/2ZYFJ3GM2N) | 0.006644518272425249 | 0.0066555740432612314 | 2          | 4         
+CHAIN_SUCCESSION(GET, GET /api/products/66VCHSJNUP) | 0.006644518272425249 | 0.013333333333333334 | 2          | 8         
+CHAIN_SUCCESSION(GET, GET /api/products/L9ECAV7KIM) | 0.0033333333333333335 | 0.006666666666666667 | 1          | 4         
+CHAIN_SUCCESSION(GET, GET /api/products/LS4PSXUNUM) | 0.009966777408637873 | 0.011666666666666667 | 3          | 7         
+CHAIN_SUCCESSION(GET, GET /api/products/OLJCESPC7Z) | 0.0033333333333333335 | 0.008333333333333333 | 1          | 5         
+CHAIN_SUCCESSION(GET, GET /api/shipping) | 0.09302325581395349 | 0.06821963394342762 | 28         | 41        
+CHAIN_SUCCESSION(GET, oteldemo.AdService/GetAds) | 0.2159468438538206 | 0.24126455906821964 | 65         | 145       
+CHAIN_SUCCESSION(GET, oteldemo.CartService/GetCart) | 0.08637873754152824 | 0.056666666666666664 | 26         | 34        
+CHAIN_SUCCESSION(GET, oteldemo.CurrencyService/Convert) | 0.09302325581395349 | 0.06988352745424292 | 28         | 42        
+CHAIN_SUCCESSION(GET, oteldemo.CurrencyService/GetSupportedCurrencies) | 0.09       | 0.05333333333333334 | 27         | 32        
+CHAIN_SUCCESSION(GET, oteldemo.ProductCatalogService/GetProduct) | 0.03986710963455149 | 0.09650582362728785 | 12         | 58        
+CHAIN_SUCCESSION(GET, oteldemo.ProductCatalogService/ListProducts) | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+CHAIN_SUCCESSION(GET, oteldemo.ShippingService/GetQuote) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+CHAIN_SUCCESSION(POST /api/cart, executing api route (pages) /api/cart) | 0.03       | 0.023333333333333334 | 9          | 14        
+CHAIN_SUCCESSION(POST /getquote, {closure}) | 0.013333333333333334 | 0.016666666666666666 | 4          | 10        
+CHAIN_SUCCESSION(POST, oteldemo.CartService/AddItem) | 0.029900332225913623 | 0.023333333333333334 | 9          | 14        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, EXPIRE) | 0.023255813953488372 | 0.016666666666666666 | 7          | 10        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, HGET) | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, HMSET) | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+CHAIN_SUCCESSION(POST, oteldemo.CartService/GetCart) | 0.029900332225913623 | 0.02329450915141431 | 9          | 14        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/GetCart, HGET) | 0.0033333333333333335 | 0.006666666666666667 | 1          | 4         
+CHAIN_SUCCESSION(POST, POST /api/cart) | 0.03       | 0.023333333333333334 | 9          | 14        
+CHOICE(EXPIRE, HGET)      | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+CHOICE(EXPIRE, HMSET)     | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+CHOICE(GET /api/cart, oteldemo.CartService/GetCart) | 0.08666666666666667 | 0.056666666666666664 | 26         | 34        
+CHOICE(GET /api/currency, oteldemo.CurrencyService/GetSupportedCurrencies) | 0.08970099667774087 | 0.05324459234608985 | 27         | 32        
+CHOICE(GET /api/data, oteldemo.AdService/GetAds) | 0.2159468438538206 | 0.24126455906821964 | 65         | 145       
+CHOICE(GET /api/products/1YMWWN1N4O, oteldemo.ProductCatalogService/GetProduct) | 0.01       | 0.011666666666666667 | 3          | 7         
+CHOICE(GET /api/products/2ZYFJ3GM2N, oteldemo.ProductCatalogService/GetProduct) | 0.006644518272425249 | 0.006666666666666667 | 2          | 4         
+CHOICE(GET /api/products/66VCHSJNUP, oteldemo.ProductCatalogService/GetProduct) | 0.006666666666666667 | 0.013333333333333334 | 2          | 8         
+CHOICE(GET /api/products/L9ECAV7KIM, oteldemo.ProductCatalogService/GetProduct) | 0.0033222591362126247 | 0.006666666666666667 | 1          | 4         
+CHOICE(GET /api/products/LS4PSXUNUM, oteldemo.ProductCatalogService/GetProduct) | 0.009966777408637873 | 0.011647254575707155 | 3          | 7         
+CHOICE(GET /api/products/OLJCESPC7Z, oteldemo.ProductCatalogService/GetProduct) | 0.0033222591362126247 | 0.008319467554076539 | 1          | 5         
+CHOICE(GET /api/products, oteldemo.ProductCatalogService/ListProducts) | 0.09333333333333334 | 0.17803660565723795 | 28         | 107       
+CHOICE(GET /api/shipping, oteldemo.CurrencyService/Convert) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+CHOICE(GET /api/shipping, oteldemo.ShippingService/GetQuote) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+CHOICE(HGET, HMSET)       | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+CHOICE(oteldemo.CartService/AddItem, oteldemo.CartService/GetCart) | 0.029900332225913623 | 0.02329450915141431 | 9          | 14        
+CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ShippingService/GetQuote) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+CHOICE(POST /api/cart, oteldemo.CartService/AddItem) | 0.029900332225913623 | 0.02329450915141431 | 9          | 14        
+CHOICE(POST /api/cart, oteldemo.CartService/GetCart) | 0.03       | 0.023333333333333334 | 9          | 14        
+EXISTENCE(calculate-quote) | 0.013289036544850499 | 0.016638935108153077 | 4          | 10        
+EXISTENCE({closure})      | 0.013289036544850499 | 0.016666666666666666 | 4          | 10        
+EXISTENCE(CurrencyService/Convert) | 0.013289036544850499 | 0.009983361064891847 | 4          | 6         
+EXISTENCE(CurrencyService/GetSupportedCurrencies) | 0.009966777408637873 | 0.006666666666666667 | 3          | 4         
+EXISTENCE(executing api route (pages) /api/cart) | 0.11666666666666667 | 0.08       | 35         | 48        
+EXISTENCE(executing api route (pages) /api/currency) | 0.09       | 0.05333333333333334 | 27         | 32        
+EXISTENCE(executing api route (pages) /api/data) | 0.21666666666666667 | 0.24166666666666667 | 65         | 145       
+EXISTENCE(executing api route (pages) /api/products) | 0.09333333333333334 | 0.17803660565723795 | 28         | 107       
+EXISTENCE(executing api route (pages) /api/products/[productId]) | 0.03986710963455149 | 0.08319467554076539 | 12         | 50        
+EXISTENCE(executing api route (pages) /api/shipping) | 0.09302325581395349 | 0.06833333333333333 | 28         | 41        
+EXISTENCE(EXPIRE)         | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+EXISTENCE(GET)            | 0.8833333333333333 | 0.8119800332778702 | 265        | 488       
+EXISTENCE(GET /api/cart)  | 0.08666666666666667 | 0.056666666666666664 | 26         | 34        
+EXISTENCE(GET /api/currency) | 0.08970099667774087 | 0.05324459234608985 | 27         | 32        
+EXISTENCE(GET /api/data)  | 0.2159468438538206 | 0.24126455906821964 | 65         | 145       
+EXISTENCE(GET /api/products) | 0.09333333333333334 | 0.17803660565723795 | 28         | 107       
+EXISTENCE(GET /api/products/1YMWWN1N4O) | 0.009966777408637873 | 0.011647254575707155 | 3          | 7         
+EXISTENCE(GET /api/products/2ZYFJ3GM2N) | 0.006666666666666667 | 0.006666666666666667 | 2          | 4         
+EXISTENCE(GET /api/products/66VCHSJNUP) | 0.006644518272425249 | 0.013333333333333334 | 2          | 8         
+EXISTENCE(GET /api/products/L9ECAV7KIM) | 0.0033222591362126247 | 0.0066555740432612314 | 1          | 4         
+EXISTENCE(GET /api/products/LS4PSXUNUM) | 0.009966777408637873 | 0.011666666666666667 | 3          | 7         
+EXISTENCE(GET /api/products/OLJCESPC7Z) | 0.0033333333333333335 | 0.008333333333333333 | 1          | 5         
+EXISTENCE(GET /api/shipping) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+EXISTENCE(HGET)           | 0.026578073089700997 | 0.023333333333333334 | 8          | 14        
+EXISTENCE(HMSET)          | 0.023255813953488372 | 0.016666666666666666 | 7          | 10        
+EXISTENCE(oteldemo.AdService/GetAds) | 0.21666666666666667 | 0.295      | 65         | 177       
+EXISTENCE(oteldemo.CartService/AddItem) | 0.029900332225913623 | 0.02329450915141431 | 9          | 14        
+EXISTENCE(oteldemo.CartService/GetCart) | 0.11666666666666667 | 0.08       | 35         | 48        
+EXISTENCE(oteldemo.CurrencyService/Convert) | 0.09302325581395349 | 0.06988352745424292 | 28         | 42        
+EXISTENCE(oteldemo.CurrencyService/GetSupportedCurrencies) | 0.08970099667774087 | 0.05324459234608985 | 27         | 32        
+EXISTENCE(oteldemo.ProductCatalogService/GetProduct) | 0.04318936877076412 | 0.11166666666666666 | 13         | 67        
+EXISTENCE(oteldemo.ProductCatalogService/ListProducts) | 0.11666666666666667 | 0.21797004991680533 | 35         | 131       
+EXISTENCE(oteldemo.ShippingService/GetQuote) | 0.09333333333333334 | 0.06833333333333333 | 28         | 41        
+EXISTENCE(POST)           | 0.03       | 0.023333333333333334 | 9          | 14        
+EXISTENCE(POST /api/cart) | 0.03       | 0.023333333333333334 | 9          | 14        
+EXISTENCE(POST /getquote) | 0.013333333333333334 | 0.016666666666666666 | 4          | 10        
+EXISTENCE(POST /oteldemo.CartService/AddItem) | 0.023255813953488372 | 0.016666666666666666 | 7          | 10        
+EXISTENCE(POST /oteldemo.CartService/GetCart) | 0.0033222591362126247 | 0.0066555740432612314 | 1          | 4         
+EXISTENCE(resolve page components) | 0.26245847176079734 | 0.13166666666666665 | 79         | 79        
+INIT(CurrencyService/Convert) | 0.013289036544850499 | 0.009983361064891847 | 4          | 6         
+INIT(CurrencyService/GetSupportedCurrencies) | 0.009966777408637873 | 0.0066555740432612314 | 3          | 4         
+INIT(GET)                 | 0.8833333333333333 | 0.8119800332778702 | 265        | 488       
+INIT(oteldemo.ProductCatalogService/GetProduct) | 0.0033333333333333335 | 0.015      | 1          | 9         
+INIT(oteldemo.ProductCatalogService/ListProducts) | 0.023333333333333334 | 0.04       | 7          | 24        
+INIT(POST)                | 0.029900332225913623 | 0.02329450915141431 | 9          | 14        
+INIT(POST /getquote)      | 0.013289036544850499 | 0.016666666666666666 | 4          | 10        
+INIT(POST /oteldemo.CartService/AddItem) | 0.023255813953488372 | 0.016666666666666666 | 7          | 10        
+INIT(POST /oteldemo.CartService/GetCart) | 0.0033333333333333335 | 0.006666666666666667 | 1          | 4         
+LAST(calculate-quote)     | 0.013289036544850499 | 0.016666666666666666 | 4          | 10        
+LAST(executing api route (pages) /api/cart) | 0.11666666666666667 | 0.08       | 35         | 48        
+LAST(executing api route (pages) /api/currency) | 0.09       | 0.05333333333333334 | 27         | 32        
+LAST(executing api route (pages) /api/data) | 0.21666666666666667 | 0.24166666666666667 | 65         | 145       
+LAST(executing api route (pages) /api/products) | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+LAST(executing api route (pages) /api/products/[productId]) | 0.03986710963455149 | 0.08319467554076539 | 12         | 50        
+LAST(executing api route (pages) /api/shipping) | 0.09302325581395349 | 0.06821963394342762 | 28         | 41        
+LAST(EXPIRE)              | 0.023255813953488372 | 0.016666666666666666 | 7          | 10        
+LAST(GET /api/cart)       | 0.08637873754152824 | 0.056572379367720464 | 26         | 34        
+LAST(GET /api/currency)   | 0.09       | 0.05333333333333334 | 27         | 32        
+LAST(GET /api/data)       | 0.21666666666666667 | 0.24166666666666667 | 65         | 145       
+LAST(GET /api/products)   | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+LAST(GET /api/products/1YMWWN1N4O) | 0.009966777408637873 | 0.011647254575707155 | 3          | 7         
+LAST(GET /api/products/2ZYFJ3GM2N) | 0.006666666666666667 | 0.006666666666666667 | 2          | 4         
+LAST(GET /api/products/66VCHSJNUP) | 0.006644518272425249 | 0.013333333333333334 | 2          | 8         
+LAST(GET /api/products/L9ECAV7KIM) | 0.0033333333333333335 | 0.006666666666666667 | 1          | 4         
+LAST(GET /api/products/LS4PSXUNUM) | 0.01       | 0.011666666666666667 | 3          | 7         
+LAST(GET /api/products/OLJCESPC7Z) | 0.0033222591362126247 | 0.008319467554076539 | 1          | 5         
+LAST(GET /api/shipping)   | 0.09302325581395349 | 0.06821963394342762 | 28         | 41        
+LAST(HGET)                | 0.026578073089700997 | 0.023333333333333334 | 8          | 14        
+LAST(HMSET)               | 0.023255813953488372 | 0.016638935108153077 | 7          | 10        
+LAST(oteldemo.AdService/GetAds) | 0.2159468438538206 | 0.24126455906821964 | 65         | 145       
+LAST(oteldemo.CartService/AddItem) | 0.029900332225913623 | 0.023333333333333334 | 9          | 14        
+LAST(oteldemo.CartService/GetCart) | 0.11627906976744186 | 0.07986688851913477 | 35         | 48        
+LAST(oteldemo.CurrencyService/Convert) | 0.09302325581395349 | 0.06988352745424292 | 28         | 42        
+LAST(oteldemo.CurrencyService/GetSupportedCurrencies) | 0.09       | 0.05333333333333334 | 27         | 32        
+LAST(oteldemo.ProductCatalogService/GetProduct) | 0.03986710963455149 | 0.09650582362728785 | 12         | 58        
+LAST(oteldemo.ProductCatalogService/ListProducts) | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+LAST(oteldemo.ShippingService/GetQuote) | 0.09302325581395349 | 0.06821963394342762 | 28         | 41        
+LAST(POST /api/cart)      | 0.03       | 0.023333333333333334 | 9          | 14        
+LAST(resolve page components) | 0.2633333333333333 | 0.13166666666666665 | 79         | 79        
+SUCCESSION(GET, executing api route (pages) /api/cart) | 0.08637873754152824 | 0.056572379367720464 | 26         | 34        
+SUCCESSION(GET, executing api route (pages) /api/currency) | 0.08970099667774087 | 0.05324459234608985 | 27         | 32        
+SUCCESSION(GET, executing api route (pages) /api/data) | 0.21666666666666667 | 0.24166666666666667 | 65         | 145       
+SUCCESSION(GET, executing api route (pages) /api/products) | 0.09302325581395349 | 0.17803660565723795 | 28         | 107       
+SUCCESSION(GET, executing api route (pages) /api/products/[productId]) | 0.03986710963455149 | 0.08333333333333333 | 12         | 50        
+SUCCESSION(GET, executing api route (pages) /api/shipping) | 0.09302325581395349 | 0.06833333333333333 | 28         | 41        
+SUCCESSION(GET, resolve page components) | 0.2633333333333333 | 0.13166666666666665 | 79         | 79        
+SUCCESSION(POST, executing api route (pages) /api/cart) | 0.03       | 0.023333333333333334 | 9          | 14        
+SUCCESSION(POST /getquote, calculate-quote) | 0.013289036544850499 | 0.016638935108153077 | 4          | 10        
+
+Common constraints minor changes (< 0.1): 102
+Common constraints changed (> 0.1):   146
+
+file dynatrace_s1.json contains 0 constraints that only occur here
+
+file dynatrace_s2.json contains 29 constraints that only occur here
+
+Constraints only in file (dynatrace_s1.json):
+None
+
+Constraints only in file (dynatrace_s2.json):
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /api/products/0PUK6V6EV0, executing api route (pages) /api/products/[productId])",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.196102",
+  "updateDate": "2025-06-21T17:02:31.196103"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /api/products/6E92ZMYYFZ, executing api route (pages) /api/products/[productId])",
+  "probability": 0.009983361064891847,
+  "nr": 6,
+  "insertDate": "2025-06-21T17:02:31.196011",
+  "updateDate": "2025-06-21T17:02:31.196012"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /api/products/9SIQT8TOJO, executing api route (pages) /api/products/[productId])",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.195517",
+  "updateDate": "2025-06-21T17:02:31.195518"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /api/products/HQTGWGPNH4, executing api route (pages) /api/products/[productId])",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194699",
+  "updateDate": "2025-06-21T17:02:31.194699"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /api/products/0PUK6V6EV0)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194438",
+  "updateDate": "2025-06-21T17:02:31.194439"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /api/products/6E92ZMYYFZ)",
+  "probability": 0.01,
+  "nr": 6,
+  "insertDate": "2025-06-21T17:02:31.19623",
+  "updateDate": "2025-06-21T17:02:31.196231"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /api/products/9SIQT8TOJO)",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194928",
+  "updateDate": "2025-06-21T17:02:31.194929"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /api/products/HQTGWGPNH4)",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194087",
+  "updateDate": "2025-06-21T17:02:31.194088"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.AdService/GetAds, io.grpc.stub.ServerCalls$UnaryServerCallHandler$UnaryServerCallListener.onHalfClose)",
+  "probability": 0.05333333333333334,
+  "nr": 32,
+  "insertDate": "2025-06-21T17:02:31.196394",
+  "updateDate": "2025-06-21T17:02:31.196394"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/cart, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016638935108153079,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:02:31.193902",
+  "updateDate": "2025-06-21T17:02:31.193904"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/cart, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.013311148086522463,
+  "nr": 8,
+  "insertDate": "2025-06-21T17:02:31.193275",
+  "updateDate": "2025-06-21T17:02:31.193279"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/products/0PUK6V6EV0, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.195123",
+  "updateDate": "2025-06-21T17:02:31.195124"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/products/6E92ZMYYFZ, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.01,
+  "nr": 6,
+  "insertDate": "2025-06-21T17:02:31.196479",
+  "updateDate": "2025-06-21T17:02:31.19648"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/products/9SIQT8TOJO, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.195836",
+  "updateDate": "2025-06-21T17:02:31.195837"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/products/HQTGWGPNH4, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.196314",
+  "updateDate": "2025-06-21T17:02:31.196315"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016638935108153079,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:02:31.195372",
+  "updateDate": "2025-06-21T17:02:31.195373"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.013333333333333334,
+  "nr": 8,
+  "insertDate": "2025-06-21T17:02:31.195209",
+  "updateDate": "2025-06-21T17:02:31.19521"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016638935108153079,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:02:31.19575",
+  "updateDate": "2025-06-21T17:02:31.195751"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(GET /api/products/0PUK6V6EV0)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194228",
+  "updateDate": "2025-06-21T17:02:31.194228"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(GET /api/products/6E92ZMYYFZ)",
+  "probability": 0.01,
+  "nr": 6,
+  "insertDate": "2025-06-21T17:02:31.196566",
+  "updateDate": "2025-06-21T17:02:31.196567"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(GET /api/products/9SIQT8TOJO)",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.195669",
+  "updateDate": "2025-06-21T17:02:31.19567"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(GET /api/products/HQTGWGPNH4)",
+  "probability": 0.004991680532445923,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.19503",
+  "updateDate": "2025-06-21T17:02:31.195031"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(io.grpc.stub.ServerCalls$UnaryServerCallHandler$UnaryServerCallListener.onHalfClose)",
+  "probability": 0.05333333333333334,
+  "nr": 32,
+  "insertDate": "2025-06-21T17:02:31.19434",
+  "updateDate": "2025-06-21T17:02:31.194341"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "INIT(oteldemo.AdService/GetAds)",
+  "probability": 0.05324459234608985,
+  "nr": 32,
+  "insertDate": "2025-06-21T17:02:31.194536",
+  "updateDate": "2025-06-21T17:02:31.194537"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(GET /api/products/0PUK6V6EV0)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.195293",
+  "updateDate": "2025-06-21T17:02:31.195293"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(GET /api/products/6E92ZMYYFZ)",
+  "probability": 0.009983361064891847,
+  "nr": 6,
+  "insertDate": "2025-06-21T17:02:31.195446",
+  "updateDate": "2025-06-21T17:02:31.195446"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(GET /api/products/9SIQT8TOJO)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194618",
+  "updateDate": "2025-06-21T17:02:31.194618"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(GET /api/products/HQTGWGPNH4)",
+  "probability": 0.005,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:02:31.194808",
+  "updateDate": "2025-06-21T17:02:31.194809"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(io.grpc.stub.ServerCalls$UnaryServerCallHandler$UnaryServerCallListener.onHalfClose)",
+  "probability": 0.05333333333333334,
+  "nr": 32,
+  "insertDate": "2025-06-21T17:02:31.195596",
+  "updateDate": "2025-06-21T17:02:31.195597"
+}

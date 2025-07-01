@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
     Box,
     Button,
@@ -16,12 +16,12 @@ import {
 import RestService from "@/app/lib/RestService";
 import Typography from "@mui/material/Typography";
 import JsonView from "@/app/ui/json/JsonView";
-import {AxiosResponse} from "axios";
-import {defaultSourceDetails, SourceDetails} from "@/app/lib/Util";
+import { AxiosResponse } from "axios";
+import { defaultSourceDetails, SourceDetails } from "@/app/lib/Util";
 import Statistics from "@/app/ui/Statistics";
-import {ProbDeclare, ProbDeclareConstraint, ProbDeclareInfo} from "@/app/lib/probDeclare";
+import { ProbDeclare, ProbDeclareConstraint, ProbDeclareInfo } from "@/app/lib/probDeclare";
 import DeclareView from "@/app/ui/DeclareView";
-import {sort} from "next/dist/build/webpack/loaders/css-loader/src/utils";
+import { sort } from "next/dist/build/webpack/loaders/css-loader/src/utils";
 
 interface ProbDeclareViewProps {
     sourceFile: string;
@@ -54,7 +54,7 @@ function formatDateArray(date): string {
         nanoseconds;
 }
 
-const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclareViewProps) => {
+const ProbDeclareView = ({ sourceFile, expectedTraces, closeCallBack }: ProbDeclareViewProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [initialized, setInitialized] = useState<boolean>(false);
     const [probDeclare, setProbDeclare] = useState<ProbDeclare | null>(null);
@@ -88,8 +88,8 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const setPaused = (paused: boolean) => {
         setProbDeclare((prev) => ({
             ...prev!,
-                paused: paused
-            }
+            paused: paused
+        }
         ));
     }
 
@@ -301,7 +301,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             c.probability = c.nr / cloneTracesProcessed;
         })
         if (!found) {
-            clone.push({declareTemplate, nr: seedNrTraces, probability: seedNrTraces / cloneTracesProcessed})
+            clone.push({ declareTemplate, nr: seedNrTraces, probability: seedNrTraces / cloneTracesProcessed })
         }
     }
 
@@ -316,7 +316,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             console.error("generation active -> pause or finish first!");
             return;
         }
-        let clone: ProbDeclareConstraint[] = probDeclare?.constraints.map(c => ({...c}));
+        let clone: ProbDeclareConstraint[] = probDeclare?.constraints.map(c => ({ ...c }));
         let cloneTracesProcessed = probDeclare.tracesProcessed;
         cloneTracesProcessed += seedNrTraces;
         seededDeclareModel.forEach(dt => addDeclare(clone, cloneTracesProcessed, dt));
@@ -338,7 +338,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     }
 
     const evaluateSeedingResult = () => {
-        const sortFn = (a:ProbDeclareConstraint, b:ProbDeclareConstraint) => b.declareTemplate.localeCompare(a.declareTemplate);
+        const sortFn = (a: ProbDeclareConstraint, b: ProbDeclareConstraint) => b.declareTemplate.localeCompare(a.declareTemplate);
         const expected = expectedSeededResult.toSorted(sortFn);
         const actual = probDeclare!.constraints!.toSorted(sortFn);
         if (expected.length !== actual.length) {
@@ -346,7 +346,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             return;
         }
 
-        const diff: {actual: ProbDeclareConstraint, expected: ProbDeclareConstraint}[] = [];
+        const diff: { actual: ProbDeclareConstraint, expected: ProbDeclareConstraint }[] = [];
         for (let i = 0; i < expected.length; i++) {
             if (expected[i].probability !== actual[i].probability
                 || expected[i].nr !== actual[i].nr
@@ -356,7 +356,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                 // console.log(expected[i]);
                 // console.log("actual:");
                 // console.log(actual[i]);
-                diff.push({expected: expected[i], actual: actual[i]})
+                diff.push({ expected: expected[i], actual: actual[i] })
             }
         }
         console.log("diff:");
@@ -432,7 +432,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const renderExistingModels = () => {
         return loadingExistingModels ? (renderLoadingIndicator()) : (existingModels && (
             <TableContainer component={Paper}>
-                <Table sx={{minWidth: 650}} size="small" aria-label="existing models">
+                <Table sx={{ minWidth: 650 }} size="small" aria-label="existing models">
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -447,23 +447,23 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {existingModels.map((row:ProbDeclareInfo) => (
-                            <TableRow key={row.id} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                      onClick={() => handleRowClick(row)}>
-                                    <TableCell component="th" scope="row">
-                                        {row.id}
-                                    </TableCell>
-                                    <TableCell>
-                                        {formatDateArray(row.insertDate)}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.updateDate.toString()}
-                                    </TableCell>
-                                    <TableCell>
-                                        {mapBoolToString(row.generating)}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                        {existingModels.map((row: ProbDeclareInfo) => (
+                            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                onClick={() => handleRowClick(row)}>
+                                <TableCell component="th" scope="row">
+                                    {row.id}
+                                </TableCell>
+                                <TableCell>
+                                    {formatDateArray(row.insertDate)}
+                                </TableCell>
+                                <TableCell>
+                                    {formatDateArray(row.updateDate)}
+                                </TableCell>
+                                <TableCell>
+                                    {mapBoolToString(row.generating)}
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -473,7 +473,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const renderProbDeclare = () => {
         return probDeclare && (
             <TableContainer component={Paper}>
-                <Table sx={{minWidth: 650}} size="small" aria-label="current model">
+                <Table sx={{ minWidth: 650 }} size="small" aria-label="current model">
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -491,7 +491,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                             .map((row) => (
                                 <TableRow
                                     key={row.declareTemplate}
-                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell align="right">{row.probability}</TableCell>
                                     <TableCell component="th" scope="row">
@@ -508,7 +508,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     const renderLoadingIndicator = () => {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                <CircularProgress/>
+                <CircularProgress />
             </Box>
         );
     }
@@ -519,11 +519,11 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                 <Box>
                     <Typography variant="h5">Seed Model</Typography>
                     <TextField id={'nr-traces-seed'} label={'Nr. Traces'} defaultValue={seedNrTraces}
-                               type={'number'} variant={'standard'} onChange={onSeedNrTracesChanged}
-                               disabled={calculatingSeededResult}/>
+                        type={'number'} variant={'standard'} onChange={onSeedNrTracesChanged}
+                        disabled={calculatingSeededResult} />
                     <TextField id={'trace-id-seed'} label={'Trace Id'} defaultValue={seedTraceId}
-                               variant={'standard'} onChange={onSeedTraceIdChanged}
-                               disabled={calculatingSeededResult}/>
+                        variant={'standard'} onChange={onSeedTraceIdChanged}
+                        disabled={calculatingSeededResult} />
                     <Button variant={"contained"} onClick={onClickGenerateDeclareModelForSeed}>
                         generate declare Model
                     </Button>
@@ -533,41 +533,41 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                         aria-label="minimum height"
                         minRows={20}
                         placeholder="Enter Spans List"
-                        style={{width: "50%"}}
+                        style={{ width: "50%" }}
                         onChange={onSeedSpansChanged}
                         disabled={calculatingSeededResult}
                     />
                     <Box width={"50%"}>
-                        {seededDeclareModel && <DeclareView rawData={seededDeclareModel}/>}
+                        {seededDeclareModel && <DeclareView rawData={seededDeclareModel} />}
                     </Box>
                 </Grid2>
                 <Box>
                     <Button variant={'contained'} onClick={calculateExpectedSeededResult}
-                            disabled={calculatingSeededResult}>
+                        disabled={calculatingSeededResult}>
                         calculate expected result
                     </Button>
                     <Button variant={'contained'}
-                            onClick={() => setShowExpectedSeededResult(!showExpectedSeededResult)}>
+                        onClick={() => setShowExpectedSeededResult(!showExpectedSeededResult)}>
                         show expected seeded result
                     </Button>
-                    {showExpectedSeededResult && <JsonView data={expectedSeededResult}/>}
+                    {showExpectedSeededResult && <JsonView data={expectedSeededResult} />}
                     <Button variant={'contained'} onClick={initSeeding}
-                            disabled={expectedSeededResult.length === 0}>
+                        disabled={expectedSeededResult.length === 0}>
                         seed
                     </Button> {/*TODO move up*/}
                     <Button variant={'contained'} onClick={evaluateSeedingResult}
-                            disabled={expectedSeededResult.length === 0}>
+                        disabled={expectedSeededResult.length === 0}>
                         evaluate seeding result
                     </Button> {/*TODO move up*/}
                     <Typography>seeding evaluation result: {seedingEvaluationSuccessful ? "SUCCESS" : "FAILURE"}</Typography>
-                    {seedingResultReady && <Typography>
+                    {/* {seedingResultReady && <Typography>
                         Expected === Actual:
                         {expectedSeededResult
                             .toSorted((a, b) => b.probability - a.probability)
-                        === probDeclare?.constraints!
-                            .toSorted((a, b) => b.probability - a.probability)
+                            === probDeclare?.constraints!
+                                .toSorted((a, b) => b.probability - a.probability)
                             ? "true" : "false"}
-                    </Typography>}
+                    </Typography>} */}
                 </Box>
             </Box>
         )
@@ -576,14 +576,14 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
     return (
         <>
             <Box>
-            <Typography variant="h4">Prob Declare Modell for {sourceFile}</Typography>
+                <Typography variant="h4">Prob Declare Modell for {sourceFile}</Typography>
                 <Box>
                     <Typography variant="h5">Existing Models</Typography>
                     <Button variant={'contained'} onClick={showExistingModels}>
                         show existing models
                     </Button>
                     <Button variant={'contained'} onClick={loadExistingModel}
-                            disabled={selectedProbDeclareInfo === null}>
+                        disabled={selectedProbDeclareInfo === null}>
                         load existing model
                     </Button>
                     {renderExistingModels()}
@@ -594,22 +594,22 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                         start
                     </Button>
                     <Button variant={'contained'} onClick={pause}
-                            disabled={probDeclare?.paused || aborting || !probDeclare?.generating}>
+                        disabled={probDeclare?.paused || aborting || !probDeclare?.generating}>
                         pause
                     </Button>
                     <Button variant={'contained'} onClick={resume}
-                            disabled={!probDeclare?.paused || aborting || !probDeclare?.generating}>
+                        disabled={!probDeclare?.paused || aborting || !probDeclare?.generating}>
                         resume
                     </Button>
                     <Button variant={'contained'} onClick={abort}
-                            disabled={aborting || !initialized/*|| !probDeclare?.generating*/}>
+                        disabled={aborting || !initialized/*|| !probDeclare?.generating*/}>
                         abort
                     </Button>
                     <Button variant={'contained'} onClick={reset}>
                         reset
                     </Button>
                     <Button variant={'contained'} onClick={close}
-                            disabled={aborting || probDeclare?.generating && !probDeclare?.paused}>
+                        disabled={aborting || probDeclare?.generating && !probDeclare?.paused}>
                         close
                     </Button>
                 </Box>
@@ -621,24 +621,24 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                         <Box>
                             <Typography variant="h5">Paging Options</Typography>
                             <TextField id={'start_page'} label={'Start Page (>=0)'} defaultValue={sourceDetails.page}
-                                       type={'number'} variant={'standard'} onChange={onStartPageChanged}
-                                       disabled={probDeclare !== null}/>
+                                type={'number'} variant={'standard'} onChange={onStartPageChanged}
+                                disabled={probDeclare !== null} />
                             <TextField id={'page_size'} label={'Page Size'} defaultValue={sourceDetails.size}
-                                       type={'number'} variant={'standard'} onChange={onPageSizeChanged}
-                                       disabled={probDeclare !== null}/>
+                                type={'number'} variant={'standard'} onChange={onPageSizeChanged}
+                                disabled={probDeclare !== null} />
                             <TextField id={'expected_traces'} label={'Expected Traces'} defaultValue={expectedTraces}
-                                       type={'number'} variant={'standard'} onChange={onActualExpectedTracesChanged}
-                                       disabled={probDeclare !== null}/>
+                                type={'number'} variant={'standard'} onChange={onActualExpectedTracesChanged}
+                                disabled={probDeclare !== null} />
 
                         </Box>
                         <Box>
                             <Typography variant="h5">Segmentation (Evaluation only)</Typography>
                             <TextField id={'nr_segments'} label={'Nr Segments'} defaultValue={nrSegments}
-                                       type={'number'} variant={'standard'} onChange={onNrSegmentsChanged}
-                                       disabled={probDeclare !== null}/>
+                                type={'number'} variant={'standard'} onChange={onNrSegmentsChanged}
+                                disabled={probDeclare !== null} />
                             <TextField id={'segment_size'} label={'Segment Size'} defaultValue={segmentSize}
-                                       type={'number'} variant={'standard'} onChange={onSegmentSizeChanged}
-                                       disabled={probDeclare !== null}/>
+                                type={'number'} variant={'standard'} onChange={onSegmentSizeChanged}
+                                disabled={probDeclare !== null} />
                         </Box>
                     </>
                 )}
@@ -648,7 +648,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
                 {showStatistics &&
                     <Box>
                         <Typography variant="h5">Statistics</Typography>
-                        {probDeclare?.constraints! && <Statistics constraints={probDeclare.constraints}/>}
+                        {probDeclare?.constraints! && <Statistics constraints={probDeclare.constraints} />}
                     </Box>}
                 <Button variant={'contained'} onClick={() => setShowSeedView(!showSeedView)}>
                     show seeding options
@@ -659,7 +659,7 @@ const ProbDeclareView = ({sourceFile, expectedTraces, closeCallBack}: ProbDeclar
             <Button variant={'contained'} onClick={() => setShowRawData(!showRawData)}>
                 show raw data
             </Button>
-            {showRawData && <JsonView data={probDeclare}/>}
+            {showRawData && <JsonView data={probDeclare} />}
         </>
     );
 };

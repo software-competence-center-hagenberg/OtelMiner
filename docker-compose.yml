@@ -50,6 +50,8 @@ services:
     depends_on:
       - database
   trace-receiver:
+    environment:
+      NR_THREADS: 100
     user: "1000:1000"
     cap_drop:
       - ALL
@@ -85,7 +87,7 @@ services:
       - rabbitmq-server
     deploy:
       mode: replicated
-      replicas: 4
+      replicas: 10
   # otel-generator:
   #   image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
   #   command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318 --traces 1" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"

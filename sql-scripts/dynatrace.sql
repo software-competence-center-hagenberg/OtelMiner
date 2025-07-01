@@ -6,6 +6,8 @@ delete from prob_declare where id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
 ALTER TABLE public."declare" 
 ALTER COLUMN constraint_template TYPE varchar(500);
 
+select * from prob_declare where id = '4846df24-1291-45d3-85bf-c8c023cb357d';
+
 ---------------------------------------------------------------------------------
 SELECT 
     COUNT(DISTINCT t.id) AS nr_traces,
@@ -22,14 +24,27 @@ WHERE
 ---------------------------------------------------------------------------------
 
 SELECT 
-    FLOOR(EXTRACT(EPOCH FROM (update_date - insert_date)) / 60) AS difference_minutes,
-    FLOOR(EXTRACT(EPOCH FROM (update_date - insert_date)) % 60) AS difference_seconds,
-    FLOOR((EXTRACT(EPOCH FROM (update_date - insert_date)) * 1000) % 1000) AS difference_milliseconds
-from prob_declare where id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7';
+    id,
+    insert_date,
+    update_date,
+    (update_date - insert_date) AS duration,
+    EXTRACT(EPOCH FROM (update_date - insert_date)) AS duration_seconds
+FROM prob_declare pd
+WHERE NOT generating
+  AND EXISTS (
+      SELECT 1 
+      FROM prob_declare_to_trace pdt
+      INNER JOIN trace t ON pdt.trace_id = t.id
+      WHERE pdt.prob_declare_id = pd.id
+        AND t.source_file like '%AstroShop%'
+  )
+ORDER BY insert_date ASC;
 
 ---------------------------------------------------------------------------------
-select count(*) from declare where prob_declare_id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7';
 
+select count(*) from trace where source_file like '%AstroShop%';
+select count(*) from span where trace_id in (select id from trace where source_file like '%AstroShop%');
+select count(*) from declare where prob_declare_id = '38e54284-2779-40fb-b994-c239e1cbe817';
 ---------------------------------------------------------------------------------
 SELECT 
     CASE 
