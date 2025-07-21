@@ -24,12 +24,12 @@ let test_map_relations _ =
   let expected_relations =
     DeclareSet.of_list
       [
-        ALTERNATE_SUCCESSION ("a", "b");
-        ALTERNATE_SUCCESSION ("a", "c");
+        ALTERNATE_PRECEDENCE ("a", "b");
+        ALTERNATE_PRECEDENCE ("a", "c");
         CHAIN_SUCCESSION ("b", "c");
         CHAIN_SUCCESSION ("d", "e");
-        PRECEDENCE ("a", "d");
-        PRECEDENCE ("a", "e");
+        SUCCESSION ("a", "d");
+        SUCCESSION ("a", "e");
         SUCCESSION ("b", "d");
         SUCCESSION ("b", "e");
         SUCCESSION ("c", "d");
