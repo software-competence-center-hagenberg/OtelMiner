@@ -21,9 +21,9 @@ let rec find_next_a_or_b a b = function
  * For every miss (h != cur), first the abortion_predicate is checked, if it is 
  * NOT fulfilled the find_next_function is applied to retrieve the next 
  * starting point of the list to continue check. Then the 
- * continuation_predicate is applied to the result of the list and if 
- * fulfilled, the search continous.
- * Finally, when the list is empty the found_predicate is checked and its 
+ * continuation_predicate is applied to the result of the list and, if 
+ * fulfilled, the search continuous.
+ * Finally, when the list is empty, the found_predicate is checked and its 
  * result determines if the relation is fulfilled or not.
  *------------------------------------------------------------------------------
  * Input:
