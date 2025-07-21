@@ -51,7 +51,7 @@ services:
       - database
   trace-receiver:
     environment:
-      NR_THREADS: 100
+      NR_THREADS: 10
     user: "1000:1000"
     cap_drop:
       - ALL

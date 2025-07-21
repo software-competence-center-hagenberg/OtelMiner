@@ -13,16 +13,18 @@ let rec find_next_a_or_b a b = function
 
 (*
  *------------------------------------------------------------------------------
- * Generic function to determine if a and b are in a relation.
- * General algorithm a and b are occuring the same list and in order to find if
- * they fulfill a specific relation the list needs to be traversed and apply
- * checks at certain points that lead to an abortion or a continuation.
+ * Generic function to determine in which relation two activities (a and b), 
+ * are in a given list of activities.
  * Every time the current value is equal to the head of the list to check
- * traverse, the counter (cnt) is incremented by 1. For every miss (h != cur),
- * first the abortion_predicate is checked, if it is NOT fulfilled the
- * find_next_function is applied to retrieve the next starting point of the
- * list to continue check. Then the continuation_predicate is applied to the
- * result of the list and if fulfilled the algorithm continous.
+ * traverse, the counter (cnt) is incremented by 1 and the a and b are 
+ * switched. 
+ * For every miss (h != cur), first the abortion_predicate is checked, if it is 
+ * NOT fulfilled the find_next_function is applied to retrieve the next 
+ * starting point of the list to continue check. Then the 
+ * continuation_predicate is applied to the result of the list and if 
+ * fulfilled, the search continous.
+ * Finally, when the list is empty the found_predicate is checked and its 
+ * result determines if the relation is fulfilled or not.
  *------------------------------------------------------------------------------
  * Input:
  * a ... activity

@@ -2,13 +2,13 @@ open Opentelemetry_proto
 open Util
 open Activity
 
-(* 
+(*
  * Checks which DECLARE constraint applies to a b in activities. Checks in
  * descending order what applies. If CHAIN_SUCCESSI0N applies, then all the
  * other constraints apply anyway. IF not, then CHAIN_RESPONSE or
  * CHAIN_PRECEDENCE can still apply. If no chain constraints apply, then the
  * alternate constraints can still apply. Again if ALTERNATE_SUCCESSION
- * applies, then all the beneath apply anyway. 
+ * applies, then all the beneath apply anyway.
  *)
 let determine_relation (a : string) (b : string) (activities : string list) :
     Declare.t option =
@@ -29,7 +29,7 @@ let determine_relation (a : string) (b : string) (activities : string list) :
   else if is_precedence a b activities then Some (Declare.PRECEDENCE (a, b))
   else None
 
-(* 
+(*
  * Helper function to get the next activity to be checked as well as the rest
  * of the list after that. An activity to be checked is found if it is not a
  * member of the set of already checked activities.
@@ -45,7 +45,7 @@ let rec get_next_to_check (activities : string list) (checked : StringSet.t) :
 (*
  * Function that maps a given list of activities to a set of DECLARE relation
  * constraints.
- * Maps each combination of activities 
+ * Maps each combination of activities
  *)
 let map_relations (activities : string list) : DeclareSet.t =
   let rec map_relations_aux a ax tmp checked acc =
@@ -61,9 +61,7 @@ let map_relations (activities : string list) : DeclareSet.t =
                 StringSet.(checked |> add a)
                 acc)
     | b :: t -> (
-        if
-          (* FIXME: for now case a = b not handled -> explicit impl if necessary *)
-          b = a
+        if b = a
         then map_relations_aux a t tmp checked acc
         else
           match determine_relation a b activities with
@@ -75,9 +73,9 @@ let map_relations (activities : string list) : DeclareSet.t =
   map_relations_aux (List.hd activities) activities [] StringSet.empty
     DeclareSet.empty
 
-(* 
+(*
  * Function that maps a given list of activities which are expected to be
- * siblings to the DECLARE choice constraint 
+ * siblings to the DECLARE choice constraint
  *)
 let map_choices (activities : string list) : DeclareSet.t =
   if activities = [] then DeclareSet.empty
@@ -112,7 +110,7 @@ let extract_activites (nodes : Span_tree.span_tree_node list) =
  *)
 type mapping_conf = {
   p : string list; (* tree traversal path [a(n-1), a(n-2), a(n-3), ..., a0] *)
-  a : StringSet.t; (* activities FIXME change to Hashtbl with int counter! *)
+  a : StringSet.t; (* activities *)
   c : DeclareSet.t; (* Set of all constraints *)
 }
 
@@ -159,9 +157,9 @@ let configure_child (node : Span_tree.span_tree_node) (conf : mapping_conf) :
     c = DeclareSet.union conf.c constraints;
   }
 
-(* 
+(*
  * Creates an DECLARE existence constraint for each discovered activity and
- * adds it to the given set of constraints. 
+ * adds it to the given set of constraints.
  *)
 let add_existence (activities : StringSet.t) (constraints : DeclareSet.t) =
   let existence =
@@ -190,7 +188,7 @@ let map_to_declare (root : Span_tree.span_tree_node) : Declare.t list =
 
 (* Takes a list of span_trees and
  * maps each tree to list of DECLARE constraints which reperesent the DECLARE
- * model of that tree 
+ * model of that tree
  *)
 let create_declare_constraints (span_trees : Span_tree.span_tree_node list) :
     Declare.t list list =
@@ -202,8 +200,8 @@ let create_declare_constraints (span_trees : Span_tree.span_tree_node list) :
   in
   create_declare_constraints_aux span_trees (fun x -> x)
 
-(* 
- * Main function for mapping a list of resource spans toi their DECLARE mdoel
+(*
+ * Main function for mapping a list of resource spans to their DECLARE mdoel
  * representations
  *)
 let convert_resource_spans (resource_spans : Trace.resource_spans list) :

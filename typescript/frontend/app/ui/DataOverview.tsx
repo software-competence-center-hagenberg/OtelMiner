@@ -127,18 +127,12 @@ const DataOverview: React.FC = () => {
     }
 
     return (
-        <Grid2 container spacing={2} columns={12}>
-            <Grid2 size={3}>
-                <Typography variant="h3">Overview</Typography>
-                {renderDataOverview()}
-            </Grid2>
-            <Grid2 size={"grow"}>
                 <Box height="100%">
+                    <Typography variant="h3">Overview</Typography>
+                    {renderDataOverview()}
                     {sourceFile && !generatingProbDeclare && <TraceDetailsView sourceFile={sourceFile}/>}
                     {sourceFile && generatingProbDeclare && <ProbDeclareView sourceFile={sourceFile} expectedTraces={nrTraces!} closeCallBack={() => setGeneratingProbDeclare(false)}/>}
                 </Box>
-            </Grid2>
-        </Grid2>
     );
 };
 
