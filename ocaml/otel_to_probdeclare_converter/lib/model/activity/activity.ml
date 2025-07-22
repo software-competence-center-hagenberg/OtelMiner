@@ -72,9 +72,9 @@ let is_relation (a : string) (b : string) (activities : string list)
 let is_succession (a : string) (b : string) (activities : string list) =
   is_relation a b activities
     (fun cnt cur h t -> (cnt = 0 && h = b) || (cur = b && find_next b t = []))
-    (fun cur t -> find_next cur t)
+    (fun _cur t -> find_next_a_or_b a b t)
     (fun _next _cur -> true)
-    (fun cnt -> cnt >= 2 && cnt mod 2 = 0)
+    (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
 (* Checks if a and b are fulfilling the response declare constraint *)
 let is_response (a : string) (b : string) (activities : string list) : bool =
@@ -82,13 +82,13 @@ let is_response (a : string) (b : string) (activities : string list) : bool =
     (fun _cnt cur _h t -> cur = b && find_next b t = [])
     (fun cur t -> find_next cur t)
     (fun _next _cur -> true)
-    (fun cnt -> cnt >= 2 && cnt mod 2 = 0)
+    (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
 (* Checks if a and b are fulfilling the precedence declare constraint *)
 let is_precedence (a : string) (b : string) (activities : string list) : bool =
   is_relation a b activities
     (fun cnt _cur h _t -> cnt = 0 && h = b)
-    (fun cur t -> find_next cur t)
+    (fun _cur t -> find_next_a_or_b a b t)
     (fun _next _cur -> true)
     (fun cnt -> cnt >= 2)
 
@@ -138,17 +138,17 @@ let is_chain_response (a : string) (b : string) (activities : string list) :
   is_relation a b activities
     (fun _cnt cur _h _t -> cur = b)
     (fun _cur t -> find_next a t)
-    (fun next _cur -> next <> [])
+    (fun _next _cur -> true)
     (fun cnt -> cnt > 0 && cnt mod 2 = 0)
 
 (* Checks if a and b are fulfilling the chain precedence declare constraint *)
 (*let is_chain_precedence (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
-    (fun _cnt cur h t -> cur = a && h = b || not (h = a) && List.hd t = b)
+    (fun _cnt cur h t -> (cur = a && h = b) || (t <> [] && not (h = a) && List.hd t = b))
     (fun _cur t -> find_next_a_or_b a b t)
     (fun next _cur -> List.hd next = a)
-    (fun cnt -> cnt > 0 && cnt mod 2 = 0)*)
+    (fun cnt -> cnt >= 2)*)
 let is_chain_precedence (a : string) (b : string) (activities : string list) :
     bool =
   let rec aux cnt = function
