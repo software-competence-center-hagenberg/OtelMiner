@@ -67,6 +67,10 @@ let test_is_chain_response _ =
     (is_chain_response "a" "b" [ "a"; "b"; "c" ]);
   assert_bool "Chain response should be true"
     (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain response should be true"
+    (is_chain_response "a" "b" [ "b"; "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain response should be true"
+    (is_chain_response "a" "b" [ "b"; "a"; "b"; "b"; "c"; "d"; "a"; "b" ]);
   assert_bool "Chain response should be false"
     (not (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
   assert_bool "Chain response should be false"
@@ -76,9 +80,11 @@ let test_is_chain_precedence _ =
   assert_bool "Chain precedence should be true"
     (is_chain_precedence "a" "b" [ "a"; "b"; "c" ]);
   assert_bool "Chain precedence should be true"
-    (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+    (is_chain_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain precedence should be true"
+    (is_chain_precedence "a" "b" [ "a"; "a"; "b"; "c"; "d"; "a"; "b" ]);
   assert_bool "Chain precedence should be false"
-    (not (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
+    (not (is_chain_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
   assert_bool "Chain precedence should be false"
     (not (is_chain_precedence "a" "b" [ "a"; "c"; "b" ]))
 
