@@ -71,15 +71,15 @@ let is_relation (a : string) (b : string) (activities : string list)
 (* Checks if a and b are fulfilling the succession declare constraint *)
 let is_succession (a : string) (b : string) (activities : string list) =
   is_relation a b activities
-    (fun cnt cur h t -> (cnt = 0 && h = b) || (cur = b && (find_next b t) = []))
+    (fun cnt cur h t -> (cnt = 0 && h = b) || (cur = b && find_next b t = []))
     (fun cur t -> find_next cur t)
-    (fun _next _cur ->  true)
+    (fun _next _cur -> true)
     (fun cnt -> cnt >= 2 && cnt mod 2 = 0)
 
 (* Checks if a and b are fulfilling the response declare constraint *)
 let is_response (a : string) (b : string) (activities : string list) : bool =
   is_relation a b activities
-    (fun _cnt cur _h t -> (cur = b && (find_next b t) = []))
+    (fun _cnt cur _h t -> cur = b && find_next b t = [])
     (fun cur t -> find_next cur t)
     (fun _next _cur -> true)
     (fun cnt -> cnt >= 2 && cnt mod 2 = 0)
@@ -87,12 +87,12 @@ let is_response (a : string) (b : string) (activities : string list) : bool =
 (* Checks if a and b are fulfilling the precedence declare constraint *)
 let is_precedence (a : string) (b : string) (activities : string list) : bool =
   is_relation a b activities
-    (fun cnt _cur h _t -> (cnt = 0 && h = b))
+    (fun cnt _cur h _t -> cnt = 0 && h = b)
     (fun cur t -> find_next cur t)
     (fun _next _cur -> true)
     (fun cnt -> cnt >= 2)
 
-(* 
+(*
  * Checks if a and b are fulfilling the alternate succession declare constraint
  *)
 let is_alternate_succession (a : string) (b : string) (activities : string list)
@@ -109,10 +109,10 @@ let is_alternate_response (a : string) (b : string) (activities : string list) :
   is_relation a b activities
     (fun _cnt cur h _t -> cur = b && h = a)
     (fun _cur t -> find_next_a_or_b a b t)
-    (fun next cur -> not (cur = b && (List.hd next) = a))
+    (fun next cur -> not (cur = b && List.hd next = a))
     (fun cnt -> cnt > 2 && cnt mod 2 = 0)
 
-(* 
+(*
  * Checks if a and b are fulfilling the alternate precedence declare constraint
  *)
 let is_alternate_precedence (a : string) (b : string) (activities : string list)
@@ -120,7 +120,7 @@ let is_alternate_precedence (a : string) (b : string) (activities : string list)
   is_relation a b activities
     (fun _cnt cur h _t -> cur = a && h = b)
     (fun _cur t -> find_next_a_or_b a b t)
-    (fun next cur -> not (cur = a && (List.hd next) = b))
+    (fun next cur -> not (cur = a && List.hd next = b))
     (fun cnt -> cnt > 2)
 
 (* Checks if a and b are fulfilling the chain succession declare constraint *)
