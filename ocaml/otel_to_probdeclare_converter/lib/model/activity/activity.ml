@@ -4,8 +4,8 @@ let rec find_next a = function
   | h :: t -> if h = a then h :: t else find_next a t
 
 (*
- * returns the remaining list including a or b as head, if found, 
- * else empty list
+ * returns the remaining list including a or b as head, if found, else empty
+ * list
  *)
 let rec find_next_a_or_b a b = function
   | [] -> []
@@ -13,16 +13,17 @@ let rec find_next_a_or_b a b = function
 
 (*
  *------------------------------------------------------------------------------
- * Generic function to determine in which relation two activities (a and b), 
- * are in a given list of activities.
- * Every time the current value is equal to the head of the list to check
- * traverse, the counter (cnt) is incremented by 1 and the a and b are 
- * switched. 
- * For every miss (h != cur), first the abortion_predicate is checked, if it is 
- * NOT fulfilled the find_next_function is applied to retrieve the next 
- * starting point of the list to continue check. Then the 
- * continuation_predicate is applied to the result of the list and, if 
- * fulfilled, the search continuous.
+ * generic, tail-recursive recursive function to determine the relation that 
+ * two activities (a and b) have, in a given list of activities. Every time the 
+ * currently searched value (cur) is equal to the current  head (h) of 
+ * activities, the counter (cnt) is  incremented by one and cur is switched
+ * from a to b or b to a.
+ * For every miss (h != cur), first the abortion_predicate is checked, if it is
+ * NOT fulfilled, the find_next_function is applied to retrieve the next
+ * sub-list (next) of the current tail (t) to substitute activities in the next 
+ * recursion.
+ * Then the continuation_predicate is checked and, if fulfilled, the search 
+ * continuous by stepping into a recursion with the same cur.
  * Finally, when the list is empty, the found_predicate is checked and its 
  * result determines if the relation is fulfilled or not.
  *------------------------------------------------------------------------------
@@ -30,19 +31,19 @@ let rec find_next_a_or_b a b = function
  * a ... activity
  * b ... activity
  * activities ... list of activities
- * abortion_predicate ... 
- *    a function to determine if the relation determination should be aborted. *    Expects cur, h, and t and applies the logic based on the DECLARE template
- *    definition of the specific relation
+ * abortion_predicate ...
+ *   A function to determine if the relation determination should be aborted.
+ *   Expects cnt, cur, h, and t and applies the logic based on the DECLARE
+ *   constraint template definition of the specific relation.
  * find_next_function ...
- *    a function to determine the next sub list to continue. Utilizes either
- *    find_next or find_next_a_or_b
+ *   A function to determine the next sub list to continue. Expects cur and t as
+ *   input. Usually utilizes either the function find_next or find_next_a_or_b.
  * continuation_predicate ...
- *    a function to determine if the relation determination should be continued
- *    after the find_next_function is applied. Expects next cur the recursive
- *    that should be applied in case of continuation wrapped in a function
+ *   A function to determine if the relation determination should be continued
+ *   after the find_next_function was applied. Expects next and cur as input.
  * found_predicate ...
- *    predicate to determine if the relation is true or false based on the cnt
- *    value
+ *   A function to determine if the relation is true or false based on the value
+ *   of cnt.
  *------------------------------------------------------------------------------
  *)
 let is_relation (a : string) (b : string) (activities : string list)
@@ -107,7 +108,7 @@ let is_alternate_succession (a : string) (b : string) (activities : string list)
 let is_alternate_response (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
-    (fun _cnt cur h _t -> cur = b && h = a)
+    (fun _cnt _cur h _t -> (*cur = b &&*) h = a)
     (fun _cur t -> find_next_a_or_b a b t)
     (fun next cur -> not (cur = b && List.hd next = a))
     (fun cnt -> cnt > 2 && cnt mod 2 = 0)
@@ -118,7 +119,7 @@ let is_alternate_response (a : string) (b : string) (activities : string list) :
 let is_alternate_precedence (a : string) (b : string) (activities : string list)
     : bool =
   is_relation a b activities
-    (fun _cnt cur h _t -> cur = a && h = b)
+    (fun _cnt _cur h _t -> (*cur = a &&*) h = b)
     (fun _cur t -> find_next_a_or_b a b t)
     (fun next cur -> not (cur = a && List.hd next = b))
     (fun cnt -> cnt > 2)
@@ -145,9 +146,9 @@ let is_chain_response (a : string) (b : string) (activities : string list) :
 (*let is_chain_precedence (a : string) (b : string) (activities : string list) :
     bool =
   is_relation a b activities
-    (fun _cnt cur h t -> (cur = a && h = b) || (t <> [] && not (h = a) && List.hd t = b))
+    (fun _cnt cur h _t -> cur = b || h = b )
     (fun _cur t -> find_next_a_or_b a b t)
-    (fun next _cur -> List.hd next = a)
+    (fun _next _cur -> true)
     (fun cnt -> cnt >= 2)*)
 let is_chain_precedence (a : string) (b : string) (activities : string list) :
     bool =
