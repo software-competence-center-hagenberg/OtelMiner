@@ -482,12 +482,12 @@ public class ProbDeclareManagerService implements DisposableBean {
 
     private void updateConstraintsNotContainedInCurrentTrace(List<String> visited) {
         constraints.keySet()
-                .stream()
-                .filter(c -> !visited.contains(c))
                 .forEach(c -> {
-                    log.debug("updating {}", c);
-                    ProbDeclareConstraintModelEntry declare = constraints.get(c);
-                    updateProbability(declare);
+                    if (!visited.contains(c)) {
+                        log.debug("updating {}", c);
+                        ProbDeclareConstraintModelEntry declare = constraints.get(c);
+                        updateProbability(declare);
+                    }
                 });
     }
 
