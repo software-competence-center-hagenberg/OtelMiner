@@ -136,7 +136,7 @@ public class TraceCacheManager implements DisposableBean {
     public void addSeed(Seed seed) {
         queue.clear();
         List<Trace> seededTraces = new ArrayList<>(seed.nrTraces());
-        List<Span> spans = new ArrayList<>(seed.nrTraces());
+        List<Span> spans = new ArrayList<>(seed.traceData().getSpans().size());
         seed.traceData().getSpans().forEach(span -> {
             spans.add(Span.builder().json(span).build());
         });
