@@ -256,6 +256,13 @@ const ProbDeclareView = ({ sourceFile, expectedTraces, closeCallBack }: ProbDecl
         setActualExpectedTraces(() => event.target.valueAsNumber);
     }
 
+    function onSortChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        setSourceDetails(prev => ({
+            ...prev,
+            sort: event.target.value
+        }));
+    }
+
     function onNrSegmentsChanged(event: React.ChangeEvent<HTMLInputElement>) {
         setNrSegments(() => event.target.valueAsNumber);
     }
@@ -351,11 +358,6 @@ const ProbDeclareView = ({ sourceFile, expectedTraces, closeCallBack }: ProbDecl
             if (expected[i].probability !== actual[i].probability
                 || expected[i].nr !== actual[i].nr
                 || expected[i].declareTemplate !== actual[i].declareTemplate) {
-                // console.log("expected != actual! constraint nr. " + i + ":");
-                // console.log("expected:");
-                // console.log(expected[i]);
-                // console.log("actual:");
-                // console.log(actual[i]);
                 diff.push({ expected: expected[i], actual: actual[i] })
             }
         }
@@ -628,6 +630,9 @@ const ProbDeclareView = ({ sourceFile, expectedTraces, closeCallBack }: ProbDecl
                                 disabled={probDeclare !== null} />
                             <TextField id={'expected_traces'} label={'Expected Traces'} defaultValue={expectedTraces}
                                 type={'number'} variant={'standard'} onChange={onActualExpectedTracesChanged}
+                                disabled={probDeclare !== null} />
+                            <TextField id={'sort'} label={'Sort'} defaultValue={sourceDetails.sort}
+                                variant={'standard'} onChange={onSortChanged}
                                 disabled={probDeclare !== null} />
 
                         </Box>
