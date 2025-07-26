@@ -1,0 +1,3900 @@
+
+Differences in common constraints (based on 'constraintTemplate')
+Prob1                 | Prob2                | Nr1        | Nr2        | DeclareTemplate          
+----------------------+----------------------+------------+------------+--------------------------------------------------
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | ALTERNATE_PRECEDENCE(POST, BasicController.queryForStationId) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | ALTERNATE_PRECEDENCE(POST, TicketInfoController.queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_PRECEDENCE(POST, POST /basic/queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_PRECEDENCE(POST, POST /station/queryForId) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | CHAIN_PRECEDENCE(POST, POST /ticketinfo/queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_PRECEDENCE(POST, POST /travel/queryWithPackage) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(AccountLoginController.login, POST) 
+0.024721878862793572 | 0.026359143327841845 | 20         | 32         | CHAIN_SUCCESSION(AccountRepository.findByEmail, find ts.accounts) 
+0.014833127317676144 | 0.01400329489291598 | 12         | 17         | CHAIN_SUCCESSION(AccountRepository.findById, find ts.accounts) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(AccountSsoController.login, AccountRepository.findByEmail) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | CHAIN_SUCCESSION(AddMoneyRepository.findAll, find ts.addMoney) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHAIN_SUCCESSION(AddMoneyRepository.findByUserId, find ts.addMoney) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(AdminOrderController.addOrder, POST) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(ConfigController.delete, ConfigRepository.findByName) 
+0.004944375772558714 | 0.007413509060955519 | 4          | 9          | CHAIN_SUCCESSION(ConfigRepository.findByName, find ts.config) 
+0.014833127317676144 | 0.011532125205930808 | 12         | 14         | CHAIN_SUCCESSION(ConsignPriceConfigRepository.findByIndex, find ts.consign_price) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | CHAIN_SUCCESSION(ConsignPriceConfigRepository.save, update ts.consign_price) 
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | CHAIN_SUCCESSION(ContactsRepository.findById, find ts.contacts) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHAIN_SUCCESSION(ContactsRepository.save, update ts.contacts) 
+0.004944375772558714 | 0.005766062602965404 | 4          | 7          | CHAIN_SUCCESSION(FoodStoreRepository.findById, find ts.stores) 
+0.006180469715698393 | 0.007413509060955519 | 5          | 9          | CHAIN_SUCCESSION(FoodStoreRepository.save, update ts.stores) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | CHAIN_SUCCESSION(GET /**, BasicErrorController.error) 
+0.014833127317676144 | 0.01070840197693575 | 12         | 13         | CHAIN_SUCCESSION(GET /controller/api/testResults, EMController.getTestResults) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(GET, GET /route/queryById/{routeId}) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(GET, GET /travel/getRouteByTripId/{tripId}) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | CHAIN_SUCCESSION(GET /inside_payment/queryAccount, BasicErrorController.error) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | CHAIN_SUCCESSION(GET /inside_payment/queryAccount, InsidePaymentController.queryAccount) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | CHAIN_SUCCESSION(GET /**, ResourceHttpRequestHandler.handleRequest) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(GET /route/queryById/{routeId}, RouteController.queryById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(GET /travel2/adminQueryAll, Travel2Controller.adminQueryAll) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(GET /travel/getRouteByTripId/{tripId}, TravelController.getRouteByTripId) 
+0.5908529048207664 | 0.5963756177924218 | 478        | 724        | CHAIN_SUCCESSION(GET /v2/api-docs, Swagger2Controller.getDocumentation) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | CHAIN_SUCCESSION(InsidePaymentController.queryAccount, AddMoneyRepository.findAll) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHAIN_SUCCESSION(InsidePaymentController.queryAccount, PaymentRepository.findByUserId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(OrderController.addcreateNewOrder, OrderRepository.findByAccountId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(OrderController.addcreateNewOrder, OrderRepository.save) 
+0.021013597033374538 | 0.018945634266886325 | 17         | 23         | CHAIN_SUCCESSION(OrderOtherRepository.findById, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(OrderOtherRepository.findByTravelDateAndTrainNumber, find test.orders) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | CHAIN_SUCCESSION(OrderOtherRepository.save, update test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(OrderRepository.findByAccountId, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(OrderRepository.save, update test.orders) 
+0.0173053152039555 | 0.018121911037891267 | 14         | 22         | CHAIN_SUCCESSION(PaymentRepository.findById, find ts.payment) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHAIN_SUCCESSION(PaymentRepository.findByUserId, find ts.payment) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST /account/login, AccountSsoController.login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST /account/login, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /adminorder/addOrder, AdminOrderController.addOrder) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /basic/queryForStationId, BasicController.queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /basic/queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /basic/queryForTravel, BasicController.queryForTravel) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /basic/queryForTravel, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /config/delete, ConfigController.delete) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /contacts/deleteContacts, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /contacts/deleteContacts, FuckContactsController.deleteContacts) 
+0.022249690976514216 | 0.025535420098846788 | 18         | 31         | CHAIN_SUCCESSION(POST /login, AccountLoginController.login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST /login, BasicErrorController.errorHtml) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST /login, Render error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /order/adminAddOrder, OrderController.addcreateNewOrder) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST, POST /account/login) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | CHAIN_SUCCESSION(POST, POST /train/retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST, POST /travel/query) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST, POST /verification/verify) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /routePlan/cheapestRoute, RoutePlanController.getCheapestRoutes) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHAIN_SUCCESSION(POST /seat/getLeftTicketOfInterval, BasicErrorController.error) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHAIN_SUCCESSION(POST /seat/getLeftTicketOfInterval, SeatController.getLeftTicketOfInterval) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /station/queryForId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /station/queryForId, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /ticketinfo/queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(POST /ticketinfo/queryForStationId, TicketInfoController.queryForStationId) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHAIN_SUCCESSION(POST /train/retrieve, TrainController.retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /travel2/queryWithPackage, Travel2Controller.queryPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /travel/create, BasicErrorController.error) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(POST /travel/create, TravelController.create) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /travelPlan/getTransferResult, TravelPlanController.getTransferResult) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /travel/query, BasicErrorController.error) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(POST /travel/query, TravelController.query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(POST /travel/queryWithPackage, TravelController.queryPackage) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHAIN_SUCCESSION(POST /verification/verify, VerificationCodeController.verifyCode) 
+0.0173053152039555 | 0.014827018121911038 | 14         | 18         | CHAIN_SUCCESSION(PriceConfigRepository.findById, find ts.price_config) 
+0.006180469715698393 | 0.009884678747940691 | 5          | 12         | CHAIN_SUCCESSION(PriceConfigRepository.save, update ts.price_config) 
+0.00865265760197775 | 0.009060955518945634 | 7          | 11         | CHAIN_SUCCESSION(PUT /controller/api/newAction, EMController.newAction) 
+0.006180469715698393 | 0.008237232289950576 | 5          | 10         | CHAIN_SUCCESSION(PUT /controller/api/runSUT, EMController.runSut) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | CHAIN_SUCCESSION(ResourceHttpRequestHandler.handleRequest, HttpServletResponseWrapper.sendError) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(RouteController.queryById, RouteRepository.findById) 
+0.013597033374536464 | 0.012355848434925865 | 11         | 15         | CHAIN_SUCCESSION(RouteRepository.findById, find ts.routes) 
+0.012360939431396786 | 0.013179571663920923 | 10         | 16         | CHAIN_SUCCESSION(RouteRepository.save, update ts.routes) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | CHAIN_SUCCESSION(SeatController.getLeftTicketOfInterval, GET) 
+0.023485784919653894 | 0.019769357495881382 | 19         | 24         | CHAIN_SUCCESSION(SecurityRepository.findByName, find ts.security_config) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHAIN_SUCCESSION(StationController.queryForId, StationRepository.findByName) 
+0.027194066749072928 | 0.023887973640856673 | 22         | 29         | CHAIN_SUCCESSION(StationRepository.findById, find ts.station) 
+0.009888751545117428 | 0.007413509060955519 | 8          | 9          | CHAIN_SUCCESSION(StationRepository.findByName, find ts.station) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHAIN_SUCCESSION(TrainController.retrieve, TrainTypeRepository.findById) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHAIN_SUCCESSION(TrainFoodRepository.findById, find ts.trainfoods) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | CHAIN_SUCCESSION(TrainFoodRepository.save, update ts.trainfoods) 
+0.02595797280593325 | 0.0214168039538715 | 21         | 26         | CHAIN_SUCCESSION(TrainTypeRepository.findById, find ts.trainType) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(Travel2Controller.adminQueryAll, GET) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(Travel2Controller.adminQueryAll, POST) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(Travel2Controller.adminQueryAll, TripRepository.findAll) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(TravelController.create, TripRepository.findByTripId) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHAIN_SUCCESSION(TravelController.create, TripRepository.save) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(TravelController.getRouteByTripId, TripRepository.findByTripId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHAIN_SUCCESSION(TravelPlanController.getTransferResult, POST) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHAIN_SUCCESSION(TripRepository.findAll, find ts.trip) 
+0.05315203955500618 | 0.051070840197693576 | 43         | 62         | CHAIN_SUCCESSION(TripRepository.findByTripId, find ts.trip) 
+0.007416563658838072 | 0.006589785831960461 | 6          | 8          | CHAIN_SUCCESSION(TripRepository.save, update ts.trip) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHOICE(AccountLoginController.login, BasicErrorController.errorHtml) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHOICE(AccountLoginController.login, Render error) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHOICE(AccountSsoController.login, BasicErrorController.error) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | CHOICE(AddMoneyRepository.findAll, PaymentRepository.findByUserId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHOICE(BasicController.queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHOICE(BasicController.queryForTravel, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHOICE(BasicErrorController.error, FuckContactsController.deleteContacts) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | CHOICE(BasicErrorController.errorHtml, Render error) 
+0.011124845488257108 | 0.01400329489291598 | 9          | 17         | CHOICE(BasicErrorController.error, HttpServletResponseWrapper.sendError) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | CHOICE(BasicErrorController.error, InsidePaymentController.queryAccount) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | CHOICE(BasicErrorController.error, ResourceHttpRequestHandler.handleRequest) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | CHOICE(BasicErrorController.error, SeatController.getLeftTicketOfInterval) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHOICE(BasicErrorController.error, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | CHOICE(BasicErrorController.error, TicketInfoController.queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHOICE(BasicErrorController.error, TravelController.create) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHOICE(BasicErrorController.error, TravelController.query) 
+0.006180469715698393 | 0.005766062602965404 | 5          | 7          | CHOICE(GET, POST)         
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHOICE(GET, TripRepository.findAll) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | CHOICE(OrderRepository.findByAccountId, OrderRepository.save) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | CHOICE(POST, TripRepository.findAll) 
+0.007416563658838072 | 0.005766062602965404 | 6          | 7          | CHOICE(TripRepository.findByTripId, TripRepository.save) 
+0.022249690976514216 | 0.025535420098846788 | 18         | 31         | EXISTENCE(AccountLoginController.login) 
+0.024721878862793572 | 0.026359143327841845 | 20         | 32         | EXISTENCE(AccountRepository.findByEmail) 
+0.014833127317676144 | 0.01400329489291598 | 12         | 17         | EXISTENCE(AccountRepository.findById) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(AccountSsoController.login) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | EXISTENCE(AddMoneyRepository.findAll) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | EXISTENCE(AddMoneyRepository.findByUserId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(AdminOrderController.addOrder) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(BasicController.queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(BasicController.queryForTravel) 
+0.07416563658838071 | 0.07413509060955518 | 60         | 90         | EXISTENCE(BasicErrorController.error) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(BasicErrorController.errorHtml) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(ConfigController.delete) 
+0.004944375772558714 | 0.007413509060955519 | 4          | 9          | EXISTENCE(ConfigRepository.findByName) 
+0.014833127317676144 | 0.011532125205930808 | 12         | 14         | EXISTENCE(ConsignPriceConfigRepository.findByIndex) 
+0.004944375772558714 | 0.005766062602965404 | 4          | 7          | EXISTENCE(ConsignPriceConfigRepository.save) 
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | EXISTENCE(ContactsRepository.findById) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | EXISTENCE(ContactsRepository.save) 
+0.014833127317676144 | 0.01070840197693575 | 12         | 13         | EXISTENCE(EMController.getTestResults) 
+0.00865265760197775 | 0.009060955518945634 | 7          | 11         | EXISTENCE(EMController.newAction) 
+0.006180469715698393 | 0.008237232289950576 | 5          | 10         | EXISTENCE(EMController.runSut) 
+0.024721878862793572 | 0.026359143327841845 | 20         | 32         | EXISTENCE(find test.orders) 
+0.03955500618046971 | 0.04036243822075782 | 32         | 49         | EXISTENCE(find ts.accounts) 
+0.00865265760197775 | 0.009884678747940691 | 7          | 12         | EXISTENCE(find ts.addMoney) 
+0.004944375772558714 | 0.007413509060955519 | 4          | 9          | EXISTENCE(find ts.config) 
+0.014833127317676144 | 0.011532125205930808 | 12         | 14         | EXISTENCE(find ts.consign_price) 
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | EXISTENCE(find ts.contacts) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(find ts.foodorder) 
+0.021013597033374538 | 0.022240527182866558 | 17         | 27         | EXISTENCE(find ts.payment) 
+0.018541409147095178 | 0.016474464579901153 | 15         | 20         | EXISTENCE(find ts.price_config) 
+0.013597033374536464 | 0.012355848434925865 | 11         | 15         | EXISTENCE(find ts.routes) 
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | EXISTENCE(find ts.security_config) 
+0.037082818294190356 | 0.03212520593080725 | 30         | 39         | EXISTENCE(find ts.station) 
+0.006180469715698393 | 0.006589785831960461 | 5          | 8          | EXISTENCE(find ts.stores) 
+0.002472187886279357 | 0.004118616144975288 | 2          | 5          | EXISTENCE(find ts.trainfoods) 
+0.02595797280593325 | 0.0214168039538715 | 21         | 26         | EXISTENCE(find ts.trainType) 
+0.05562422744128554 | 0.05518945634266886 | 45         | 67         | EXISTENCE(find ts.trip)   
+0.004944375772558714 | 0.005766062602965404 | 4          | 7          | EXISTENCE(FoodStoreRepository.findById) 
+0.006180469715698393 | 0.007413509060955519 | 5          | 9          | EXISTENCE(FoodStoreRepository.save) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(FuckContactsController.deleteContacts) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | EXISTENCE(GET /**)        
+0.014833127317676144 | 0.016474464579901153 | 12         | 20         | EXISTENCE(GET)            
+0.014833127317676144 | 0.01070840197693575 | 12         | 13         | EXISTENCE(GET /controller/api/testResults) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | EXISTENCE(GET /inside_payment/queryAccount) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(GET /route/queryById/{routeId}) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(GET /travel2/adminQueryAll) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(GET /travel/getRouteByTripId/{tripId}) 
+0.5908529048207664 | 0.5963756177924218 | 478        | 724        | EXISTENCE(GET /v2/api-docs) 
+0.012360939431396786 | 0.016474464579901153 | 10         | 20         | EXISTENCE(HttpServletResponseWrapper.sendError) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | EXISTENCE(InsidePaymentController.queryAccount) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(OrderController.addcreateNewOrder) 
+0.021013597033374538 | 0.018945634266886325 | 17         | 23         | EXISTENCE(OrderOtherRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(OrderOtherRepository.findByTravelDateAndTrainNumber) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | EXISTENCE(OrderOtherRepository.save) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(OrderRepository.findByAccountId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(OrderRepository.save) 
+0.0173053152039555 | 0.018121911037891267 | 14         | 22         | EXISTENCE(PaymentRepository.findById) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | EXISTENCE(PaymentRepository.findByUserId) 
+0.06056860321384425 | 0.05518945634266886 | 49         | 67         | EXISTENCE(POST)           
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(POST /account/login) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /adminorder/addOrder) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(POST /basic/queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(POST /basic/queryForTravel) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /config/delete) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /contacts/deleteContacts) 
+0.022249690976514216 | 0.025535420098846788 | 18         | 31         | EXISTENCE(POST /login)    
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /order/adminAddOrder) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /routePlan/cheapestRoute) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | EXISTENCE(POST /seat/getLeftTicketOfInterval) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(POST /station/queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(POST /ticketinfo/queryForStationId) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | EXISTENCE(POST /train/retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /travel2/queryWithPackage) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(POST /travel/create) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /travelPlan/getTransferResult) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(POST /travel/query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(POST /travel/queryWithPackage) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(POST /verification/verify) 
+0.0173053152039555 | 0.014827018121911038 | 14         | 18         | EXISTENCE(PriceConfigRepository.findById) 
+0.006180469715698393 | 0.009884678747940691 | 5          | 12         | EXISTENCE(PriceConfigRepository.save) 
+0.00865265760197775 | 0.009060955518945634 | 7          | 11         | EXISTENCE(PUT /controller/api/newAction) 
+0.006180469715698393 | 0.008237232289950576 | 5          | 10         | EXISTENCE(PUT /controller/api/runSUT) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(Render error)   
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | EXISTENCE(ResourceHttpRequestHandler.handleRequest) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(RouteController.queryById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(RoutePlanController.getCheapestRoutes) 
+0.013597033374536464 | 0.012355848434925865 | 11         | 15         | EXISTENCE(RouteRepository.findById) 
+0.012360939431396786 | 0.013179571663920923 | 10         | 16         | EXISTENCE(RouteRepository.save) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | EXISTENCE(SeatController.getLeftTicketOfInterval) 
+0.023485784919653894 | 0.019769357495881382 | 19         | 24         | EXISTENCE(SecurityRepository.findByName) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(StationController.queryForId) 
+0.027194066749072928 | 0.023887973640856673 | 22         | 29         | EXISTENCE(StationRepository.findById) 
+0.009888751545117428 | 0.007413509060955519 | 8          | 9          | EXISTENCE(StationRepository.findByName) 
+0.5908529048207664 | 0.5963756177924218 | 478        | 724        | EXISTENCE(Swagger2Controller.getDocumentation) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | EXISTENCE(TicketInfoController.queryForStationId) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | EXISTENCE(TrainController.retrieve) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | EXISTENCE(TrainFoodRepository.findById) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | EXISTENCE(TrainFoodRepository.save) 
+0.02595797280593325 | 0.0214168039538715 | 21         | 26         | EXISTENCE(TrainTypeRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(Travel2Controller.adminQueryAll) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(Travel2Controller.queryPackage) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(TravelController.create) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(TravelController.getRouteByTripId) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | EXISTENCE(TravelController.query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(TravelController.queryPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | EXISTENCE(TravelPlanController.getTransferResult) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | EXISTENCE(TripRepository.findAll) 
+0.05315203955500618 | 0.051070840197693576 | 43         | 62         | EXISTENCE(TripRepository.findByTripId) 
+0.007416563658838072 | 0.006589785831960461 | 6          | 8          | EXISTENCE(TripRepository.save) 
+0.002472187886279357 | 0.004118616144975288 | 2          | 5          | EXISTENCE(update test.orders) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | EXISTENCE(update ts.consign_price) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | EXISTENCE(update ts.contacts) 
+0.006180469715698393 | 0.009884678747940691 | 5          | 12         | EXISTENCE(update ts.price_config) 
+0.012360939431396786 | 0.013179571663920923 | 10         | 16         | EXISTENCE(update ts.routes) 
+0.006180469715698393 | 0.007413509060955519 | 5          | 9          | EXISTENCE(update ts.stores) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | EXISTENCE(update ts.trainfoods) 
+0.007416563658838072 | 0.006589785831960461 | 6          | 8          | EXISTENCE(update ts.trip) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | EXISTENCE(VerificationCodeController.verifyCode) 
+0.014833127317676144 | 0.01400329489291598 | 12         | 17         | INIT(AccountRepository.findById) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | INIT(AddMoneyRepository.findByUserId) 
+0.003708281829419036 | 0.005766062602965404 | 3          | 7          | INIT(ConfigRepository.findByName) 
+0.009888751545117428 | 0.008237232289950576 | 8          | 10         | INIT(ConsignPriceConfigRepository.findByIndex) 
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | INIT(ConsignPriceConfigRepository.save) 
+0.021013597033374538 | 0.018121911037891267 | 17         | 22         | INIT(ContactsRepository.findById) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | INIT(FoodStoreRepository.findById) 
+0.006180469715698393 | 0.006589785831960461 | 5          | 8          | INIT(FoodStoreRepository.save) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | INIT(GET /**)             
+0.006180469715698393 | 0.006589785831960461 | 5          | 8          | INIT(GET)                 
+0.014833127317676144 | 0.01070840197693575 | 12         | 13         | INIT(GET /controller/api/testResults) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | INIT(GET /inside_payment/queryAccount) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | INIT(GET /travel2/adminQueryAll) 
+0.5908529048207664 | 0.5963756177924218 | 478        | 724        | INIT(GET /v2/api-docs)    
+0.018541409147095178 | 0.01729818780889621 | 15         | 21         | INIT(OrderOtherRepository.findById) 
+0.0173053152039555 | 0.018121911037891267 | 14         | 22         | INIT(PaymentRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | INIT(POST /adminorder/addOrder) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | INIT(POST /basic/queryForTravel) 
+0.022249690976514216 | 0.025535420098846788 | 18         | 31         | INIT(POST /login)         
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | INIT(POST /seat/getLeftTicketOfInterval) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | INIT(POST /travelPlan/getTransferResult) 
+0.0173053152039555 | 0.014827018121911038 | 14         | 18         | INIT(PriceConfigRepository.findById) 
+0.006180469715698393 | 0.009884678747940691 | 5          | 12         | INIT(PriceConfigRepository.save) 
+0.00865265760197775 | 0.009060955518945634 | 7          | 11         | INIT(PUT /controller/api/newAction) 
+0.006180469715698393 | 0.008237232289950576 | 5          | 10         | INIT(PUT /controller/api/runSUT) 
+0.009888751545117428 | 0.009060955518945634 | 8          | 11         | INIT(RouteRepository.findById) 
+0.011124845488257108 | 0.012355848434925865 | 9          | 15         | INIT(RouteRepository.save) 
+0.023485784919653894 | 0.018945634266886325 | 19         | 23         | INIT(SecurityRepository.findByName) 
+0.024721878862793572 | 0.0214168039538715 | 20         | 26         | INIT(StationRepository.findById) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | INIT(TrainFoodRepository.findById) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | INIT(TrainFoodRepository.save) 
+0.0173053152039555 | 0.01400329489291598 | 14         | 17         | INIT(TrainTypeRepository.findById) 
+0.03955500618046971 | 0.04036243822075782 | 32         | 49         | INIT(TripRepository.findByTripId) 
+0.07416563658838071 | 0.07413509060955518 | 60         | 90         | LAST(BasicErrorController.error) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | LAST(BasicErrorController.errorHtml) 
+0.014833127317676144 | 0.01070840197693575 | 12         | 13         | LAST(EMController.getTestResults) 
+0.00865265760197775 | 0.009060955518945634 | 7          | 11         | LAST(EMController.newAction) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | LAST(EMController.runSut) 
+0.024721878862793572 | 0.026359143327841845 | 20         | 32         | LAST(find test.orders)    
+0.03955500618046971 | 0.04036243822075782 | 32         | 49         | LAST(find ts.accounts)    
+0.00865265760197775 | 0.009884678747940691 | 7          | 12         | LAST(find ts.addMoney)    
+0.004944375772558714 | 0.007413509060955519 | 4          | 9          | LAST(find ts.config)      
+0.014833127317676144 | 0.011532125205930808 | 12         | 14         | LAST(find ts.consign_price) 
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | LAST(find ts.contacts)    
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | LAST(find ts.foodorder)   
+0.021013597033374538 | 0.022240527182866558 | 17         | 27         | LAST(find ts.payment)     
+0.018541409147095178 | 0.016474464579901153 | 15         | 20         | LAST(find ts.price_config) 
+0.013597033374536464 | 0.012355848434925865 | 11         | 15         | LAST(find ts.routes)      
+0.023485784919653894 | 0.02059308072487644 | 19         | 25         | LAST(find ts.security_config) 
+0.037082818294190356 | 0.03212520593080725 | 30         | 39         | LAST(find ts.station)     
+0.006180469715698393 | 0.006589785831960461 | 5          | 8          | LAST(find ts.stores)      
+0.002472187886279357 | 0.004118616144975288 | 2          | 5          | LAST(find ts.trainfoods)  
+0.02595797280593325 | 0.0214168039538715 | 21         | 26         | LAST(find ts.trainType)   
+0.05562422744128554 | 0.05518945634266886 | 45         | 67         | LAST(find ts.trip)        
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | LAST(FuckContactsController.deleteContacts) 
+0.012360939431396786 | 0.016474464579901153 | 10         | 20         | LAST(HttpServletResponseWrapper.sendError) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | LAST(Render error)        
+0.5908529048207664 | 0.5963756177924218 | 478        | 724        | LAST(Swagger2Controller.getDocumentation) 
+0.002472187886279357 | 0.004118616144975288 | 2          | 5          | LAST(update test.orders)  
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | LAST(update ts.consign_price) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | LAST(update ts.contacts)  
+0.006180469715698393 | 0.009884678747940691 | 5          | 12         | LAST(update ts.price_config) 
+0.012360939431396786 | 0.013179571663920923 | 10         | 16         | LAST(update ts.routes)    
+0.006180469715698393 | 0.007413509060955519 | 5          | 9          | LAST(update ts.stores)    
+0.003708281829419036 | 0.004942339373970346 | 3          | 6          | LAST(update ts.trainfoods) 
+0.007416563658838072 | 0.006589785831960461 | 6          | 8          | LAST(update ts.trip)      
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | LAST(VerificationCodeController.verifyCode) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, AccountRepository.findByEmail) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, AccountSsoController.login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, BasicErrorController.error) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, find ts.accounts) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, POST /account/login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, POST /verification/verify) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountLoginController.login, VerificationCodeController.verifyCode) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(AccountSsoController.login, find ts.accounts) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(AdminOrderController.addOrder, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(AdminOrderController.addOrder, update test.orders) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(BasicController.queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(BasicController.queryForStationId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(BasicController.queryForStationId, POST /station/queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(BasicController.queryForStationId, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(BasicController.queryForStationId, StationRepository.findByName) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(ConfigController.delete, find ts.config) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET, find ts.routes) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | SUCCESSION(GET, find ts.trip) 
+0.0012360939431396785 | 0.002471169686985173 | 1          | 3          | SUCCESSION(GET /**, HttpServletResponseWrapper.sendError) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | SUCCESSION(GET /inside_payment/queryAccount, AddMoneyRepository.findAll) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | SUCCESSION(GET /inside_payment/queryAccount, find ts.addMoney) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | SUCCESSION(GET /inside_payment/queryAccount, find ts.payment) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | SUCCESSION(GET /inside_payment/queryAccount, PaymentRepository.findByUserId) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET, RouteController.queryById) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET /route/queryById/{routeId}, find ts.routes) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET /route/queryById/{routeId}, RouteRepository.findById) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET, RouteRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, find ts.routes) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, find ts.trainType) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, find ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, GET) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, GET /route/queryById/{routeId}) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, POST) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, POST /train/retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, RouteController.queryById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, RouteRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, TrainController.retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, TrainTypeRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel2/adminQueryAll, TripRepository.findAll) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(GET, TravelController.getRouteByTripId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel/getRouteByTripId/{tripId}, find ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(GET /travel/getRouteByTripId/{tripId}, TripRepository.findByTripId) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | SUCCESSION(GET, TripRepository.findByTripId) 
+0.003708281829419036 | 0.004118616144975288 | 3          | 5          | SUCCESSION(InsidePaymentController.queryAccount, find ts.addMoney) 
+0.002472187886279357 | 0.0032948929159802307 | 2          | 4          | SUCCESSION(InsidePaymentController.queryAccount, find ts.payment) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(OrderController.addcreateNewOrder, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(OrderController.addcreateNewOrder, update test.orders) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /account/login, AccountRepository.findByEmail) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /account/login, find ts.accounts) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST, AccountRepository.findByEmail) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST, AccountSsoController.login) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /adminorder/addOrder, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /adminorder/addOrder, POST) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /adminorder/addOrder, update test.orders) 
+0.038318912237330034 | 0.03706754530477759 | 31         | 45         | SUCCESSION(POST, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /basic/queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /basic/queryForStationId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /basic/queryForStationId, POST /station/queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /basic/queryForStationId, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /basic/queryForStationId, StationRepository.findByName) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /config/delete, ConfigRepository.findByName) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /config/delete, find ts.config) 
+0.003708281829419036 | 0.0032948929159802307 | 3          | 4          | SUCCESSION(POST, find test.orders) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST, find ts.accounts) 
+0.011124845488257108 | 0.008237232289950576 | 9          | 10         | SUCCESSION(POST, find ts.station) 
+0.007416563658838072 | 0.005766062602965404 | 6          | 7          | SUCCESSION(POST, find ts.trainType) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, AccountRepository.findByEmail) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, AccountSsoController.login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, BasicErrorController.error) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, find ts.accounts) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, POST) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, POST /account/login) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, POST /verification/verify) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST /login, VerificationCodeController.verifyCode) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /order/adminAddOrder, find test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /order/adminAddOrder, OrderRepository.findByAccountId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /order/adminAddOrder, OrderRepository.save) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /order/adminAddOrder, update test.orders) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /routePlan/cheapestRoute, POST /travel/queryWithPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /routePlan/cheapestRoute, TravelController.queryPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /seat/getLeftTicketOfInterval, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /seat/getLeftTicketOfInterval, GET) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /station/queryForId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /station/queryForId, StationRepository.findByName) 
+0.009888751545117428 | 0.007413509060955519 | 8          | 9          | SUCCESSION(POST, StationRepository.findByName) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, BasicController.queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, POST /basic/queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, POST /station/queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST /ticketinfo/queryForStationId, StationRepository.findByName) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(POST, TrainController.retrieve) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | SUCCESSION(POST /train/retrieve, find ts.trainType) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | SUCCESSION(POST /train/retrieve, TrainTypeRepository.findById) 
+0.007416563658838072 | 0.005766062602965404 | 6          | 7          | SUCCESSION(POST, TrainTypeRepository.findById) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(POST /travel/create, find ts.trip) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(POST /travel/create, TripRepository.findByTripId) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(POST /travel/create, TripRepository.save) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(POST /travel/create, update ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travelPlan/getTransferResult, POST) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travelPlan/getTransferResult, POST /travel/query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travelPlan/getTransferResult, TravelController.query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, BasicController.queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, find ts.station) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, POST /basic/queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, POST /station/queryForId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, POST /ticketinfo/queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, StationController.queryForId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, StationRepository.findByName) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST /travel/query, TicketInfoController.queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(POST, update test.orders) 
+0.022249690976514216 | 0.02471169686985173 | 18         | 30         | SUCCESSION(POST, VerificationCodeController.verifyCode) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(RouteController.queryById, find ts.routes) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(RoutePlanController.getCheapestRoutes, POST /travel/queryWithPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(RoutePlanController.getCheapestRoutes, TravelController.queryPackage) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(SeatController.getLeftTicketOfInterval, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(StationController.queryForId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, BasicController.queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, BasicErrorController.error) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, find ts.station) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, POST /basic/queryForStationId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, POST /station/queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, StationController.queryForId) 
+0.004944375772558714 | 0.004118616144975288 | 4          | 5          | SUCCESSION(TicketInfoController.queryForStationId, StationRepository.findByName) 
+0.004944375772558714 | 0.004942339373970346 | 4          | 6          | SUCCESSION(TrainController.retrieve, find ts.trainType) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, find ts.routes) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, find ts.trainType) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, find ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, GET /route/queryById/{routeId}) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, POST /train/retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, RouteController.queryById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, RouteRepository.findById) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, TrainController.retrieve) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(Travel2Controller.adminQueryAll, TrainTypeRepository.findById) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(TravelController.create, find ts.trip) 
+0.002472187886279357 | 0.002471169686985173 | 2          | 3          | SUCCESSION(TravelController.create, update ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.getRouteByTripId, find ts.trip) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, BasicController.queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, BasicErrorController.error) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, find ts.station) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, POST /basic/queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, POST /station/queryForId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, POST /ticketinfo/queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, StationController.queryForId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, StationRepository.findByName) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelController.query, TicketInfoController.queryForStationId) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelPlanController.getTransferResult, POST /travel/query) 
+0.0012360939431396785 | 0.0016474464579901153 | 1          | 2          | SUCCESSION(TravelPlanController.getTransferResult, TravelController.query) 
+
+Common constraints minor changes (< 0.1): 931
+Common constraints changed (> 0.1):   460
+
+file S2.json contains 0 constraints that only occur here
+
+file S3.json contains 428 constraints that only occur here
+
+Constraints only in file (S2.json):
+None
+
+Constraints only in file (S3.json):
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "ALTERNATE_PRECEDENCE(POST /logout, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.222576",
+  "updateDate": "2025-07-26T15:28:15.222577"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "ALTERNATE_PRECEDENCE(POST, RoutePlanController.getCheapestRoutes)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.22895",
+  "updateDate": "2025-07-26T15:28:15.22895"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "ALTERNATE_PRECEDENCE(POST, TravelController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23133",
+  "updateDate": "2025-07-26T15:28:15.231331"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST /logout, AccountLoginController.logout)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.219022",
+  "updateDate": "2025-07-26T15:28:15.219022"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST /logout, AccountSsoController.logoutDeleteToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246559",
+  "updateDate": "2025-07-26T15:28:15.246559"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST /logout, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.226259",
+  "updateDate": "2025-07-26T15:28:15.226261"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST, POST /routePlan/cheapestRoute)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242015",
+  "updateDate": "2025-07-26T15:28:15.242015"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST, POST /travel2/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250218",
+  "updateDate": "2025-07-26T15:28:15.25022"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_PRECEDENCE(POST, POST /travel/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.229833",
+  "updateDate": "2025-07-26T15:28:15.229835"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_RESPONSE(TravelPlanController.getByCheapest, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217538",
+  "updateDate": "2025-07-26T15:28:15.217539"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_RESPONSE(TravelPlanController.getTransferResult, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250691",
+  "updateDate": "2025-07-26T15:28:15.250692"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(AccountLoginController.logout, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233024",
+  "updateDate": "2025-07-26T15:28:15.233024"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(AdminBasicInfoController.getAllStations, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241631",
+  "updateDate": "2025-07-26T15:28:15.241631"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(AdminOrderController.getAllOrders, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231605",
+  "updateDate": "2025-07-26T15:28:15.231605"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, ContactsRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238995",
+  "updateDate": "2025-07-26T15:28:15.238996"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, FoodStoreRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244375",
+  "updateDate": "2025-07-26T15:28:15.244375"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, FoodStoreRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243663",
+  "updateDate": "2025-07-26T15:28:15.243664"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, StationRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250446",
+  "updateDate": "2025-07-26T15:28:15.250447"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, TrainFoodRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210816",
+  "updateDate": "2025-07-26T15:28:15.210816"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(EMController.runSut, TrainFoodRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240019",
+  "updateDate": "2025-07-26T15:28:15.240019"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodController.createFoodOrder, FoodOrderRepository.findByOrderId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.219965",
+  "updateDate": "2025-07-26T15:28:15.219967"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodController.createFoodOrder, FoodOrderRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24687",
+  "updateDate": "2025-07-26T15:28:15.24687"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodController.getFood, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211441",
+  "updateDate": "2025-07-26T15:28:15.211441"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodController.getFood, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241312",
+  "updateDate": "2025-07-26T15:28:15.241312"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodMapController.getTrainFoodOfTrip, TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215455",
+  "updateDate": "2025-07-26T15:28:15.215456"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodOrderRepository.findByOrderId, find ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223329",
+  "updateDate": "2025-07-26T15:28:15.22333"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(FoodOrderRepository.save, update ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237864",
+  "updateDate": "2025-07-26T15:28:15.237865"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /adminbasic/getAllStations/{id}, AdminBasicInfoController.getAllStations)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242876",
+  "updateDate": "2025-07-26T15:28:15.242877"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /adminorder/findAll/{id}, AdminOrderController.getAllOrders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236282",
+  "updateDate": "2025-07-26T15:28:15.236283"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /assurance/getAssuranceById, AssuranceController.getAssuranceById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209397",
+  "updateDate": "2025-07-26T15:28:15.209398"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /assurance/getAssuranceById, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209872",
+  "updateDate": "2025-07-26T15:28:15.209872"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /assurance/getAssuranceById, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21855",
+  "updateDate": "2025-07-26T15:28:15.218551"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /**)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214359",
+  "updateDate": "2025-07-26T15:28:15.214359"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /order/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243118",
+  "updateDate": "2025-07-26T15:28:15.243118"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /orderOther/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211898",
+  "updateDate": "2025-07-26T15:28:15.211899"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET, GET /station/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21499",
+  "updateDate": "2025-07-26T15:28:15.21499"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /inside_payment/queryAddMoney, InsidePaymentController.queryAddMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212209",
+  "updateDate": "2025-07-26T15:28:15.212209"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /order/findAll, OrderController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.227101",
+  "updateDate": "2025-07-26T15:28:15.227103"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /orderOther/findAll, OrderOtherController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215677",
+  "updateDate": "2025-07-26T15:28:15.215677"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /securityConfig/findAll, SecurityController.findAllSecurityConfig)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240347",
+  "updateDate": "2025-07-26T15:28:15.240347"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /station/query, StationController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215756",
+  "updateDate": "2025-07-26T15:28:15.215756"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /travel/queryAll, TravelController.queryAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245856",
+  "updateDate": "2025-07-26T15:28:15.245857"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /verifyLoginToken/{token}, AccountSsoController.verifyLoginToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214206",
+  "updateDate": "2025-07-26T15:28:15.214206"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(GET /verifyLoginToken/{token}, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231423",
+  "updateDate": "2025-07-26T15:28:15.231423"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(InsidePaymentController.queryAddMoney, AddMoneyRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.227527",
+  "updateDate": "2025-07-26T15:28:15.227529"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderController.findAllOrder, OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.219413",
+  "updateDate": "2025-07-26T15:28:15.219413"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderController.payOrder, OrderRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.227965",
+  "updateDate": "2025-07-26T15:28:15.227965"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherController.addcreateNewOrder, OrderOtherRepository.findByAccountId)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.216901",
+  "updateDate": "2025-07-26T15:28:15.216902"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherController.addcreateNewOrder, OrderOtherRepository.save)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.22225",
+  "updateDate": "2025-07-26T15:28:15.222251"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherController.calculateSoldTicket, OrderOtherRepository.findByTravelDateAndTrainNumber)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21659",
+  "updateDate": "2025-07-26T15:28:15.21659"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherController.findAllOrder, OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233818",
+  "updateDate": "2025-07-26T15:28:15.233818"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherRepository.findAll, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245084",
+  "updateDate": "2025-07-26T15:28:15.245084"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderOtherRepository.findByAccountId, find test.orders)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.25111",
+  "updateDate": "2025-07-26T15:28:15.251111"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderRepository.findAll, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210033",
+  "updateDate": "2025-07-26T15:28:15.210033"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(OrderRepository.findById, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216072",
+  "updateDate": "2025-07-26T15:28:15.216072"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(PaymentRepository.save, update ts.payment)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223912",
+  "updateDate": "2025-07-26T15:28:15.223913"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /basic/queryForTravel, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235886",
+  "updateDate": "2025-07-26T15:28:15.235887"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /food/createFoodOrder, FoodController.createFoodOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236204",
+  "updateDate": "2025-07-26T15:28:15.236205"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /food/getFood, FoodController.getFood)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209159",
+  "updateDate": "2025-07-26T15:28:15.209159"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /foodmap/getTrainFoodOfTrip, FoodMapController.getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246098",
+  "updateDate": "2025-07-26T15:28:15.246098"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /login, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250533",
+  "updateDate": "2025-07-26T15:28:15.250533"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /login, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242488",
+  "updateDate": "2025-07-26T15:28:15.242488"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /logout, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211979",
+  "updateDate": "2025-07-26T15:28:15.211979"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/create, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243511",
+  "updateDate": "2025-07-26T15:28:15.243511"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/create, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235571",
+  "updateDate": "2025-07-26T15:28:15.235571"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/create, OrderController.createNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213111",
+  "updateDate": "2025-07-26T15:28:15.213112"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/modifyOrderStatus, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232008",
+  "updateDate": "2025-07-26T15:28:15.232009"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/modifyOrderStatus, OrderController.modifyOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242642",
+  "updateDate": "2025-07-26T15:28:15.242643"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /orderOther/adminAddOrder, OrderOtherController.addcreateNewOrder)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.216508",
+  "updateDate": "2025-07-26T15:28:15.216509"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /orderOther/calculate, OrderOtherController.calculateSoldTicket)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233737",
+  "updateDate": "2025-07-26T15:28:15.233738"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/payOrder, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242798",
+  "updateDate": "2025-07-26T15:28:15.242798"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /order/payOrder, OrderController.payOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243974",
+  "updateDate": "2025-07-26T15:28:15.243975"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST, POST /foodmap/getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235488",
+  "updateDate": "2025-07-26T15:28:15.235489"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST, POST /orderOther/adminAddOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249487",
+  "updateDate": "2025-07-26T15:28:15.249487"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /preserveOther, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240107",
+  "updateDate": "2025-07-26T15:28:15.240107"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /preserveOther, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249645",
+  "updateDate": "2025-07-26T15:28:15.249646"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /preserveOther, PreserveOtherController.preserve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234757",
+  "updateDate": "2025-07-26T15:28:15.234757"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /price/query, PriceController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24702",
+  "updateDate": "2025-07-26T15:28:15.247021"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /rebook/payDifference, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250765",
+  "updateDate": "2025-07-26T15:28:15.250765"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /rebook/payDifference, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209069",
+  "updateDate": "2025-07-26T15:28:15.209069"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /rebook/payDifference, RebookController.payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213277",
+  "updateDate": "2025-07-26T15:28:15.213277"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /seat/getLeftTicketOfInterval, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23986",
+  "updateDate": "2025-07-26T15:28:15.23986"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /securityConfig/create, SecurityController.create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.22879",
+  "updateDate": "2025-07-26T15:28:15.22879"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travel/getTripsByRouteId, TravelController.getTripsByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236048",
+  "updateDate": "2025-07-26T15:28:15.236049"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travelPlan/getCheapest, TravelPlanController.getByCheapest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238175",
+  "updateDate": "2025-07-26T15:28:15.238175"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travelPlan/getMinStation, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.228612",
+  "updateDate": "2025-07-26T15:28:15.228613"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travelPlan/getMinStation, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245622",
+  "updateDate": "2025-07-26T15:28:15.245623"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travelPlan/getMinStation, TravelPlanController.getByMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216671",
+  "updateDate": "2025-07-26T15:28:15.216671"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /travelPlan/getTransferResult, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249011",
+  "updateDate": "2025-07-26T15:28:15.249011"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(PriceConfigRepository.findByRouteIdAndTrainType, find ts.price_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249334",
+  "updateDate": "2025-07-26T15:28:15.249335"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(PriceController.query, PriceConfigRepository.findByRouteIdAndTrainType)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24648",
+  "updateDate": "2025-07-26T15:28:15.24648"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(SecurityController.create, SecurityRepository.findByName)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248769",
+  "updateDate": "2025-07-26T15:28:15.248769"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(SecurityController.create, SecurityRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.20932",
+  "updateDate": "2025-07-26T15:28:15.209321"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(SecurityController.findAllSecurityConfig, SecurityRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23253",
+  "updateDate": "2025-07-26T15:28:15.23253"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(SecurityRepository.findAll, find ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249728",
+  "updateDate": "2025-07-26T15:28:15.249728"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(SecurityRepository.save, update ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234138",
+  "updateDate": "2025-07-26T15:28:15.234139"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(StationController.query, StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214759",
+  "updateDate": "2025-07-26T15:28:15.214759"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(StationRepository.findAll, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233896",
+  "updateDate": "2025-07-26T15:28:15.233896"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(TrainFoodRepository.findByTripId, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233411",
+  "updateDate": "2025-07-26T15:28:15.233411"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(TravelController.getTripsByRouteId, TripRepository.findByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212614",
+  "updateDate": "2025-07-26T15:28:15.212615"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(TravelController.queryAll, TripRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234851",
+  "updateDate": "2025-07-26T15:28:15.234851"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHAIN_SUCCESSION(TripRepository.findByRouteId, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217461",
+  "updateDate": "2025-07-26T15:28:15.217461"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AccountLoginController.login, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211365",
+  "updateDate": "2025-07-26T15:28:15.211365"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AccountLoginController.login, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218864",
+  "updateDate": "2025-07-26T15:28:15.218864"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AccountLoginController.logout, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241238",
+  "updateDate": "2025-07-26T15:28:15.241238"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AccountSsoController.logoutDeleteToken, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242955",
+  "updateDate": "2025-07-26T15:28:15.242955"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AccountSsoController.verifyLoginToken, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217918",
+  "updateDate": "2025-07-26T15:28:15.217918"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AssuranceController.getAssuranceById, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250938",
+  "updateDate": "2025-07-26T15:28:15.250938"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(AssuranceController.getAssuranceById, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246253",
+  "updateDate": "2025-07-26T15:28:15.246254"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicController.queryForTravel, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238729",
+  "updateDate": "2025-07-26T15:28:15.238729"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, OrderController.createNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246633",
+  "updateDate": "2025-07-26T15:28:15.246634"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, OrderController.modifyOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233656",
+  "updateDate": "2025-07-26T15:28:15.233656"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, OrderController.payOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244608",
+  "updateDate": "2025-07-26T15:28:15.244608"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, PreserveOtherController.preserve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240619",
+  "updateDate": "2025-07-26T15:28:15.240619"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, RebookController.payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210343",
+  "updateDate": "2025-07-26T15:28:15.210343"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, TravelPlanController.getByMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242329",
+  "updateDate": "2025-07-26T15:28:15.242329"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(BasicErrorController.error, TravelPlanController.getTransferResult)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239782",
+  "updateDate": "2025-07-26T15:28:15.239782"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodOrderRepository.findByOrderId, FoodOrderRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242568",
+  "updateDate": "2025-07-26T15:28:15.242568"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodStoreRepository.findById, FoodStoreRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24679",
+  "updateDate": "2025-07-26T15:28:15.24679"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodStoreRepository.findById, TrainFoodRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243202",
+  "updateDate": "2025-07-26T15:28:15.243203"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodStoreRepository.findById, TrainFoodRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232777",
+  "updateDate": "2025-07-26T15:28:15.232777"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodStoreRepository.save, TrainFoodRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.222873",
+  "updateDate": "2025-07-26T15:28:15.222874"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(FoodStoreRepository.save, TrainFoodRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223776",
+  "updateDate": "2025-07-26T15:28:15.223777"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(HttpServletResponseWrapper.sendError, OrderController.createNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.226656",
+  "updateDate": "2025-07-26T15:28:15.226658"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(HttpServletResponseWrapper.sendError, PreserveOtherController.preserve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243432",
+  "updateDate": "2025-07-26T15:28:15.243432"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(HttpServletResponseWrapper.sendError, RebookController.payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247962",
+  "updateDate": "2025-07-26T15:28:15.247962"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(HttpServletResponseWrapper.sendError, SeatController.getLeftTicketOfInterval)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235407",
+  "updateDate": "2025-07-26T15:28:15.235408"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(HttpServletResponseWrapper.sendError, TravelPlanController.getByMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249099",
+  "updateDate": "2025-07-26T15:28:15.249099"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(OrderOtherRepository.findByAccountId, OrderOtherRepository.save)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.210972",
+  "updateDate": "2025-07-26T15:28:15.210972"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(SecurityRepository.findByName, SecurityRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234294",
+  "updateDate": "2025-07-26T15:28:15.234294"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "CHOICE(TrainFoodRepository.findById, TrainFoodRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.229379",
+  "updateDate": "2025-07-26T15:28:15.229381"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AccountLoginController.logout)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218787",
+  "updateDate": "2025-07-26T15:28:15.218787"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AccountSsoController.logoutDeleteToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218473",
+  "updateDate": "2025-07-26T15:28:15.218474"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AccountSsoController.verifyLoginToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245783",
+  "updateDate": "2025-07-26T15:28:15.245783"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AdminBasicInfoController.getAllStations)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212529",
+  "updateDate": "2025-07-26T15:28:15.212536"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AdminOrderController.getAllOrders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241471",
+  "updateDate": "2025-07-26T15:28:15.241472"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(AssuranceController.getAssuranceById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.20833",
+  "updateDate": "2025-07-26T15:28:15.208332"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(FoodController.createFoodOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247339",
+  "updateDate": "2025-07-26T15:28:15.247339"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(FoodController.getFood)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223175",
+  "updateDate": "2025-07-26T15:28:15.223176"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(FoodMapController.getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.207748",
+  "updateDate": "2025-07-26T15:28:15.20775"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(FoodOrderRepository.findByOrderId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234216",
+  "updateDate": "2025-07-26T15:28:15.234216"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(FoodOrderRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244533",
+  "updateDate": "2025-07-26T15:28:15.244534"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /adminbasic/getAllStations/{id})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237329",
+  "updateDate": "2025-07-26T15:28:15.237329"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /adminorder/findAll/{id})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213011",
+  "updateDate": "2025-07-26T15:28:15.213011"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /assurance/getAssuranceById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213886",
+  "updateDate": "2025-07-26T15:28:15.213886"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /inside_payment/queryAddMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235175",
+  "updateDate": "2025-07-26T15:28:15.235175"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /order/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237408",
+  "updateDate": "2025-07-26T15:28:15.237408"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /orderOther/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.220992",
+  "updateDate": "2025-07-26T15:28:15.220994"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /securityConfig/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232268",
+  "updateDate": "2025-07-26T15:28:15.232268"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /station/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240917",
+  "updateDate": "2025-07-26T15:28:15.240917"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /travel/queryAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239366",
+  "updateDate": "2025-07-26T15:28:15.239367"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(GET /verifyLoginToken/{token})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236594",
+  "updateDate": "2025-07-26T15:28:15.236594"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(InsidePaymentController.queryAddMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240994",
+  "updateDate": "2025-07-26T15:28:15.240995"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderController.createNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210896",
+  "updateDate": "2025-07-26T15:28:15.210896"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247577",
+  "updateDate": "2025-07-26T15:28:15.247577"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderController.modifyOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21175",
+  "updateDate": "2025-07-26T15:28:15.21175"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderController.payOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239459",
+  "updateDate": "2025-07-26T15:28:15.239459"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderOtherController.addcreateNewOrder)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.218299",
+  "updateDate": "2025-07-26T15:28:15.218299"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderOtherController.calculateSoldTicket)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209722",
+  "updateDate": "2025-07-26T15:28:15.209722"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderOtherController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209481",
+  "updateDate": "2025-07-26T15:28:15.209482"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248456",
+  "updateDate": "2025-07-26T15:28:15.248456"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderOtherRepository.findByAccountId)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.211055",
+  "updateDate": "2025-07-26T15:28:15.211055"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244298",
+  "updateDate": "2025-07-26T15:28:15.244298"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(OrderRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215231",
+  "updateDate": "2025-07-26T15:28:15.215231"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(PaymentRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233111",
+  "updateDate": "2025-07-26T15:28:15.233111"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /food/createFoodOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.219331",
+  "updateDate": "2025-07-26T15:28:15.219331"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /food/getFood)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236128",
+  "updateDate": "2025-07-26T15:28:15.236128"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /foodmap/getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215919",
+  "updateDate": "2025-07-26T15:28:15.21592"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /logout)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244057",
+  "updateDate": "2025-07-26T15:28:15.244057"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /order/create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232947",
+  "updateDate": "2025-07-26T15:28:15.232947"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /order/modifyOrderStatus)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243743",
+  "updateDate": "2025-07-26T15:28:15.243743"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /orderOther/adminAddOrder)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.245546",
+  "updateDate": "2025-07-26T15:28:15.245547"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /orderOther/calculate)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242249",
+  "updateDate": "2025-07-26T15:28:15.242249"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /order/payOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246327",
+  "updateDate": "2025-07-26T15:28:15.246328"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /preserveOther)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245315",
+  "updateDate": "2025-07-26T15:28:15.245316"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /price/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213578",
+  "updateDate": "2025-07-26T15:28:15.213578"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /rebook/payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213733",
+  "updateDate": "2025-07-26T15:28:15.213734"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /securityConfig/create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.228084",
+  "updateDate": "2025-07-26T15:28:15.228085"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /travel/getTripsByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.207472",
+  "updateDate": "2025-07-26T15:28:15.207474"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /travelPlan/getCheapest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234366",
+  "updateDate": "2025-07-26T15:28:15.234367"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(POST /travelPlan/getMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238018",
+  "updateDate": "2025-07-26T15:28:15.238019"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(PreserveOtherController.preserve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.22903",
+  "updateDate": "2025-07-26T15:28:15.229031"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(PriceConfigRepository.findByRouteIdAndTrainType)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217843",
+  "updateDate": "2025-07-26T15:28:15.217843"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(PriceController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238806",
+  "updateDate": "2025-07-26T15:28:15.238806"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(RebookController.payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215994",
+  "updateDate": "2025-07-26T15:28:15.215994"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(SecurityController.create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233261",
+  "updateDate": "2025-07-26T15:28:15.233261"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(SecurityController.findAllSecurityConfig)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23219",
+  "updateDate": "2025-07-26T15:28:15.232191"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(SecurityRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241791",
+  "updateDate": "2025-07-26T15:28:15.241791"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(SecurityRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231772",
+  "updateDate": "2025-07-26T15:28:15.231772"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(StationController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234931",
+  "updateDate": "2025-07-26T15:28:15.234931"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215381",
+  "updateDate": "2025-07-26T15:28:15.215381"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237484",
+  "updateDate": "2025-07-26T15:28:15.237484"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TravelController.getTripsByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210741",
+  "updateDate": "2025-07-26T15:28:15.210741"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TravelController.queryAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242722",
+  "updateDate": "2025-07-26T15:28:15.242722"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TravelPlanController.getByCheapest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237095",
+  "updateDate": "2025-07-26T15:28:15.237095"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TravelPlanController.getByMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215845",
+  "updateDate": "2025-07-26T15:28:15.215846"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(TripRepository.findByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245001",
+  "updateDate": "2025-07-26T15:28:15.245001"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(update ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235008",
+  "updateDate": "2025-07-26T15:28:15.235008"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(update ts.payment)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237712",
+  "updateDate": "2025-07-26T15:28:15.237713"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "EXISTENCE(update ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247499",
+  "updateDate": "2025-07-26T15:28:15.2475"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(ContactsRepository.save)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.249415",
+  "updateDate": "2025-07-26T15:28:15.249415"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /adminbasic/getAllStations/{id})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23119",
+  "updateDate": "2025-07-26T15:28:15.231192"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /adminorder/findAll/{id})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.22579",
+  "updateDate": "2025-07-26T15:28:15.225792"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /assurance/getAssuranceById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243591",
+  "updateDate": "2025-07-26T15:28:15.243591"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /inside_payment/queryAddMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249806",
+  "updateDate": "2025-07-26T15:28:15.249807"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /securityConfig/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.228875",
+  "updateDate": "2025-07-26T15:28:15.228875"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /travel/queryAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232097",
+  "updateDate": "2025-07-26T15:28:15.232097"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(GET /verifyLoginToken/{token})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.222427",
+  "updateDate": "2025-07-26T15:28:15.222428"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(PaymentRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242175",
+  "updateDate": "2025-07-26T15:28:15.242176"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /config/delete)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247263",
+  "updateDate": "2025-07-26T15:28:15.247263"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /contacts/deleteContacts)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211677",
+  "updateDate": "2025-07-26T15:28:15.211677"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /food/createFoodOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21206",
+  "updateDate": "2025-07-26T15:28:15.212061"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /food/getFood)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211826",
+  "updateDate": "2025-07-26T15:28:15.211826"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /logout)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233337",
+  "updateDate": "2025-07-26T15:28:15.233337"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /order/adminAddOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.228711",
+  "updateDate": "2025-07-26T15:28:15.228711"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /order/create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215531",
+  "updateDate": "2025-07-26T15:28:15.215531"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /order/modifyOrderStatus)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247814",
+  "updateDate": "2025-07-26T15:28:15.247814"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /orderOther/adminAddOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241555",
+  "updateDate": "2025-07-26T15:28:15.241556"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /orderOther/calculate)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209798",
+  "updateDate": "2025-07-26T15:28:15.209798"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /order/payOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.2381",
+  "updateDate": "2025-07-26T15:28:15.2381"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /preserveOther)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248937",
+  "updateDate": "2025-07-26T15:28:15.248938"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /price/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.205893",
+  "updateDate": "2025-07-26T15:28:15.205896"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /rebook/payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21027",
+  "updateDate": "2025-07-26T15:28:15.21027"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /securityConfig/create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216751",
+  "updateDate": "2025-07-26T15:28:15.216751"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /train/retrieve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210666",
+  "updateDate": "2025-07-26T15:28:15.210667"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /travel/create)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212378",
+  "updateDate": "2025-07-26T15:28:15.212379"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /travel/getTripsByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236939",
+  "updateDate": "2025-07-26T15:28:15.236939"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /travelPlan/getCheapest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.228454",
+  "updateDate": "2025-07-26T15:28:15.228456"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(POST /travelPlan/getMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214286",
+  "updateDate": "2025-07-26T15:28:15.214286"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "INIT(TripRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216433",
+  "updateDate": "2025-07-26T15:28:15.216433"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(AccountLoginController.login)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239542",
+  "updateDate": "2025-07-26T15:28:15.239542"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(AccountSsoController.logoutDeleteToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249178",
+  "updateDate": "2025-07-26T15:28:15.249178"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(AccountSsoController.verifyLoginToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249881",
+  "updateDate": "2025-07-26T15:28:15.249881"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(AssuranceController.getAssuranceById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.208083",
+  "updateDate": "2025-07-26T15:28:15.208084"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(BasicController.queryForTravel)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.219257",
+  "updateDate": "2025-07-26T15:28:15.219257"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(OrderController.createNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239201",
+  "updateDate": "2025-07-26T15:28:15.239201"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(OrderController.modifyOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212936",
+  "updateDate": "2025-07-26T15:28:15.212937"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(PreserveOtherController.preserve)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241867",
+  "updateDate": "2025-07-26T15:28:15.241868"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(RebookController.payDifference)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233188",
+  "updateDate": "2025-07-26T15:28:15.233188"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(SeatController.getLeftTicketOfInterval)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216985",
+  "updateDate": "2025-07-26T15:28:15.216985"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246947",
+  "updateDate": "2025-07-26T15:28:15.246948"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(TravelController.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211291",
+  "updateDate": "2025-07-26T15:28:15.211291"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(TravelPlanController.getByMinStation)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248535",
+  "updateDate": "2025-07-26T15:28:15.248535"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(update ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210195",
+  "updateDate": "2025-07-26T15:28:15.210195"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(update ts.payment)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245704",
+  "updateDate": "2025-07-26T15:28:15.245705"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "LAST(update ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234682",
+  "updateDate": "2025-07-26T15:28:15.234682"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AccountLoginController.logout, AccountSsoController.logoutDeleteToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237013",
+  "updateDate": "2025-07-26T15:28:15.237013"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AccountLoginController.logout, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232453",
+  "updateDate": "2025-07-26T15:28:15.232454"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminBasicInfoController.getAllStations, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211598",
+  "updateDate": "2025-07-26T15:28:15.211598"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminBasicInfoController.getAllStations, GET /station/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21738",
+  "updateDate": "2025-07-26T15:28:15.217381"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminBasicInfoController.getAllStations, StationController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209559",
+  "updateDate": "2025-07-26T15:28:15.209559"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminBasicInfoController.getAllStations, StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214049",
+  "updateDate": "2025-07-26T15:28:15.214049"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.addOrder, OrderOtherController.addcreateNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244689",
+  "updateDate": "2025-07-26T15:28:15.244689"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.addOrder, OrderOtherRepository.findByAccountId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209951",
+  "updateDate": "2025-07-26T15:28:15.209951"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.addOrder, OrderOtherRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.222021",
+  "updateDate": "2025-07-26T15:28:15.222023"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.addOrder, POST /orderOther/adminAddOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235964",
+  "updateDate": "2025-07-26T15:28:15.235964"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217611",
+  "updateDate": "2025-07-26T15:28:15.217611"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, GET /order/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231509",
+  "updateDate": "2025-07-26T15:28:15.231509"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, GET /orderOther/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217764",
+  "updateDate": "2025-07-26T15:28:15.217765"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, OrderController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249254",
+  "updateDate": "2025-07-26T15:28:15.249255"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, OrderOtherController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248048",
+  "updateDate": "2025-07-26T15:28:15.248048"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.208793",
+  "updateDate": "2025-07-26T15:28:15.208795"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(AdminOrderController.getAllOrders, OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245469",
+  "updateDate": "2025-07-26T15:28:15.24547"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, find ts.contacts)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214604",
+  "updateDate": "2025-07-26T15:28:15.214604"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24539",
+  "updateDate": "2025-07-26T15:28:15.245391"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, find ts.stores)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215306",
+  "updateDate": "2025-07-26T15:28:15.215306"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.2191",
+  "updateDate": "2025-07-26T15:28:15.2191"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, update ts.stores)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210506",
+  "updateDate": "2025-07-26T15:28:15.210506"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(EMController.runSut, update ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245163",
+  "updateDate": "2025-07-26T15:28:15.245163"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.createFoodOrder, find ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247887",
+  "updateDate": "2025-07-26T15:28:15.247887"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.createFoodOrder, update ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21918",
+  "updateDate": "2025-07-26T15:28:15.21918"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.220347",
+  "updateDate": "2025-07-26T15:28:15.220349"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.211212",
+  "updateDate": "2025-07-26T15:28:15.211213"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, FoodMapController.getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.220676",
+  "updateDate": "2025-07-26T15:28:15.220678"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, GET /travel/getRouteByTripId/{tripId})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247102",
+  "updateDate": "2025-07-26T15:28:15.247103"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, POST /foodmap/getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218151",
+  "updateDate": "2025-07-26T15:28:15.218151"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21623",
+  "updateDate": "2025-07-26T15:28:15.21623"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, TravelController.getRouteByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.230738",
+  "updateDate": "2025-07-26T15:28:15.23074"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodController.getFood, TripRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250037",
+  "updateDate": "2025-07-26T15:28:15.250037"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(FoodMapController.getTrainFoodOfTrip, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217994",
+  "updateDate": "2025-07-26T15:28:15.217994"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminbasic/getAllStations/{id}, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218628",
+  "updateDate": "2025-07-26T15:28:15.218628"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminbasic/getAllStations/{id}, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236514",
+  "updateDate": "2025-07-26T15:28:15.236514"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminbasic/getAllStations/{id}, GET /station/query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238563",
+  "updateDate": "2025-07-26T15:28:15.238563"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminbasic/getAllStations/{id}, StationController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232667",
+  "updateDate": "2025-07-26T15:28:15.232668"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminbasic/getAllStations/{id}, StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249953",
+  "updateDate": "2025-07-26T15:28:15.249953"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246014",
+  "updateDate": "2025-07-26T15:28:15.246014"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231688",
+  "updateDate": "2025-07-26T15:28:15.231688"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, GET /order/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21152",
+  "updateDate": "2025-07-26T15:28:15.21152"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, GET /orderOther/findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242409",
+  "updateDate": "2025-07-26T15:28:15.242409"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, OrderController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.230963",
+  "updateDate": "2025-07-26T15:28:15.230964"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, OrderOtherController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.222721",
+  "updateDate": "2025-07-26T15:28:15.222721"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218225",
+  "updateDate": "2025-07-26T15:28:15.218226"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /adminorder/findAll/{id}, OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213809",
+  "updateDate": "2025-07-26T15:28:15.213809"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217148",
+  "updateDate": "2025-07-26T15:28:15.217148"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213502",
+  "updateDate": "2025-07-26T15:28:15.213503"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.227855",
+  "updateDate": "2025-07-26T15:28:15.227855"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248372",
+  "updateDate": "2025-07-26T15:28:15.248372"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /inside_payment/queryAddMoney, AddMoneyRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24477",
+  "updateDate": "2025-07-26T15:28:15.244771"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /inside_payment/queryAddMoney, find ts.addMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237253",
+  "updateDate": "2025-07-26T15:28:15.237254"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, OrderController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.208554",
+  "updateDate": "2025-07-26T15:28:15.208556"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /order/findAll, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237942",
+  "updateDate": "2025-07-26T15:28:15.237942"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /order/findAll, OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214836",
+  "updateDate": "2025-07-26T15:28:15.214836"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, OrderOtherController.findAllOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239285",
+  "updateDate": "2025-07-26T15:28:15.239285"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /orderOther/findAll, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246715",
+  "updateDate": "2025-07-26T15:28:15.246715"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /orderOther/findAll, OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248608",
+  "updateDate": "2025-07-26T15:28:15.248609"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, OrderOtherRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246177",
+  "updateDate": "2025-07-26T15:28:15.246177"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, OrderRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23636",
+  "updateDate": "2025-07-26T15:28:15.23636"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, ResourceHttpRequestHandler.handleRequest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240267",
+  "updateDate": "2025-07-26T15:28:15.240267"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /securityConfig/findAll, find ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.246403",
+  "updateDate": "2025-07-26T15:28:15.246403"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /securityConfig/findAll, SecurityRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247186",
+  "updateDate": "2025-07-26T15:28:15.247186"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, StationController.query)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245239",
+  "updateDate": "2025-07-26T15:28:15.24524"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /station/query, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214684",
+  "updateDate": "2025-07-26T15:28:15.214684"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /station/query, StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215156",
+  "updateDate": "2025-07-26T15:28:15.215156"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET, StationRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238411",
+  "updateDate": "2025-07-26T15:28:15.238411"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /travel/queryAll, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.216824",
+  "updateDate": "2025-07-26T15:28:15.216824"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(GET /travel/queryAll, TripRepository.findAll)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241939",
+  "updateDate": "2025-07-26T15:28:15.24194"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(InsidePaymentController.queryAddMoney, find ts.addMoney)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240189",
+  "updateDate": "2025-07-26T15:28:15.24019"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderController.findAllOrder, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23533",
+  "updateDate": "2025-07-26T15:28:15.235331"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderController.payOrder, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.249568",
+  "updateDate": "2025-07-26T15:28:15.249568"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderOtherController.addcreateNewOrder, find test.orders)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.213196",
+  "updateDate": "2025-07-26T15:28:15.213196"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderOtherController.addcreateNewOrder, update test.orders)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.219493",
+  "updateDate": "2025-07-26T15:28:15.219494"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderOtherController.calculateSoldTicket, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235254",
+  "updateDate": "2025-07-26T15:28:15.235254"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(OrderOtherController.findAllOrder, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247733",
+  "updateDate": "2025-07-26T15:28:15.247734"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, AccountSsoController.logoutDeleteToken)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236668",
+  "updateDate": "2025-07-26T15:28:15.236668"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /adminorder/addOrder, OrderOtherController.addcreateNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.247418",
+  "updateDate": "2025-07-26T15:28:15.247418"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /adminorder/addOrder, OrderOtherRepository.findByAccountId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235805",
+  "updateDate": "2025-07-26T15:28:15.235806"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /adminorder/addOrder, OrderOtherRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237633",
+  "updateDate": "2025-07-26T15:28:15.237634"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /adminorder/addOrder, POST /orderOther/adminAddOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232371",
+  "updateDate": "2025-07-26T15:28:15.232372"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21615",
+  "updateDate": "2025-07-26T15:28:15.21615"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/createFoodOrder, find ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237786",
+  "updateDate": "2025-07-26T15:28:15.237787"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/createFoodOrder, FoodOrderRepository.findByOrderId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210424",
+  "updateDate": "2025-07-26T15:28:15.210424"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/createFoodOrder, FoodOrderRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21871",
+  "updateDate": "2025-07-26T15:28:15.21871"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/createFoodOrder, update ts.foodorder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214128",
+  "updateDate": "2025-07-26T15:28:15.214128"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.242098",
+  "updateDate": "2025-07-26T15:28:15.242098"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238255",
+  "updateDate": "2025-07-26T15:28:15.238256"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, FoodMapController.getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239942",
+  "updateDate": "2025-07-26T15:28:15.239942"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, GET)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243899",
+  "updateDate": "2025-07-26T15:28:15.243899"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, GET /travel/getRouteByTripId/{tripId})",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24422",
+  "updateDate": "2025-07-26T15:28:15.24422"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248134",
+  "updateDate": "2025-07-26T15:28:15.248134"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, POST /foodmap/getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243357",
+  "updateDate": "2025-07-26T15:28:15.243358"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240701",
+  "updateDate": "2025-07-26T15:28:15.240701"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, TravelController.getRouteByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237557",
+  "updateDate": "2025-07-26T15:28:15.237557"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /food/getFood, TripRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243281",
+  "updateDate": "2025-07-26T15:28:15.243281"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, FoodMapController.getTrainFoodOfTrip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212132",
+  "updateDate": "2025-07-26T15:28:15.212132"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /foodmap/getTrainFoodOfTrip, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.225369",
+  "updateDate": "2025-07-26T15:28:15.225371"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /foodmap/getTrainFoodOfTrip, TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213354",
+  "updateDate": "2025-07-26T15:28:15.213355"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/adminAddOrder, find test.orders)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.224484",
+  "updateDate": "2025-07-26T15:28:15.224486"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/adminAddOrder, OrderOtherRepository.findByAccountId)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.243818",
+  "updateDate": "2025-07-26T15:28:15.243818"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/adminAddOrder, OrderOtherRepository.save)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.247654",
+  "updateDate": "2025-07-26T15:28:15.247654"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/adminAddOrder, update test.orders)",
+  "probability": 0.0016474464579901153,
+  "nr": 2,
+  "insertDate": "2025-07-26T15:28:15.217689",
+  "updateDate": "2025-07-26T15:28:15.217689"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/calculate, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.245933",
+  "updateDate": "2025-07-26T15:28:15.245933"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /orderOther/calculate, OrderOtherRepository.findByTravelDateAndTrainNumber)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218072",
+  "updateDate": "2025-07-26T15:28:15.218073"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, OrderOtherController.addcreateNewOrder)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23185",
+  "updateDate": "2025-07-26T15:28:15.23185"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, OrderOtherRepository.findByAccountId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210116",
+  "updateDate": "2025-07-26T15:28:15.210116"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, OrderOtherRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218398",
+  "updateDate": "2025-07-26T15:28:15.218398"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /order/payOrder, find test.orders)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.221352",
+  "updateDate": "2025-07-26T15:28:15.221354"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /order/payOrder, OrderRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244924",
+  "updateDate": "2025-07-26T15:28:15.244925"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /price/query, find ts.price_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.221681",
+  "updateDate": "2025-07-26T15:28:15.221682"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /price/query, PriceConfigRepository.findByRouteIdAndTrainType)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.243033",
+  "updateDate": "2025-07-26T15:28:15.243033"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /routePlan/cheapestRoute, POST /travel2/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239616",
+  "updateDate": "2025-07-26T15:28:15.239616"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /routePlan/cheapestRoute, Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212855",
+  "updateDate": "2025-07-26T15:28:15.212855"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /seat/getLeftTicketOfInterval, GET /**)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23683",
+  "updateDate": "2025-07-26T15:28:15.236831"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /seat/getLeftTicketOfInterval, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213962",
+  "updateDate": "2025-07-26T15:28:15.213962"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /seat/getLeftTicketOfInterval, ResourceHttpRequestHandler.handleRequest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244135",
+  "updateDate": "2025-07-26T15:28:15.244135"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /securityConfig/create, find ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241161",
+  "updateDate": "2025-07-26T15:28:15.241161"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /securityConfig/create, SecurityRepository.findByName)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233574",
+  "updateDate": "2025-07-26T15:28:15.233575"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /securityConfig/create, SecurityRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209644",
+  "updateDate": "2025-07-26T15:28:15.209645"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /securityConfig/create, update ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234062",
+  "updateDate": "2025-07-26T15:28:15.234062"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, TrainFoodRepository.findByTripId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.206785",
+  "updateDate": "2025-07-26T15:28:15.206787"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234442",
+  "updateDate": "2025-07-26T15:28:15.234443"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST, TravelController.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233975",
+  "updateDate": "2025-07-26T15:28:15.233975"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travel/getTripsByRouteId, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.250613",
+  "updateDate": "2025-07-26T15:28:15.250613"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travel/getTripsByRouteId, TripRepository.findByRouteId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234521",
+  "updateDate": "2025-07-26T15:28:15.234522"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, POST)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.237173",
+  "updateDate": "2025-07-26T15:28:15.237173"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, POST /routePlan/cheapestRoute)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240531",
+  "updateDate": "2025-07-26T15:28:15.240531"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, POST /travel2/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.251021",
+  "updateDate": "2025-07-26T15:28:15.251022"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, POST /travel/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212297",
+  "updateDate": "2025-07-26T15:28:15.212298"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, RoutePlanController.getCheapestRoutes)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217304",
+  "updateDate": "2025-07-26T15:28:15.217304"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.231929",
+  "updateDate": "2025-07-26T15:28:15.231929"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getCheapest, TravelController.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.224062",
+  "updateDate": "2025-07-26T15:28:15.224062"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, BasicController.queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244453",
+  "updateDate": "2025-07-26T15:28:15.244453"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217066",
+  "updateDate": "2025-07-26T15:28:15.217066"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.234601",
+  "updateDate": "2025-07-26T15:28:15.234601"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, POST /basic/queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213654",
+  "updateDate": "2025-07-26T15:28:15.213654"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, POST /station/queryForId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.209239",
+  "updateDate": "2025-07-26T15:28:15.20924"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, POST /ticketinfo/queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248287",
+  "updateDate": "2025-07-26T15:28:15.248288"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, StationController.queryForId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215073",
+  "updateDate": "2025-07-26T15:28:15.215073"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, StationRepository.findByName)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238335",
+  "updateDate": "2025-07-26T15:28:15.238335"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(POST /travelPlan/getTransferResult, TicketInfoController.queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223019",
+  "updateDate": "2025-07-26T15:28:15.223019"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PriceController.query, find ts.price_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.215603",
+  "updateDate": "2025-07-26T15:28:15.215603"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, ContactsRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235089",
+  "updateDate": "2025-07-26T15:28:15.23509"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, find ts.contacts)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.232862",
+  "updateDate": "2025-07-26T15:28:15.232862"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239699",
+  "updateDate": "2025-07-26T15:28:15.2397"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, find ts.stores)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248855",
+  "updateDate": "2025-07-26T15:28:15.248855"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, find ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.223478",
+  "updateDate": "2025-07-26T15:28:15.223479"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, FoodStoreRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.217223",
+  "updateDate": "2025-07-26T15:28:15.217223"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, FoodStoreRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.208949",
+  "updateDate": "2025-07-26T15:28:15.208949"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, StationRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241711",
+  "updateDate": "2025-07-26T15:28:15.241711"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, TrainFoodRepository.findById)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235651",
+  "updateDate": "2025-07-26T15:28:15.235651"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, TrainFoodRepository.save)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238485",
+  "updateDate": "2025-07-26T15:28:15.238486"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, update ts.stores)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.22363",
+  "updateDate": "2025-07-26T15:28:15.223631"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(PUT /controller/api/runSUT, update ts.trainfoods)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248211",
+  "updateDate": "2025-07-26T15:28:15.248212"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(RoutePlanController.getCheapestRoutes, POST /travel2/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.233489",
+  "updateDate": "2025-07-26T15:28:15.233489"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(RoutePlanController.getCheapestRoutes, Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.230057",
+  "updateDate": "2025-07-26T15:28:15.230059"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SeatController.getLeftTicketOfInterval, GET /**)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212694",
+  "updateDate": "2025-07-26T15:28:15.212694"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SeatController.getLeftTicketOfInterval, HttpServletResponseWrapper.sendError)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.210583",
+  "updateDate": "2025-07-26T15:28:15.210584"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SeatController.getLeftTicketOfInterval, ResourceHttpRequestHandler.handleRequest)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.239104",
+  "updateDate": "2025-07-26T15:28:15.239105"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SecurityController.create, find ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.244847",
+  "updateDate": "2025-07-26T15:28:15.244847"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SecurityController.create, update ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.23644",
+  "updateDate": "2025-07-26T15:28:15.236441"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(SecurityController.findAllSecurityConfig, find ts.security_config)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.213429",
+  "updateDate": "2025-07-26T15:28:15.213429"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(StationController.query, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.235729",
+  "updateDate": "2025-07-26T15:28:15.23573"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelController.getTripsByRouteId, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.230486",
+  "updateDate": "2025-07-26T15:28:15.230487"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelController.queryAll, find ts.trip)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.241393",
+  "updateDate": "2025-07-26T15:28:15.241393"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, POST /routePlan/cheapestRoute)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.21113",
+  "updateDate": "2025-07-26T15:28:15.211131"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, POST /travel2/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214444",
+  "updateDate": "2025-07-26T15:28:15.214444"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, POST /travel/queryWithPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.224934",
+  "updateDate": "2025-07-26T15:28:15.224936"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, RoutePlanController.getCheapestRoutes)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212776",
+  "updateDate": "2025-07-26T15:28:15.212776"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, Travel2Controller.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.24108",
+  "updateDate": "2025-07-26T15:28:15.24108"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getByCheapest, TravelController.queryPackage)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.212451",
+  "updateDate": "2025-07-26T15:28:15.212451"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, BasicController.queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.240831",
+  "updateDate": "2025-07-26T15:28:15.240831"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, BasicErrorController.error)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.229612",
+  "updateDate": "2025-07-26T15:28:15.229614"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, find ts.station)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.207158",
+  "updateDate": "2025-07-26T15:28:15.20716"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, POST /basic/queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214911",
+  "updateDate": "2025-07-26T15:28:15.214911"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, POST /station/queryForId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.214523",
+  "updateDate": "2025-07-26T15:28:15.214523"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, POST /ticketinfo/queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.236747",
+  "updateDate": "2025-07-26T15:28:15.236747"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, StationController.queryForId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.218938",
+  "updateDate": "2025-07-26T15:28:15.218939"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, StationRepository.findByName)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.248686",
+  "updateDate": "2025-07-26T15:28:15.248686"
+}
+{
+  "probDeclareId": "db2f55ad-9875-4e6e-b1a3-022ba425c910",
+  "constraintTemplate": "SUCCESSION(TravelPlanController.getTransferResult, TicketInfoController.queryForStationId)",
+  "probability": 0.0008237232289950577,
+  "nr": 1,
+  "insertDate": "2025-07-26T15:28:15.238642",
+  "updateDate": "2025-07-26T15:28:15.238642"
+}
