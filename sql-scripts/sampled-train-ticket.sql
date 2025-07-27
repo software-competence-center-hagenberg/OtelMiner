@@ -33,7 +33,8 @@ ORDER BY insert_date ASC;
 ---------------------------------------------------------------------------------
 select count(*) from trace where source_file = 'sampled-train-ticket';
 select count(*) from span where trace_id in (select id from trace where source_file = 'sampled-train-ticket');
-select count(*) from declare where prob_declare_id = '9e247532-7958-4dae-a054-d76a5e916255';
+select count(*) from declare where prob_declare_id = 'db2f55ad-9875-4e6e-b1a3-022ba425c910';
+select constraint_template, probability, nr from declare where prob_declare_id = 'db2f55ad-9875-4e6e-b1a3-022ba425c910' and probability >= 0.5;
 ---------------------------------------------------------------------------------
 SELECT 
     CASE 
@@ -52,11 +53,13 @@ SELECT
 FROM 
     public."declare"
 WHERE 
-    prob_declare_id = 'a4be77f3-70aa-40bb-b789-747cad8318e1'
+    prob_declare_id = 'db2f55ad-9875-4e6e-b1a3-022ba425c910'
 GROUP BY 
     probability_range
 ORDER BY 
     MIN(probability);
+---------------------------------------------------------------------------------
+select distinct constraint_template from declare where prob_declare_id ='db2f55ad-9875-4e6e-b1a3-022ba425c910' and constraint_template LIKE 'EXISTENCE%'
 ---------------------------------------------------------------------------------
 SELECT 
     CASE 
@@ -74,13 +77,15 @@ SELECT
         WHEN constraint_template LIKE 'CHAIN_PRECEDENCE%' THEN 'CHAIN_PRECEDENCE'
         WHEN constraint_template LIKE 'CHAIN_SUCCESSION%' THEN 'CHAIN_SUCCESSION'
     END AS constraint_template_group,
+    count(*) as count_total,
     SUM(nr) AS nr_total,
     ROUND(SUM(probability)::numeric, 4) AS probability_total,
     ROUND(AVG(probability)::numeric, 4) AS average_probability
 FROM 
     public."declare"
 WHERE 
-    constraint_template LIKE 'EXISTENCE%' OR
+	prob_declare_id = 'db2f55ad-9875-4e6e-b1a3-022ba425c910' AND
+    (constraint_template LIKE 'EXISTENCE%' OR
     constraint_template LIKE 'INIT%' OR
     constraint_template LIKE 'LAST%' OR
     constraint_template LIKE 'CHOICE%' OR
@@ -92,7 +97,7 @@ WHERE
     constraint_template LIKE 'ALTERNATE_SUCCESSION%' OR
     constraint_template LIKE 'CHAIN_RESPONSE%' OR
     constraint_template LIKE 'CHAIN_PRECEDENCE%' OR
-    constraint_template LIKE 'CHAIN_SUCCESSION%'
+    constraint_template LIKE 'CHAIN_SUCCESSION%')
 GROUP BY 
     constraint_template_group
 ORDER BY 

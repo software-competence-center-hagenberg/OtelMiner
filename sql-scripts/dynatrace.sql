@@ -1,8 +1,8 @@
 select lo_get("json") from span s where s.trace_id = 'c3e60e42d6b5784492e7b44ab7ad9791';
 -----------------------------------------------------------------------------------------
-delete from "declare" where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
-delete from prob_declare_to_trace where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
-delete from prob_declare where id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
+--delete from "declare" where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
+--delete from prob_declare_to_trace where prob_declare_id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
+--delete from prob_declare where id = '9dda37f9-bed1-4f55-b873-60ac1ec13792';
 ALTER TABLE public."declare" 
 ALTER COLUMN constraint_template TYPE varchar(500);
 
@@ -44,7 +44,8 @@ ORDER BY insert_date ASC;
 
 select count(*) from trace where source_file like '%AstroShop%';
 select count(*) from span where trace_id in (select id from trace where source_file like '%AstroShop%');
-select count(*) from declare where prob_declare_id = '38e54284-2779-40fb-b994-c239e1cbe817';
+select count(*) from declare where prob_declare_id = 'e4113d45-2fcd-408e-8dc7-b8e1e57c8ab5';
+select constraint_template, probability, nr from declare where prob_declare_id = 'e4113d45-2fcd-408e-8dc7-b8e1e57c8ab5' and probability >= 0.2;
 ---------------------------------------------------------------------------------
 SELECT 
     CASE 
@@ -64,7 +65,7 @@ SELECT
 FROM 
     public."declare"
 WHERE 
-    prob_declare_id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7'
+    prob_declare_id = 'e4113d45-2fcd-408e-8dc7-b8e1e57c8ab5'
 GROUP BY 
     probability_range
 ORDER BY 
@@ -87,13 +88,15 @@ SELECT
         WHEN constraint_template LIKE 'CHAIN_PRECEDENCE%' THEN 'CHAIN_PRECEDENCE'
         WHEN constraint_template LIKE 'CHAIN_SUCCESSION%' THEN 'CHAIN_SUCCESSION'
     END AS constraint_template_group,
+    count(*) as count_total,
     SUM(nr) AS nr_total,
     ROUND(SUM(probability)::numeric, 4) AS probability_total,
     ROUND(AVG(probability)::numeric, 4) AS average_probability
 FROM 
     public."declare"
 WHERE 
-    constraint_template LIKE 'EXISTENCE%' OR
+prob_declare_id = 'e4113d45-2fcd-408e-8dc7-b8e1e57c8ab5' AND
+    (constraint_template LIKE 'EXISTENCE%' OR
     constraint_template LIKE 'INIT%' OR
     constraint_template LIKE 'LAST%' OR
     constraint_template LIKE 'CHOICE%' OR
@@ -105,8 +108,7 @@ WHERE
     constraint_template LIKE 'ALTERNATE_SUCCESSION%' OR
     constraint_template LIKE 'CHAIN_RESPONSE%' OR
     constraint_template LIKE 'CHAIN_PRECEDENCE%' OR
-    constraint_template LIKE 'CHAIN_SUCCESSION%'
-    AND prob_declare_id = 'c9dc89a7-b746-4845-bdb3-e11099d1f4e7'
+    constraint_template LIKE 'CHAIN_SUCCESSION%') 
 GROUP BY 
     constraint_template_group
 ORDER BY 
