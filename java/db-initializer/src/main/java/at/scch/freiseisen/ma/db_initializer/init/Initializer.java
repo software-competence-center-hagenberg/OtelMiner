@@ -49,13 +49,13 @@ public class Initializer {
         log.info("Starting DB initialization...");
         log.info("Loading Dynatrace traces...");
         try {
-            unpackDataAndPopupateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
+            unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
 //            log.info("Loading Jaeger traces...");
 //            unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
             log.info("Creating Sample for train-ticket system...");
             for (int i = 0; i < sampledData.length; i++) {
                 log.info("processing sample archive {} ...", i);
-                unpackDataAndPopupateDatabase(sampledData[i], jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST, true);
+                unpackDataAndPopulateDatabase(sampledData[i], jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST, true);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,13 +65,13 @@ public class Initializer {
         System.exit(0);
     }
 
-    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType)
+    private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType)
             throws IOException {
-        unpackDataAndPopupateDatabase(resourceLocation, parser, traceDataType, false);
+        unpackDataAndPopulateDatabase(resourceLocation, parser, traceDataType, false);
     }
 
-    private void unpackDataAndPopupateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
-            boolean sample) throws IOException {
+    private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
+                                               boolean sample) throws IOException {
         Resource archiveResource = resourceLoader.getResource("classpath:" + resourceLocation);
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
