@@ -1,7 +1,0 @@
-(executable
- (public_name otel_preprocessor)
- (name main)
- (libraries
-  amqp-client-async
-  declare
-  message_processor))
