@@ -54,7 +54,7 @@ public class Initializer {
             }
             if (jaegerData != null) {
                 log.info("Loading Jaeger traces...");
-                unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
+                unpackDataAndPopulateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
             }
             if (sampledData != null && sampledData.length > 0) {
                 log.info("Creating Sample for train-ticket system...");

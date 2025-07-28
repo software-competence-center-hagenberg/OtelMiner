@@ -43,7 +43,7 @@
         <module>data-layer</module>
         <module>db-service</module>
         <module>model-generator</module>
-<!--        <module>db-initializer</module>-->
+        <module>db-initializer</module>
     </modules>
 
     <dependencies>
