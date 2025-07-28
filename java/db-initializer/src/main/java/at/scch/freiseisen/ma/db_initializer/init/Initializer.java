@@ -47,15 +47,21 @@ public class Initializer {
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
         log.info("Starting DB initialization...");
-        log.info("Loading Dynatrace traces...");
         try {
-            unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
-//            log.info("Loading Jaeger traces...");
-//            unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
-            log.info("Creating Sample for train-ticket system...");
-            for (int i = 0; i < sampledData.length; i++) {
-                log.info("processing sample archive {} ...", i);
-                unpackDataAndPopulateDatabase(sampledData[i], jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST, true);
+            if (dynatraceData != null) {
+                log.info("Loading Dynatrace traces...");
+                unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
+            }
+            if (jaegerData != null) {
+                log.info("Loading Jaeger traces...");
+                unpackDataAndPopupateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
+            }
+            if (sampledData != null && sampledData.length > 0) {
+                log.info("Creating Sample for train-ticket system...");
+                for (int i = 0; i < sampledData.length; i++) {
+                    log.info("processing sample archive {} ...", i);
+                    unpackDataAndPopulateDatabase(sampledData[i], jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST, true);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
