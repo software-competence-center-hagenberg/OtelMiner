@@ -31,7 +31,7 @@ bf415d25033c   master-project-otel-to-declare-converter   master-project-otel-to
 
 You can change the number of worker threads by changing the value of environment variable ```NR_THREADS``` of the service ```model-generator``` 
 
-<img src=".readme_resources/screenshot_model-generator_docker_compose.png" alt="sc_model_gen_dc" width="50%">
+<img src=".readme_resources/screenshot_model-generator_docker_compose.png" alt="sc_model_gen_dc" width="100%">
 
 ## How to Populate the Database
 The db-initializer will automatically populate the database, if configured correctly.
@@ -63,7 +63,7 @@ Depending on the size of your data set, this may take a while.
 
 If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
 
-<img src=".readme_resources/screenshot_declare.png" alt="declare" width="50%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="50%">
+<img src=".readme_resources/screenshot_declare.png" alt="declare" width="75%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="25%">
 
 ## How to Use
 When you have a system running with a populated database.
