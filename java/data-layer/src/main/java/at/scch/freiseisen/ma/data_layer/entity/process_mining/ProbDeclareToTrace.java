@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -24,13 +25,13 @@ public class ProbDeclareToTrace {
     @Column(name = "trace_id")
     private String traceId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("probDeclareId")
     @JoinColumn(name = "prob_declare_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_pd")
     private ProbDeclare probDeclare;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("traceId")
     @JoinColumn(name = "trace_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("pdt_t")
@@ -46,6 +47,19 @@ public class ProbDeclareToTrace {
         this.insertDate = LocalDateTime.now();
         this.probDeclareId = probDeclare.getId();
         this.traceId = trace.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProbDeclareToTrace that = (ProbDeclareToTrace) o;
+        return Objects.equals(getProbDeclareId(), that.getProbDeclareId())
+               && Objects.equals(getTraceId(), that.getTraceId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getProbDeclareId(), getTraceId());
     }
 
 }

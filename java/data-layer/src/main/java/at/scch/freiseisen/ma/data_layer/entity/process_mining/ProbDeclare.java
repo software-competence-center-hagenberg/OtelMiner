@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +35,8 @@ public class ProbDeclare extends BaseEntity<String> {
     public ProbDeclare(String id) {
         this.id = id;
         this.generating = true;
-        // TODO check
-//        this.insertDate = LocalDateTime.now();
-//        this.updateDate = LocalDateTime.now();
+        this.insertDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
     }
 
     public List<Declare> getCrispConstraints() {

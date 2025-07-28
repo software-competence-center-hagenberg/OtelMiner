@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,28 +44,24 @@ public class DeclareService {
                 ).toList();
     }
 
-    public List<ProbDeclareConstraintModelEntry> addNewlyConverted(ConversionResponse response, String probDeclareId) {
-        log.info("retrieving prob declare with id {}", probDeclareId);
-
-        ProbDeclareToTraceId probDeclareToTraceId = new ProbDeclareToTraceId(probDeclareId, response.traceId());
-        ProbDeclareToTrace probDeclareToTrace = probDeclareToTraceService.safeFindById(probDeclareToTraceId);
-
-        List<Declare> entities = Arrays.stream(response.constraints())
-                .map(c -> new Declare(probDeclareToTrace, c))
-                .toList();
-
-        return mapToModel(saveAll(entities));
-    }
-
     public List<Declare> update(List<ProbDeclareConstraintModelEntry> modelEntries, String probDeclareId) {
         Map<DeclareId, ProbDeclareConstraintModelEntry> map = modelEntries.stream()
                 .collect(Collectors.toMap(pme -> new DeclareId(probDeclareId, pme.getConstraintTemplate()), Function.identity()));
+        log.info("received {} model entries for prob declare {}", modelEntries.size(), probDeclareId);
         List<Declare> entities = repository.findAllById(map.keySet());
+        log.info("{} declare entries already exist for prob declare {}", entities.size(), probDeclareId);
         entities.forEach(e -> {
-            ProbDeclareConstraintModelEntry modelEntry = map.get(new DeclareId(probDeclareId, e.getConstraintTemplate()));
+            ProbDeclareConstraintModelEntry modelEntry = map.remove(new DeclareId(probDeclareId, e.getConstraintTemplate()));
             e.setNr(modelEntry.getNr());
             e.setProbability(modelEntry.getProbability());
+            e.setUpdateDate(LocalDateTime.now());
         });
+        List<Declare> newEntitities = new ArrayList<>();
+        ProbDeclare probDeclare = probDeclareService.safeFindById(probDeclareId);
+        map.values().forEach(e -> newEntitities.add(new Declare(e, probDeclare)));
+        log.info("saving {} new model entries for prob declare {}", newEntitities.size(), probDeclareId);
+        saveAll(newEntitities);
+        log.info("updating {} existing entities for prob declare {}", entities.size(), probDeclareId);
         return saveAll(entities);
     }
 
@@ -93,5 +91,9 @@ public class DeclareService {
     public Declare save(Declare entity) {
         log.debug("persisting entity {}-{}", entity.getProbDeclare().getId(), entity.getConstraintTemplate());
         return repository.saveAndFlush(entity);
+    }
+
+    public List<Declare> findAllByProbDeclare(ProbDeclare probDeclare) {
+        return repository.findAllByProbDeclare(probDeclare);
     }
 }

@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.data_layer.service;
 
+import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclare;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTrace;
 import at.scch.freiseisen.ma.data_layer.entity.process_mining.ProbDeclareToTraceId;
 import at.scch.freiseisen.ma.data_layer.repository.process_mining.ProbDeclareToTraceRepository;
@@ -36,6 +37,18 @@ public class ProbDeclareToTraceService {
     public ProbDeclareToTrace safeFindById(ProbDeclareToTraceId id) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " not found"));
+    }
+
+    public List<ProbDeclare> findDistinctProbDeclareIdByTraceSourceFile(String sourceFile) {
+        return repository.findDistinctProbDeclareByTraceSourceFile(sourceFile);
+    }
+
+    public long countTraces(String probDeclareId) {
+        return repository.countTraces(probDeclareId);
+    }
+
+    public List<ProbDeclareToTrace> findAllById(List<ProbDeclareToTraceId> ids) {
+        return repository.findAllById(ids);
     }
 }
 

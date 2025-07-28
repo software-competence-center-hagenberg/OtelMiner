@@ -1,19 +1,17 @@
 package at.scch.freiseisen.ma.data_layer.entity.process_mining;
 
-import at.scch.freiseisen.ma.data_layer.entity.BaseEntity;
-import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
+import at.scch.freiseisen.ma.data_layer.dto.ProbDeclareConstraintModelEntry;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -28,14 +26,10 @@ public class Declare {
     private String probDeclareId;
 
     @Id
-    @Column(name = "constraint_template")
+    @Column(name = "constraint_template", length = 500)
     private String constraintTemplate;
 
-//    @OneToOne
-//    @JoinColumn(name = "trace_id")
-//    private Trace trace; // FIXME add DeclareToTrace Join Table
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("probDeclareId")
     @JoinColumn(name = "prob_declare_id", nullable = false, insertable = false, updatable = false)
     @JsonBackReference("d_pd")
@@ -52,14 +46,27 @@ public class Declare {
     @Temporal(TemporalType.TIMESTAMP)
     protected LocalDateTime updateDate;
 
-    public Declare(ProbDeclareToTrace probDeclareToTrace, String constraintTemplate) {
-//        this.id = UUID.randomUUID().toString();
-        this.probability = 1d;
-        this.nr = 1L;
-        this.constraintTemplate = constraintTemplate;
-        this.probDeclare = probDeclareToTrace.getProbDeclare();
-//        this.trace = probDeclareToTrace.getTrace();
-        this.updateDate = LocalDateTime.now();
+    public Declare(ProbDeclareConstraintModelEntry e, ProbDeclare probDeclare) {
+        this.probability = e.getProbability();
+        this.nr = e.getNr();
+        this.constraintTemplate = e.getConstraintTemplate();
         this.insertDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
+        this.probDeclare = probDeclare;
+        this.probDeclareId = probDeclare.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Declare declare = (Declare) o;
+        return Objects.equals(getConstraintTemplate(), declare.getConstraintTemplate())
+               && Objects.equals(getProbability(), declare.getProbability())
+               && Objects.equals(getNr(), declare.getNr());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getConstraintTemplate(), getProbability(), getNr());
     }
 }

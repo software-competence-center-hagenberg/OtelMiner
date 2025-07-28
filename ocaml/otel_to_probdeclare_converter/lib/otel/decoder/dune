@@ -1,3 +1,3 @@
 (library
  (name otel_decoder)
- (libraries base64 yojson opentelemetry util))
+ (libraries base64 yojson opentelemetry util timedesc amqp-client-async))

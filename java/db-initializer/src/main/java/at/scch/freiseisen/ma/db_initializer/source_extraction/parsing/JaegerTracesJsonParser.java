@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction.parsing;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.db_initializer.error.FileParsingException;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.dto_creation.DTOCreator;
@@ -24,7 +25,7 @@ public class JaegerTracesJsonParser implements FileParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void parse(Path path, HashMap<String, Trace> traces) {
+    public void parse(Path path, HashMap<String, Trace> traces, TraceDataType traceDataType) {
         log.info("parsing {}", path);
         try {
             String content = Files.readString(path);
@@ -35,13 +36,14 @@ public class JaegerTracesJsonParser implements FileParser {
                     String traceId = span.get("traceID").asText();
                     String spanId = span.get("spanID").asText();
                     String parentSpanId = extractParentSpanId(span);
-                    dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces);
+                    dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces, traceDataType);
                 });
             });
+            log.info("parsing done -> deleting temp file");
+            Files.delete(path);
         } catch (IOException e) {
             throw new FileParsingException(path.toString());
         }
-        log.info("parsing done");
     }
 
     private String extractParentSpanId(JsonNode span) {

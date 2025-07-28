@@ -10,8 +10,8 @@ type traces_model = {
   constraints : Declare.t list list;
 }
 
-let decode_and_convert_resource_spans_or_multiple_traces
-    (tt : trace_type) (data : Yojson.Basic.t) : Declare.t list list =
+let decode_and_convert_resource_spans_or_multiple_traces (tt : trace_type)
+    (data : Yojson.Basic.t) : Declare.t list list =
   Log.info "converting data of type %s" (Util.trace_string_type_to_string tt);
   Log.info "decoding ...";
   match tt with
@@ -27,14 +27,18 @@ let decode_and_convert_resource_spans_or_multiple_traces
 
 let decode_and_convert_trace_spans_for_single_trace (tt : trace_type)
     (data : Yojson.Basic.t) : Declare.t list =
-  Log.info "converting data of type %s" (Util.trace_string_type_to_string tt);
+  Log.info "decoding and converting data of type %s"
+    (Util.trace_string_type_to_string tt);
   Log.info "decoding ...";
+  let decoded = Otel_decoder.decode tt data in
+  Log.info "converting ...";
   match tt with
   | RESOURCE_SPANS ->
       failwith "RESOURECE_SPANS must be handled in other function!"
+  (* | DYNATRACE_SPANS_LIST ->
+      Otel_to_prob_declare_converter
+      .convert_trace_spans_for_single_trace_without_parent_span_ids decoded *)
   | _ ->
-      let decoded = Otel_decoder.decode tt data in
-      Log.info "converting ...";
       Otel_to_prob_declare_converter.convert_trace_spans_for_single_trace
         decoded
 
@@ -49,8 +53,7 @@ let process_trace (tt : trace_type) (message : string) : trace_model =
   Log.info "processing complete";
   { trace_id; constraints }
 
-let process_traces (tt : trace_type) (message : string) : traces_model
-    =
+let process_traces (tt : trace_type) (message : string) : traces_model =
   Log.info "processing ...";
   let json = Yojson.Basic.from_string message in
   let trace_ids = json |> member "traceIds" |> to_list |> List.map to_string in

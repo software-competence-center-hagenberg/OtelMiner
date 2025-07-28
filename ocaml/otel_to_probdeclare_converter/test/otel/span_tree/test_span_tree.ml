@@ -307,7 +307,7 @@ let test_generate_span_trees_from_spans _ =
   let json = Util.load_json_from_file "ac31d6a4e6fab4b650a501274d48d3c5.json" in
   let spans = json |> Yojson.Basic.Util.to_list in
   let decoded = List.map decode_trace_span spans in
-  let _ = generate_span_trees_from_spans_for_single_trace decoded in
+  let _ = generate_span_tree_from_spans_for_single_trace decoded in
   Format.fprintf Format.std_formatter
     "otel-trace ac31d6a4e6fab4b650a501274d48d3c5: successfully generated \
      span_tree list\n";
@@ -315,14 +315,14 @@ let test_generate_span_trees_from_spans _ =
   let json = Util.load_json_from_file "jaeger_trace.json" in
   let spans = json |> Yojson.Basic.Util.to_list in
   let decoded = List.map decode_jaeger_trace_span spans in
-  let span_trees = generate_span_trees_from_spans_for_single_trace decoded in
+  let span_trees = generate_span_tree_from_spans_for_single_trace decoded in
   assert_equal jaeger_trace_span_tree span_trees;
   let json =
     Util.load_json_from_file "jaeger_5575e1e883a056898c9ddee917664f9a.json"
   in
   let spans = json |> Yojson.Basic.Util.to_list in
   let decoded = List.map decode_jaeger_trace_span spans in
-  let span_trees = generate_span_trees_from_spans_for_single_trace decoded in
+  let span_trees = generate_span_tree_from_spans_for_single_trace decoded in
   assert_equal jaeger_5575e1e883a056898c9ddee917664f9a_span_tree span_trees
 (* FIXME make more compact *)
 

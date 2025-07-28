@@ -23,11 +23,13 @@ otel_to_probd:
       trace_spans_queue: trace-spans-queue
       jaeger-trace-queue: jaeger-trace-queue
       jaeger_trace_spans_list_queue: jaeger-trace-spans-list-queue
+      dynatrace_spans_list_queue: dynatrace-spans-list-queue
     in:
       declare: probd-result-queue
       span_trees: span-tree-result-queue
+      trace: trace-receive-queue
 model_generation:
-  nr_threads: 10
+  nr_threads: ${NR_THREADS}
   batch_size: 10
 server:
   port: 4020
@@ -50,3 +52,4 @@ db-service:
     url: /prob-declare-to-trace
   canonized-span-tree:
     url: /canonized-span-tree
+

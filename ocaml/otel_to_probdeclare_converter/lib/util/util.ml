@@ -10,6 +10,7 @@ type trace_type =
   | JAEGER_SPANS_LIST
   | OTEL_SPANS_LIST
   | RESOURCE_SPANS
+  | DYNATRACE_SPANS_LIST
 
 let trace_string_type_to_string (t: trace_type) : string =
   match t with
@@ -17,3 +18,4 @@ let trace_string_type_to_string (t: trace_type) : string =
   | JAEGER_SPANS_LIST -> "JAEGER_SPANS_LIST"
   | OTEL_SPANS_LIST -> "OTEL_SPANS_LIST"
   | RESOURCE_SPANS -> "RESOURCE_SPANS"
+  | DYNATRACE_SPANS_LIST -> "DYNATRACE_SPANS_LIST"

@@ -14,42 +14,42 @@ let test_is_relation _ =
   assert_bool "is relation should be false"
     (not
        (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-          (fun _ _ _ -> true)
-          (fun l -> if l = [] then [] else List.tl l)
-          (fun _ _ _ -> false)
+          (fun _ _ _ _ -> true)
+          (fun _ l -> if l = [] then [] else List.tl l)
+          (fun _ _ -> false)
           (fun _ -> false)));
   assert_bool "is relation should be false"
     (not
        (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-          (fun _ _ _ -> false)
-          (fun l -> if l = [] then [] else List.tl l)
-          (fun _ _ _ -> false)
+          (fun _ _ _ _ -> false)
+          (fun _ l -> if l = [] then [] else List.tl l)
+          (fun _ _ -> false)
           (fun _ -> false)));
   assert_bool "is relation should be false"
     (not
        (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-          (fun _ _ _ -> false)
-          (fun _ -> [])
-          (fun _ _ _ -> true)
+          (fun _ _ _ _ -> false)
+          (fun _ _ -> [])
+          (fun _ _ -> true)
           (fun _ -> false)));
   assert_bool "is relation should be false"
     (not
        (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-          (fun _ _ _ -> true)
-          (fun l -> if l = [] then [] else List.tl l)
-          (fun _ _ _ -> true)
+          (fun _ _ _ _ -> true)
+          (fun _ l -> if l = [] then [] else List.tl l)
+          (fun _ _ -> true)
           (fun _ -> true)));
   assert_bool "is relation should be true"
     (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-       (fun _ _ _ -> false)
-       (fun l -> if l = [] then [] else List.tl l)
-       (fun _ _ _ -> false)
+       (fun _ _ _ _ -> false)
+       (fun _ l -> if l = [] then [] else List.tl l)
+       (fun _ _ -> false)
        (fun _ -> true));
   assert_bool "is relation should be true"
     (is_relation "a" "b" [ "a"; "b"; "c"; "d" ]
-       (fun _ _ _ -> false)
-       (fun l -> if l = [] then [] else List.tl l)
-       (fun _ _ _ -> true)
+       (fun _ _ _ _ -> false)
+       (fun _ l -> if l = [] then [] else List.tl l)
+       (fun _ _ -> true)
        (fun _ -> true))
 
 let test_is_chain_succession _ =
@@ -67,6 +67,10 @@ let test_is_chain_response _ =
     (is_chain_response "a" "b" [ "a"; "b"; "c" ]);
   assert_bool "Chain response should be true"
     (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain response should be true"
+    (is_chain_response "a" "b" [ "b"; "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain response should be true"
+    (is_chain_response "a" "b" [ "b"; "a"; "b"; "b"; "c"; "d"; "a"; "b" ]);
   assert_bool "Chain response should be false"
     (not (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
   assert_bool "Chain response should be false"
@@ -76,30 +80,34 @@ let test_is_chain_precedence _ =
   assert_bool "Chain precedence should be true"
     (is_chain_precedence "a" "b" [ "a"; "b"; "c" ]);
   assert_bool "Chain precedence should be true"
-    (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+    (is_chain_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
+  assert_bool "Chain precedence should be true"
+    (is_chain_precedence "a" "b" [ "a"; "a"; "b"; "c"; "d"; "a"; "b" ]);
   assert_bool "Chain precedence should be false"
-    (not (is_chain_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
+    (not (is_chain_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]));
   assert_bool "Chain precedence should be false"
     (not (is_chain_precedence "a" "b" [ "a"; "c"; "b" ]))
 
 let test_is_alternate_succession _ =
   assert_bool "Alternate succession should be true"
-    (is_alternate_succession "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
+    (is_alternate_succession "a" "b" [ "a"; "c"; "b"; "d"; "a"; "b" ]);
+  assert_bool "Alternate succession should be false"
+    (not (is_alternate_succession "a" "b" [ "a"; "c"; "b"; "d"; "a" ]));
   assert_bool "Alternate succession should be false"
     (not (is_alternate_succession "a" "b" [ "a"; "c"; "b" ]))
 
 let test_is_alternate_response _ =
-  assert_bool "Alternate response should be true"
-    (is_alternate_response "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
-  assert_bool "Alternate response should be true"
-    (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a" ]);
+  assert_bool "Alternate response should be false"
+    (not (is_alternate_response "a" "b" [ "a"; "c"; "b"; "d"; "a" ]));
+  assert_bool "Alternate response should be false"
+    (not (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a" ]));
   assert_bool "Alternate response should be true"
     (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b" ]);
   assert_bool "Alternate response should be true"
     (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]);
-  assert_bool "Alternate response should be true"
-    (is_alternate_response "a" "b"
-       [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b"; "a" ]);
+  assert_bool "Alternate response should be false"
+    (not(is_alternate_response "a" "b"
+       [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b"; "a" ]));
   assert_bool "Alternate response should be true"
     (is_alternate_response "a" "b" [ "a"; "b"; "c"; "d"; "a"; "b"; "x"; "b" ]);
   assert_bool "Alternate response should be false"
@@ -120,38 +128,57 @@ let test_is_alternate_precedence _ =
     (is_alternate_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "x"; "b" ]);
   assert_bool "Alternate precedence should be true"
     (is_alternate_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "a"; "x"; "b" ]);
-  assert_bool "Alternate precedence should be false"
-    (not
-       (is_alternate_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "a"; "x" ]));
+  assert_bool "Alternate precedence should be true"
+    (is_alternate_precedence "a" "b" [ "a"; "b"; "c"; "d"; "a"; "a"; "x" ]);
   assert_bool "Alternate precedence should be false"
     (not (is_alternate_precedence "a" "b" [ "a"; "c"; "b" ]))
 
 let test_is_succession _ =
   assert_bool "Succession should be true"
-    (is_succession "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
+    (is_succession "a" "b" [ "a"; "b" ]);
   assert_bool "Succession should be true"
     (is_succession "a" "b" [ "a"; "c"; "b" ]);
   assert_bool "Succession should be true"
-    (is_succession "a" "b" [ "a"; "b"; "d"; "a" ]);
-  assert_bool "Succession should be true"
-    (is_succession "a" "b" [ "c"; "a"; "b"; "d"; "a" ]);
+    (is_succession "a" "b" [ "a"; "c"; "b"; "x"; "y" ]);
+    
   assert_bool "Succession should be false"
-    (not (is_succession "a" "b" [ "c"; "d"; "a"; "a"; "b" ]));
+    (not (is_succession "a" "b" [ "c"; "a"; "b"; "d"; "a" ]));
+  assert_bool "Succession should be true"
+    ((is_succession "a" "b" [ "c"; "d"; "a"; "a"; "b" ]));
+  assert_bool "Succession should be true"
+    ((is_succession "a" "b" [ "c"; "d"; "a"; "b"; "b" ]));
+  assert_bool "Succession should be false"
+    (not (is_succession "a" "b" [ "a"; "b"; "d"; "a" ]));
+  assert_bool "Succession should be false"
+    (not (is_succession "a" "b" [ "a"; "c"; "b"; "d"; "a" ]));
+  assert_bool "Succession should be false"
+    (not (is_response "a" "b" [ "d"; "c"; "b"; "a"; "a"; "b"; "a" ]));
+  assert_bool "Succession should be false"
+    (not (is_succession "a" "b" [ "c"; "d"; "a"; "b"; "b"; "a" ]));
   assert_bool "Succession should be false"
     (not (is_succession "a" "b" [ "b"; "c"; "a" ]));
   assert_bool "Succession should be false"
     (not (is_succession "a" "b" [ "d"; "c"; "a" ]))
+    
 
 let test_is_response _ =
-  assert_bool "Response should be true"
-    (is_response "a" "b" [ "a"; "c"; "b"; "d"; "a" ]);
-  assert_bool "Response should be true"
-    (is_response "a" "b" [ "a"; "b"; "d"; "a" ]);
-  assert_bool "Response should be true"
-    (is_response "a" "b" [ "c"; "a"; "b"; "d"; "a" ]);
   assert_bool "Response should be false"
-    (not (is_response "a" "b" [ "c"; "d"; "a"; "a"; "b" ]));
+    (not (is_response "a" "b" [ "a"; "c"; "b"; "d"; "a" ]));
+  assert_bool "Response should be false"
+    (not (is_response "a" "b" [ "a"; "b"; "d"; "a" ]));
+  assert_bool "Response should be false"
+    (not (is_response "a" "b" [ "c"; "a"; "b"; "d"; "a" ]));
+  assert_bool "Response should be true"
+    (is_response "a" "b" [ "c"; "d"; "a"; "a"; "b" ]);
+  assert_bool "Response should be true"
+    (is_response "a" "b" [ "c"; "d"; "a"; "a"; "b"; "b"; "b"; "b"; "b" ]);
   assert_bool "Response should be true" (is_response "a" "b" [ "a"; "c"; "b" ]);
+  assert_bool "Response should be false"
+    (not (is_response "a" "b" [ "d"; "c"; "b"; "a" ]));
+  assert_bool "Response should be false"
+    (not (is_response "a" "b" [ "d"; "c"; "b"; "a"; "a" ]));
+  assert_bool "Response should be false"
+    (not (is_response "a" "b" [ "d"; "c"; "b"; "a"; "a"; "b"; "a" ]));
   assert_bool "Response should be false"
     (not (is_response "a" "b" [ "d"; "c"; "b" ]))
 

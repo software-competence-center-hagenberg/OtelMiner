@@ -2,7 +2,7 @@ name: db-init
 services:
   db-initializer:
     build:
-      context: java/db-initializer
+      context: java
       dockerfile: ./Dockerfile
       args:
         ARTIFACT_ID: db-initializer

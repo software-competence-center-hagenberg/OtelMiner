@@ -1,5 +1,6 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Span;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.data_layer.service.SpanService;
@@ -9,13 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -34,13 +33,24 @@ public class FileProcessor {
         this.spanService = spanService;
     }
 
-    public void parseFiles(Path directory, String fileType, FileParser fileParser) throws IOException {
+    public void parseFiles(Path directory, String fileType, FileParser fileParser, TraceDataType traceDataType, boolean sample) throws IOException {
         log.info("parsing all '{}' files from {}", fileType, directory);
         try (Stream<Path> paths = Files.walk(directory)) {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(fileType))
-                    .forEach(path -> fileParser.parse(path, traces));
+                    .forEach(path -> {
+                        fileParser.parse(path, traces, traceDataType);
+                        process(sample);
+                    });
         }
+        log.info("cleaning up state");
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+        log.info("state cleaned up");
+    }
+
+    private void process(boolean sample) {
         traces.values().forEach(t -> {
             t.setSpans(t.getSpans().stream().distinct().toList());
             int nrNodes = t.getSpans().size();
@@ -54,16 +64,39 @@ public class FileProcessor {
         log.info("########## traces found with n nodes: ###########");
         tracesByNrNodes.forEach((nrNodes, traces) -> {
             log.info("{} traces with {} nodes found", traces.size(), nrNodes);
-            if (nrNodes >= 5) {
-                traces.forEach(trace -> {
-                    List<Span> spans = trace.getSpans();
-                    trace.setSpans(Collections.emptyList());
-                    Trace t = traceService.save(trace);
-                    spans.forEach(s -> s.setTrace(t));
-                    spanService.saveAll(spans);
-                });
+            if (!sample) {
+                if (nrNodes >= 5) {
+                    processNormaly(traces);
+                }
+            } else {
+                processAndSample(traces);
             }
         });
+        traces.clear();
+        tracesByNrNodes.clear();
         log.info("#################################################");
+    }
+
+    private void processAndSample(List<Trace> traces) {
+        Map<Integer, Trace> sampled = new HashMap<>();
+        traces.forEach(trace -> {
+            int key = (trace.getSourceFile() + trace.getNrNodes()).hashCode();
+            if (!sampled.containsKey(key)) {
+                trace.setSourceFile("sampled-train-ticket");
+                sampled.put(key, trace);
+            }
+        });
+        log.info("persisting {} sampled traces", sampled.size());
+        processNormaly(new ArrayList<>(sampled.values()));
+    }
+
+    private void processNormaly(List<Trace> traces) {
+        traces.forEach(trace -> {
+            List<Span> spans = trace.getSpans();
+            trace.setSpans(Collections.emptyList());
+            Trace t = traceService.save(trace);
+            spans.forEach(s -> s.setTrace(t));
+            spanService.saveAll(spans);
+        });
     }
 }

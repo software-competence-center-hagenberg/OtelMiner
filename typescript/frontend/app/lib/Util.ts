@@ -17,6 +17,7 @@ export interface SourceDetails {
     page: number;
     size: number;
     totalPages: number;
+    totalElements: number;
     sort: string;
 }
 
@@ -27,6 +28,7 @@ export function defaultSourceDetails(sourceFile: string) {
         page: 0,
         size: 100,
         totalPages: 1,
+        totalElements: 0,
         sort: "sourceFile"
     }
 }

@@ -19,4 +19,8 @@ db-service:
 #test-data:
 #  file-paths: classpath:test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
 test-data:
-  file-paths: /test-data/traces-jaeger
+#  file-paths: /test-data/traces-jaeger
+  file-paths:
+    dynatrace: /test-data/traces_spans.zip
+    jaeger: /test-data/traces-jaeger.zip
+    sample: /test-data/train-ticket-sample-00.tar.gz, /test-data/train-ticket-sample-01.tar.gz, /test-data/train-ticket-sample-02.tar.gz, /test-data/train-ticket-sample-03.tar.gz

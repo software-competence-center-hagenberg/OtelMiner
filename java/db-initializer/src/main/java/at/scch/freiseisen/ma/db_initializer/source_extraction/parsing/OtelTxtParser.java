@@ -1,9 +1,9 @@
 package at.scch.freiseisen.ma.db_initializer.source_extraction.parsing;
 
+import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.db_initializer.error.FileParsingException;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.dto_creation.DTOCreator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class OtelTxtParser implements FileParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void parse(Path path, HashMap<String, Trace> traces) {
+    public void parse(Path path, HashMap<String, Trace> traces, TraceDataType traceDataType) {
         log.info("parsing {}", path);
         String line;
         String traceId;
@@ -40,7 +40,7 @@ public class OtelTxtParser implements FileParser {
                 parentSpanId = jsonNode.has("parentSpanId")
                         ? jsonNode.get("parentSpanId").asText()
                         : StringUtils.EMPTY;
-                dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), line, traces);
+                dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), line, traces, traceDataType);
             }
         } catch (IOException e) {
             throw new FileParsingException(path.toString(), e);

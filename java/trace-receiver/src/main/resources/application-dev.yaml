@@ -4,7 +4,9 @@ spring:
 
 db-service:
   base-url: http://localhost:4242/v1
+model_generation:
+  nr_threads: 10
 
 logging:
   level:
-    at.scch: DEBUG
+    at.scch: INFO

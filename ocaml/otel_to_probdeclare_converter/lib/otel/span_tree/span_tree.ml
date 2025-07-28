@@ -58,12 +58,12 @@ let generate_nodes_for_single_trace (spans : Trace.span list) :
   in
   gen_aux spans None (fun x -> x)
 
- (*
-    * Creates a span_tree_node for every span and builds a list of roots and nodes.
-    * returns (r, n) where r is a list of roots and n is a list of non-root nodes.
-    * Note: The original order of spans is kept.
-    *)
- let generate_nodes_for_multiple_traces (spans : Trace.span list) =
+(*
+ * Creates a span_tree_node for every span and builds a list of roots and nodes.
+ * returns (r, n) where r is a list of roots and n is a list of non-root nodes.
+ * Note: The original order of spans is kept.
+ *)
+let generate_nodes_for_multiple_traces (spans : Trace.span list) =
   let rec gen_aux (spans : Trace.span list) fr fn =
     match spans with
     | [] -> (fr [], fn [])
@@ -111,7 +111,12 @@ let find_children parent nodes =
   in
   find_children_aux nodes (fun x -> x) (fun x -> x)
 
-let build_tree root nodes =
+let build_tree ?(with_parent_ids : bool = true) root nodes =
+  let find_children =
+    if with_parent_ids then find_children
+    else fun (_h : span_tree_node) (t : span_tree_node list) ->
+      match t with [] -> ([], []) | _ -> (List.hd t :: [], List.tl t)
+  in
   let rec build_tree_aux root node nodes =
     let rec map_children root children nodes =
       match children with
@@ -128,9 +133,28 @@ let build_tree root nodes =
   build_tree_aux root root nodes
 
 (* Builds all span trees with given root and nodes. *)
-let build_span_trees_for_single_trace (nodes : span_tree_node list)
+let build_span_tree_for_single_trace (nodes : span_tree_node list)
     (root : span_tree_node) : span_tree_node =
   let tree, n = build_tree root nodes in
+  match n with
+  | [] ->
+      Log.info "Tree successfully built -> no orphans left!";
+      tree
+  | _ ->
+      Log.error "Tree successfully built BUT orphans left!";
+      tree
+
+let build_span_tree_without_parent_ids (nodes : span_tree_node list) :
+    span_tree_node =
+  let sorted =
+    List.sort
+      (fun a b ->
+        Int64.compare a.span.start_time_unix_nano b.span.start_time_unix_nano)
+      nodes
+  in
+  let tree, n =
+    build_tree ~with_parent_ids:false (List.hd sorted) (List.tl sorted)
+  in
   match n with
   | [] ->
       Log.info "Tree successfully built -> no orphans left!";
@@ -153,19 +177,27 @@ let build_span_trees_for_multiple_traces nodes roots =
   in
   build_span_trees_aux nodes roots []
 
-let generate_span_trees_from_spans_for_single_trace (spans : Trace.span list) :
+let generate_span_tree_from_spans_for_single_trace (spans : Trace.span list) :
     span_tree_node =
   let root, nodes = generate_nodes_for_single_trace spans in
   match root with
-  | Some r -> build_span_trees_for_single_trace nodes r
+  | Some r -> build_span_tree_for_single_trace nodes r
   | None -> failwith "No root found!"
 
-let generate_span_trees_from_spans_for_multiple_traces (spans : Trace.span list) :
-  span_tree_node list =
+let generate_span_tree_for_single_trace_without_parent_ids
+    (spans : Trace.span list) : span_tree_node =
+  let roots, nodes = generate_nodes_for_multiple_traces spans in
+  match (roots, nodes) with
+  | _ :: _, [] -> build_span_tree_without_parent_ids roots
+  | _ ->
+      failwith "Inconsistency detected can't generate span tree w/o parent ids"
+
+let generate_span_trees_from_spans_for_multiple_traces (spans : Trace.span list)
+    : span_tree_node list =
   let roots, nodes = generate_nodes_for_multiple_traces spans in
   build_span_trees_for_multiple_traces nodes roots
 
-(* 
+(*
  * Takes resources_spans object. 
  * Extracts all spans contained in its scope_spans.
  * Generates (root) nodes out of them and

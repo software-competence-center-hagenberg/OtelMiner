@@ -1,0 +1,885 @@
+
+Differences in common constraints (based on 'constraintTemplate')
+DeclareTemplate           | Prob1      | Prob2      | Nr1        | Nr2       
+-------------------------+------------+------------+------------+------------
+CHAIN_SUCCESSION(GET /api/cart, executing api route (pages) /api/cart) | 0.10777777777777778 | 0.08958837772397095 | 97         | 111       
+CHAIN_SUCCESSION(GET /api/products, executing api route (pages) /api/products) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+CHAIN_SUCCESSION(GET /api/recommendations, executing api route (pages) /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHAIN_SUCCESSION(GET, GET /api/cart) | 0.10888888888888888 | 0.0903954802259887 | 98         | 112       
+CHAIN_SUCCESSION(GET, GET /api/products) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+CHAIN_SUCCESSION(GET, GET /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHAIN_SUCCESSION(GET, oteldemo.CartService/GetCart) | 0.1076581576026637 | 0.08958837772397095 | 97         | 111       
+CHAIN_SUCCESSION(GET, oteldemo.CurrencyService/Convert) | 0.12541620421753608 | 0.11945117029862792 | 113        | 148       
+CHAIN_SUCCESSION(GET, oteldemo.ProductCatalogService/GetProduct) | 0.12874583795782463 | 0.26957223567393057 | 116        | 334       
+CHAIN_SUCCESSION(GET, oteldemo.ProductCatalogService/ListProducts) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+CHAIN_SUCCESSION(GET, oteldemo.RecommendationService/ListRecommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHAIN_SUCCESSION(get_product_list, /oteldemo.ProductCatalogService/ListProducts) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+CHAIN_SUCCESSION(get_product_list, /schema.v1.Service/ResolveBoolean) | 0.012222222222222223 | 0.01533494753833737 | 11         | 19        
+CHAIN_SUCCESSION(/oteldemo.RecommendationService/ListRecommendations, get_product_list) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+CHAIN_SUCCESSION(POST /api/cart, executing api route (pages) /api/cart) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+CHAIN_SUCCESSION(POST, oteldemo.CartService/AddItem) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, EXPIRE) | 0.013333333333333334 | 0.01937046004842615 | 12         | 24        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, HGET) | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/AddItem, HMSET) | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+CHAIN_SUCCESSION(POST, oteldemo.CartService/GetCart) | 0.016648168701442843 | 0.02824858757062147 | 15         | 35        
+CHAIN_SUCCESSION(POST /oteldemo.CartService/GetCart, HGET) | 0.024444444444444446 | 0.0258272800645682 | 22         | 32        
+CHAIN_SUCCESSION(POST, POST /api/cart) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+CHOICE(EXPIRE, HGET)      | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+CHOICE(EXPIRE, HMSET)     | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+CHOICE(GET /api/cart, oteldemo.CartService/GetCart) | 0.10777777777777778 | 0.08958837772397095 | 97         | 111       
+CHOICE(GET /api/cart, oteldemo.CurrencyService/Convert) | 0.0022197558268590455 | 0.004035512510088781 | 2          | 5         
+CHOICE(GET /api/cart, oteldemo.ProductCatalogService/GetProduct) | 0.033296337402885685 | 0.03551251008878128 | 30         | 44        
+CHOICE(GET /api/products, oteldemo.ProductCatalogService/ListProducts) | 0.13       | 0.09523809523809523 | 117        | 118       
+CHOICE(GET /api/recommendations, oteldemo.ProductCatalogService/GetProduct) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHOICE(GET /api/recommendations, oteldemo.RecommendationService/ListRecommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHOICE(HGET, HMSET)       | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+CHOICE(oteldemo.CartService/AddItem, oteldemo.CartService/GetCart) | 0.016648168701442843 | 0.02824858757062147 | 15         | 35        
+CHOICE(oteldemo.CartService/GetCart, oteldemo.CurrencyService/Convert) | 0.0022197558268590455 | 0.005649717514124294 | 2          | 7         
+CHOICE(oteldemo.CartService/GetCart, oteldemo.ProductCatalogService/GetProduct) | 0.033296337402885685 | 0.03712671509281679 | 30         | 46        
+CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ProductCatalogService/GetProduct) | 0.0022197558268590455 | 0.03066989507667474 | 2          | 38        
+CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ShippingService/GetQuote) | 0.12333333333333334 | 0.09120258272800645 | 111        | 113       
+CHOICE(oteldemo.ProductCatalogService/GetProduct, oteldemo.RecommendationService/ListRecommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+CHOICE(/oteldemo.ProductCatalogService/ListProducts, /schema.v1.Service/ResolveBoolean) | 0.012222222222222223 | 0.01533494753833737 | 11         | 19        
+CHOICE(POST /api/cart, oteldemo.CartService/AddItem) | 0.016648168701442843 | 0.02824858757062147 | 15         | 35        
+CHOICE(POST /api/cart, oteldemo.CartService/GetCart) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+EXISTENCE(CurrencyService/Convert) | 0.025527192008879023 | 0.020984665052461663 | 23         | 26        
+EXISTENCE(executing api route (pages) /api/cart) | 0.12444444444444444 | 0.11783696529459241 | 112        | 146       
+EXISTENCE(executing api route (pages) /api/products) | 0.13       | 0.09523809523809523 | 117        | 118       
+EXISTENCE(executing api route (pages) /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+EXISTENCE(EXPIRE)         | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+EXISTENCE(GET)            | 0.7569367369589345 | 0.7271993543179984 | 682        | 901       
+EXISTENCE(GET /api/cart)  | 0.10888888888888888 | 0.0903954802259887 | 98         | 112       
+EXISTENCE(GET /api/products) | 0.13       | 0.09523809523809523 | 117        | 118       
+EXISTENCE(GET /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+EXISTENCE(get_product_list) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+EXISTENCE(HGET)           | 0.03777777777777778 | 0.04519774011299435 | 34         | 56        
+EXISTENCE(HMSET)          | 0.013333333333333334 | 0.01937046004842615 | 12         | 24        
+EXISTENCE(oteldemo.CartService/AddItem) | 0.017758046614872364 | 0.03712671509281679 | 16         | 46        
+EXISTENCE(oteldemo.CartService/GetCart) | 0.14444444444444443 | 0.13801452784503632 | 130        | 171       
+EXISTENCE(oteldemo.CurrencyService/Convert) | 0.12541620421753608 | 0.12106537530266344 | 113        | 150       
+EXISTENCE(oteldemo.ProductCatalogService/GetProduct) | 0.14317425083240842 | 0.28732849071832123 | 129        | 356       
+EXISTENCE(/oteldemo.ProductCatalogService/ListProducts) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+EXISTENCE(oteldemo.ProductCatalogService/ListProducts) | 0.1711111111111111 | 0.1509281678773204 | 154        | 187       
+EXISTENCE(/oteldemo.RecommendationService/ListRecommendations) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+EXISTENCE(oteldemo.RecommendationService/ListRecommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+EXISTENCE(oteldemo.ShippingService/GetQuote) | 0.12333333333333334 | 0.09120258272800645 | 111        | 113       
+EXISTENCE(POST)           | 0.016666666666666666 | 0.03066989507667474 | 15         | 38        
+EXISTENCE(POST /api/cart) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+EXISTENCE(POST /oteldemo.CartService/AddItem) | 0.013333333333333334 | 0.01937046004842615 | 12         | 24        
+EXISTENCE(POST /oteldemo.CartService/GetCart) | 0.0244173140954495 | 0.0258272800645682 | 22         | 32        
+EXISTENCE(/schema.v1.Service/ResolveBoolean) | 0.012222222222222223 | 0.01533494753833737 | 11         | 19        
+INIT(CurrencyService/Convert) | 0.025527192008879023 | 0.020984665052461663 | 23         | 26        
+INIT(GET)                 | 0.7569367369589345 | 0.7271993543179984 | 682        | 901       
+INIT(oteldemo.CartService/AddItem) | 0.0011098779134295228 | 0.00887812752219532 | 1          | 11        
+INIT(oteldemo.CartService/GetCart) | 0.02       | 0.018563357546408393 | 18         | 23        
+INIT(oteldemo.ProductCatalogService/GetProduct) | 0.014444444444444444 | 0.01533494753833737 | 13         | 19        
+INIT(oteldemo.ProductCatalogService/ListProducts) | 0.04111111111111111 | 0.05569007263922518 | 37         | 69        
+INIT(/oteldemo.RecommendationService/ListRecommendations) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+INIT(POST)                | 0.016648168701442843 | 0.029055690072639227 | 15         | 36        
+INIT(POST /oteldemo.CartService/AddItem) | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+INIT(POST /oteldemo.CartService/GetCart) | 0.024444444444444446 | 0.0258272800645682 | 22         | 32        
+LAST(executing api route (pages) /api/cart) | 0.12444444444444444 | 0.11783696529459241 | 112        | 146       
+LAST(executing api route (pages) /api/products) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+LAST(executing api route (pages) /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+LAST(EXPIRE)              | 0.013333333333333334 | 0.01937046004842615 | 12         | 24        
+LAST(GET /api/cart)       | 0.10876803551609324 | 0.0903954802259887 | 98         | 112       
+LAST(GET /api/products)   | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+LAST(GET /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+LAST(HGET)                | 0.03777777777777778 | 0.04519774011299435 | 34         | 56        
+LAST(HMSET)               | 0.013318534961154272 | 0.01937046004842615 | 12         | 24        
+LAST(oteldemo.CartService/AddItem) | 0.016648168701442843 | 0.02824858757062147 | 15         | 35        
+LAST(oteldemo.CartService/GetCart) | 0.12430632630410655 | 0.11945117029862792 | 112        | 148       
+LAST(oteldemo.CurrencyService/Convert) | 0.12541620421753608 | 0.12106537530266344 | 113        | 150       
+LAST(oteldemo.ProductCatalogService/GetProduct) | 0.12874583795782463 | 0.27199354317998387 | 116        | 337       
+LAST(/oteldemo.ProductCatalogService/ListProducts) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+LAST(oteldemo.ProductCatalogService/ListProducts) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+LAST(oteldemo.RecommendationService/ListRecommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+LAST(oteldemo.ShippingService/GetQuote) | 0.12319644839067703 | 0.09120258272800645 | 111        | 113       
+LAST(POST /api/cart)      | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+LAST(/schema.v1.Service/ResolveBoolean) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+SUCCESSION(GET, executing api route (pages) /api/cart) | 0.1076581576026637 | 0.08958837772397095 | 97         | 111       
+SUCCESSION(GET, executing api route (pages) /api/products) | 0.12985571587125416 | 0.09523809523809523 | 117        | 118       
+SUCCESSION(GET, executing api route (pages) /api/recommendations) | 0.03440621531631521 | 0.18966908797417273 | 31         | 235       
+SUCCESSION(/oteldemo.RecommendationService/ListRecommendations, /oteldemo.ProductCatalogService/ListProducts) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+SUCCESSION(/oteldemo.RecommendationService/ListRecommendations, /schema.v1.Service/ResolveBoolean) | 0.01220865704772475 | 0.01533494753833737 | 11         | 19        
+SUCCESSION(POST, executing api route (pages) /api/cart) | 0.016666666666666666 | 0.02824858757062147 | 15         | 35        
+
+Common constraints minor changes (< 0.1): 213
+Common constraints changed (> 0.1):   101
+
+file dynatrace_s3.json contains 0 constraints that only occur here
+
+file dynatrace_s4.json contains 96 constraints that only occur here
+
+Constraints only in file (dynatrace_s3.json):
+None
+
+Constraints only in file (dynatrace_s4.json):
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, HTTP POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.83262",
+  "updateDate": "2025-06-21T17:07:20.832621"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, orders publish)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838974",
+  "updateDate": "2025-06-21T17:07:20.838974"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835672",
+  "updateDate": "2025-06-21T17:07:20.835673"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.CartService/GetCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838939",
+  "updateDate": "2025-06-21T17:07:20.838939"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839117",
+  "updateDate": "2025-06-21T17:07:20.839117"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835947",
+  "updateDate": "2025-06-21T17:07:20.835947"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839305",
+  "updateDate": "2025-06-21T17:07:20.839305"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.827076",
+  "updateDate": "2025-06-21T17:07:20.827077"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835102",
+  "updateDate": "2025-06-21T17:07:20.835103"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.826677",
+  "updateDate": "2025-06-21T17:07:20.826678"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(oteldemo.CheckoutService/PlaceOrder, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.833911",
+  "updateDate": "2025-06-21T17:07:20.833912"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST /api/checkout, executing api route (pages) /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.832067",
+  "updateDate": "2025-06-21T17:07:20.832068"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST, oteldemo.CheckoutService/PlaceOrder)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.833491",
+  "updateDate": "2025-06-21T17:07:20.833492"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.830632",
+  "updateDate": "2025-06-21T17:07:20.830633"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHAIN_SUCCESSION(POST, POST /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.838571",
+  "updateDate": "2025-06-21T17:07:20.838572"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/products, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.821523",
+  "updateDate": "2025-06-21T17:07:20.821529"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(GET /api/recommendations, oteldemo.CurrencyService/Convert)",
+  "probability": 0.025020177562550445,
+  "nr": 31,
+  "insertDate": "2025-06-21T17:07:20.83147",
+  "updateDate": "2025-06-21T17:07:20.83147"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, orders publish)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838828",
+  "updateDate": "2025-06-21T17:07:20.838828"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835288",
+  "updateDate": "2025-06-21T17:07:20.835289"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.CartService/GetCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839202",
+  "updateDate": "2025-06-21T17:07:20.839202"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.837693",
+  "updateDate": "2025-06-21T17:07:20.837693"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.834053",
+  "updateDate": "2025-06-21T17:07:20.834054"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.822493",
+  "updateDate": "2025-06-21T17:07:20.822495"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838856",
+  "updateDate": "2025-06-21T17:07:20.838856"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.83558",
+  "updateDate": "2025-06-21T17:07:20.83558"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.825522",
+  "updateDate": "2025-06-21T17:07:20.825523"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(HTTP POST, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.8388",
+  "updateDate": "2025-06-21T17:07:20.838801"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838608",
+  "updateDate": "2025-06-21T17:07:20.838609"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.CartService/GetCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836548",
+  "updateDate": "2025-06-21T17:07:20.836548"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.834199",
+  "updateDate": "2025-06-21T17:07:20.8342"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.83099",
+  "updateDate": "2025-06-21T17:07:20.830991"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836135",
+  "updateDate": "2025-06-21T17:07:20.836137"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838641",
+  "updateDate": "2025-06-21T17:07:20.838641"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839174",
+  "updateDate": "2025-06-21T17:07:20.839174"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(orders publish, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.829699",
+  "updateDate": "2025-06-21T17:07:20.8297"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.CartService/GetCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.829941",
+  "updateDate": "2025-06-21T17:07:20.829943"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.825241",
+  "updateDate": "2025-06-21T17:07:20.825243"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.837291",
+  "updateDate": "2025-06-21T17:07:20.837294"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835776",
+  "updateDate": "2025-06-21T17:07:20.835776"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.823802",
+  "updateDate": "2025-06-21T17:07:20.823803"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838131",
+  "updateDate": "2025-06-21T17:07:20.838132"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/EmptyCart, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.829068",
+  "updateDate": "2025-06-21T17:07:20.829069"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838703",
+  "updateDate": "2025-06-21T17:07:20.838704"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838733",
+  "updateDate": "2025-06-21T17:07:20.838733"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.832463",
+  "updateDate": "2025-06-21T17:07:20.832464"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CartService/GetCart, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836243",
+  "updateDate": "2025-06-21T17:07:20.836244"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CheckoutService/PlaceOrder, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.837911",
+  "updateDate": "2025-06-21T17:07:20.837912"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838357",
+  "updateDate": "2025-06-21T17:07:20.838358"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ProductCatalogService/ListProducts)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.832933",
+  "updateDate": "2025-06-21T17:07:20.832934"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, oteldemo.RecommendationService/ListRecommendations)",
+  "probability": 0.025020177562550445,
+  "nr": 31,
+  "insertDate": "2025-06-21T17:07:20.833084",
+  "updateDate": "2025-06-21T17:07:20.833085"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.823196",
+  "updateDate": "2025-06-21T17:07:20.823197"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.CurrencyService/Convert, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.824897",
+  "updateDate": "2025-06-21T17:07:20.824898"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.PaymentService/Charge, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838768",
+  "updateDate": "2025-06-21T17:07:20.838768"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.PaymentService/Charge, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.830206",
+  "updateDate": "2025-06-21T17:07:20.830208"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.PaymentService/Charge, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.833362",
+  "updateDate": "2025-06-21T17:07:20.833362"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.PaymentService/Charge, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.834911",
+  "updateDate": "2025-06-21T17:07:20.834912"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ProductCatalogService/GetProduct, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.83162",
+  "updateDate": "2025-06-21T17:07:20.83162"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ProductCatalogService/GetProduct, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.825813",
+  "updateDate": "2025-06-21T17:07:20.825814"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ProductCatalogService/GetProduct, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838911",
+  "updateDate": "2025-06-21T17:07:20.838912"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ShippingService/GetQuote, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.838883",
+  "updateDate": "2025-06-21T17:07:20.838883"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ShippingService/GetQuote, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.823495",
+  "updateDate": "2025-06-21T17:07:20.823497"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(oteldemo.ShippingService/ShipOrder, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.830823",
+  "updateDate": "2025-06-21T17:07:20.830824"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST /api/checkout, oteldemo.CheckoutService/PlaceOrder)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.833225",
+  "updateDate": "2025-06-21T17:07:20.833226"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST /api/checkout, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.8385",
+  "updateDate": "2025-06-21T17:07:20.838501"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, orders publish)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.835866",
+  "updateDate": "2025-06-21T17:07:20.835866"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839146",
+  "updateDate": "2025-06-21T17:07:20.839146"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.CartService/GetCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.826114",
+  "updateDate": "2025-06-21T17:07:20.826115"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.CurrencyService/Convert)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839086",
+  "updateDate": "2025-06-21T17:07:20.839086"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.828284",
+  "updateDate": "2025-06-21T17:07:20.828286"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.ProductCatalogService/GetProduct)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836459",
+  "updateDate": "2025-06-21T17:07:20.83646"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.ShippingService/GetQuote)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.831852",
+  "updateDate": "2025-06-21T17:07:20.831853"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.833625",
+  "updateDate": "2025-06-21T17:07:20.833625"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "CHOICE(POST, prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.837536",
+  "updateDate": "2025-06-21T17:07:20.837537"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(executing api route (pages) /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.838671",
+  "updateDate": "2025-06-21T17:07:20.838671"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(HTTP POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.824495",
+  "updateDate": "2025-06-21T17:07:20.824497"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(orders process)",
+  "probability": 0.008071025020177562,
+  "nr": 10,
+  "insertDate": "2025-06-21T17:07:20.83637",
+  "updateDate": "2025-06-21T17:07:20.83637"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(orders publish)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.834464",
+  "updateDate": "2025-06-21T17:07:20.834466"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.829315",
+  "updateDate": "2025-06-21T17:07:20.829316"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(oteldemo.CheckoutService/PlaceOrder)",
+  "probability": 0.002421307506053269,
+  "nr": 3,
+  "insertDate": "2025-06-21T17:07:20.831161",
+  "updateDate": "2025-06-21T17:07:20.831162"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.82867",
+  "updateDate": "2025-06-21T17:07:20.828672"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.822893",
+  "updateDate": "2025-06-21T17:07:20.822894"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(POST /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.826447",
+  "updateDate": "2025-06-21T17:07:20.826449"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "EXISTENCE(prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.824097",
+  "updateDate": "2025-06-21T17:07:20.824098"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "INIT(orders process)",
+  "probability": 0.008071025020177562,
+  "nr": 10,
+  "insertDate": "2025-06-21T17:07:20.835473",
+  "updateDate": "2025-06-21T17:07:20.835474"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "INIT(oteldemo.CheckoutService/PlaceOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.834709",
+  "updateDate": "2025-06-21T17:07:20.83471"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(executing api route (pages) /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.839229",
+  "updateDate": "2025-06-21T17:07:20.839229"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(HTTP POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.829514",
+  "updateDate": "2025-06-21T17:07:20.829516"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(orders publish)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.831313",
+  "updateDate": "2025-06-21T17:07:20.831314"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(oteldemo.CartService/EmptyCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.832288",
+  "updateDate": "2025-06-21T17:07:20.83229"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(oteldemo.CheckoutService/PlaceOrder)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.827719",
+  "updateDate": "2025-06-21T17:07:20.827722"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(oteldemo.PaymentService/Charge)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.839267",
+  "updateDate": "2025-06-21T17:07:20.839267"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(oteldemo.ShippingService/ShipOrder)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836049",
+  "updateDate": "2025-06-21T17:07:20.836049"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(POST)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.832786",
+  "updateDate": "2025-06-21T17:07:20.832787"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(POST /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.830427",
+  "updateDate": "2025-06-21T17:07:20.830429"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "LAST(prepareOrderItemsAndShippingQuoteFromCart)",
+  "probability": 0.0016142050040355124,
+  "nr": 2,
+  "insertDate": "2025-06-21T17:07:20.836679",
+  "updateDate": "2025-06-21T17:07:20.836682"
+}
+{
+  "probDeclareId": "edc49609-08dc-408d-9d77-72cde97d02c2",
+  "constraintTemplate": "SUCCESSION(POST, executing api route (pages) /api/checkout)",
+  "probability": 0.0008071025020177562,
+  "nr": 1,
+  "insertDate": "2025-06-21T17:07:20.833758",
+  "updateDate": "2025-06-21T17:07:20.833758"
+}
