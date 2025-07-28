@@ -14,7 +14,7 @@ let handler (span : trace_string_type) channel result_queue message =
   Queue.publish channel result_queue 
     (Message.make result)
   >>= fun `Ok ->
-  Log.info "Sent result to trace-receiver";
+  Log.info "Sent result to model-generator";
   return ()
 
 let rabbitmq_consumer_cancelled () = Log.info "Consumer cancelled"

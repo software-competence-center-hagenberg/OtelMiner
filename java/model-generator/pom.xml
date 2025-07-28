@@ -9,9 +9,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>trace-receiver</artifactId>
-    <name>trace-collector</name>
-    <description>Collects traces received via RabbitMQ</description>
+    <artifactId>model-generator</artifactId>
+    <name>model-generator</name>
+    <description>Central Service handling communication with Dashboard, DB-Service, and manages model generation</description>
 
     <properties>
         <maven.test.skip>true</maven.test.skip>

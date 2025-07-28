@@ -49,7 +49,7 @@ services:
         ARTIFACT_ID: db-service
     depends_on:
       - database
-  trace-receiver:
+  model-generator:
     environment:
       NR_THREADS: 10
     user: "1000:1000"
@@ -63,7 +63,7 @@ services:
       context: java
       dockerfile: ./Dockerfile
       args:
-        ARTIFACT_ID: trace-receiver
+        ARTIFACT_ID: model-generator
     restart: no #on-failure
     depends_on:
       - rabbitmq-server
@@ -76,7 +76,7 @@ services:
       dockerfile: ./Dockerfile
     restart: no
     depends_on:
-      - trace-receiver
+      - model-generator
   otel-to-declare-converter:
     # runs as non-root user opam
     build:
@@ -107,7 +107,7 @@ services:
   #    restart: on-failure
   #    depends_on:
   #      - rabbitmq-server
-  #      - trace-receiver
+  #      - model-generator
   #######################standard otel collector##########################
   # otelcol:
   #   image: otel/opentelemetry-collector

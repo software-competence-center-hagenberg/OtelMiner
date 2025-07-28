@@ -6,10 +6,10 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
     default-property-inclusion: non_null
   application:
-    name: trace-receiver
+    name: model-generator
   rabbitmq:
     port: 5672
-    host: localhost
+    host: rabbitmq-server
 open_telemetry:
   exporter:
     routing_key:
@@ -27,13 +27,14 @@ otel_to_probd:
     in:
       declare: probd-result-queue
       span_trees: span-tree-result-queue
+      trace: trace-receive-queue
 model_generation:
-  nr_threads: 10
+  nr_threads: ${NR_THREADS}
   batch_size: 10
 server:
   port: 4020
 db-service:
-  base-url: http://localhost:4242/v1
+  base-url: http://db-service:4242/v1
   traces:
     url: /traces
     endpoints:
@@ -51,3 +52,4 @@ db-service:
     url: /prob-declare-to-trace
   canonized-span-tree:
     url: /canonized-span-tree
+

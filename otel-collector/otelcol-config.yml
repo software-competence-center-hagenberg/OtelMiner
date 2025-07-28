@@ -1,6 +1,6 @@
 exporters:
     otlphttp:
-        endpoint: http://trace-receiver:4020
+        endpoint: http://model-generator:4020
         compression: none
         encoding: json
 receivers:

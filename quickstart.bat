@@ -11,7 +11,7 @@ echo     -a         Enable all processes
 echo     -o         Enable ocaml process
 echo     -j         Enable all java processes
 echo     -d         Enable db-service
-echo     -r         Enable trace-receiver
+echo     -r         Enable model-generator
 echo     -t         Enable all typescript processes.
 echo     -e         Enable all backend processes.
 goto :eof
@@ -21,7 +21,7 @@ set BUILD=false
 set OCAML=false
 set SPRING=false
 set DB_SERVICE=false
-set TRACE_RECEIVER=false
+set MODEL_GENERATOR=false
 set TS=false
 
 rem Parse command-line options
@@ -45,8 +45,8 @@ if "%1" == "-b" (
     echo enabling db-service...
     set DB_SERVICE=true
 ) else if "%1" == "-r" (
-    echo enabling trace-receiver...
-    set TRACE_RECEIVER=true
+    echo enabling model-generator...
+    set MODEL_GENERATOR=true
 ) else if "%1" == "-t" (
     echo enabling all typescript processes...
     set TS=true
@@ -76,9 +76,9 @@ goto :eof
 
 rem Start services based on flags
 if "%OCAML%" == "true" call :start_service otel-to-probdeclare-converter
-if "%SPRING%" == "true" call :start_service "db-service trace-receiver"
+if "%SPRING%" == "true" call :start_service "db-service model-generator"
 if "%DB_SERVICE%" == "true" call :start_service db-service
-if "%TRACE_RECEIVER%" == "true" call :start_service trace-receiver
+if "%MODEL_GENERATOR%" == "true" call :start_service model-generator
 if "%TS%" == "true" call :start_service frontend
 
 exit /b 0

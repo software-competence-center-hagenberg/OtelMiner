@@ -55,7 +55,7 @@ services:
         ARTIFACT_ID: db-service
     depends_on:
       - database
-  trace-receiver:
+  model-generator:
     user: "1000:1000"
     cap_drop:
       - ALL
@@ -65,7 +65,7 @@ services:
       context: java
       dockerfile: ./Dockerfile
       args:
-        ARTIFACT_ID: trace-receiver
+        ARTIFACT_ID: model-generator
     restart: no #on-failure
     depends_on:
       - rabbitmq-server

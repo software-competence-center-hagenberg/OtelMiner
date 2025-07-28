@@ -6,7 +6,7 @@ process model ts-travel-service.json
 * ~20s per trace
     measured by hand: 8pages(80traces) ~30min -> 3-4.5min per page -> ~120min per 320traces -> ~0.375min per trace = 20s
 
-at the moment trace-receiver uses SingleThreadedExecutorService -> 10 threads should give a runtime acceleration of approximately a factor of 10 -> ~2s per trace
+at the moment model-generator uses SingleThreadedExecutorService -> 10 threads should give a runtime acceleration of approximately a factor of 10 -> ~2s per trace
 possible bottle-neck: capacity of rabbitMQ Queue,
 possible solutions for bottle-neck:
 * use multiple queues
@@ -24,7 +24,7 @@ planned quality of life features:
 * better layouting in frontend
 
 planned code quality features:
-* refactor trace-receiver
+* refactor model-generator
 * add missing javadoc
 * normalize and scale probability computation with THRESHOLD (Long.MAX_SIZE/100), SCALE_FACTOR (10), ROUNDING (SCALE_FACTOR/2) and recalculate nrTraces and nr of each span when threshold is reached to ensure no overflow can occur
 * switch out useEffect usages in frontend with useMemo to be more stable (done)

@@ -12,7 +12,7 @@ Options:
     -o         Enable ocaml process
     -j         Enable all java processes
     -d         Enable db-service
-    -r         Enable trace-receiver
+    -r         Enable model-generator
     -t         Enable all typescript processes.
     -e         Enable all backend processes.
 EOF
@@ -23,7 +23,7 @@ BUILD=false
 OCAML=false
 SPRING=false
 DB_SERVICE=false
-TRACE_RECEIVER=false
+MODEL_GENERATOR=false
 TS=false
 DETACH=true
 
@@ -36,7 +36,7 @@ while getopts "hbaojdrte" opt; do
         o) echo "enabling ocaml process..."; OCAML=true ;;
         j) echo "enabling all java processes..."; SPRING=true ;;
         d) echo "enabling db-service..."; DB_SERVICE=true ;;
-        r) echo "enabling trace-receiver..."; TRACE_RECEIVER=true ;;
+        r) echo "enabling model-generator..."; MODEL_GENERATOR=true ;;
         t) echo "enabling all typescript processes..."; TS=true ;;
         e) echo "enabling all backend processes..."; OCAML=true; SPRING=true ;;
         l) echo "log enabled -> not detaching..."; DETACH=false ;;
@@ -63,9 +63,9 @@ start_service() {
 
 # Start services based on flags
 [ "$OCAML" = true ] && start_service otel-to-declare-converter
-[ "$SPRING" = true ] && start_service "db-service trace-receiver"
+[ "$SPRING" = true ] && start_service "db-service model-generator"
 [ "$DB_SERVICE" = true ] && start_service db-service
-[ "$TRACE_RECEIVER" = true ] && start_service trace-receiver
+[ "$TRACE_RECEIVER" = true ] && start_service model-generator
 [ "$TS" = true ] && start_service frontend
 
 exit 0
