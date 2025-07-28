@@ -98,8 +98,6 @@ services:
   ##########################custom otel collector##########################
   # custom otel collector that exports to RabbitMQ, probably the nicer solution
   # NOTE for the future: If there is enough time then,
-  # TODO find out how to get AMQP message body as otlp_json instead of otlp_proto
-  # TODO OR how to properly convert olpt_proto to JSON
   #  otel-collector:
   #    build:
   #      context: ocaml/custom
