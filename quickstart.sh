@@ -66,6 +66,6 @@ start_service() {
 [ "$SPRING" = true ] && start_service "db-service model-generator"
 [ "$DB_SERVICE" = true ] && start_service db-service
 [ "$TRACE_RECEIVER" = true ] && start_service model-generator
-[ "$TS" = true ] && start_service frontend
+[ "$TS" = true ] && start_service dashboard
 
 exit 0

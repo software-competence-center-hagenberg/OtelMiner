@@ -15,4 +15,4 @@ run "docker compose start otel-generator"
 
 Note: only run whole file the first time, later omit db-initializer
 If troubles occur, run in the following order one after another:
-database -> db-initializer -> rabbitmq-server -> db-service -> model-generator -> otel-preprocessor -> frontend-preprocessor
+database -> db-initializer -> rabbitmq-server -> db-service -> model-generator -> otel-preprocessor -> dashboard-preprocessor

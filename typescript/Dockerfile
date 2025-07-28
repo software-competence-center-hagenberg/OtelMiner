@@ -1,10 +1,10 @@
 FROM node:20-alpine3.20 AS build
 
-WORKDIR /frontend
+WORKDIR /dashboard
 
 RUN npm install -g pnpm
 
-COPY frontend .
+COPY dashboard .
 
 #FIXME build fails due to linter errors
 RUN pnpm install && pnpm build && npx next telemetry disable

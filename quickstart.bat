@@ -79,6 +79,6 @@ if "%OCAML%" == "true" call :start_service otel-to-probdeclare-converter
 if "%SPRING%" == "true" call :start_service "db-service model-generator"
 if "%DB_SERVICE%" == "true" call :start_service db-service
 if "%MODEL_GENERATOR%" == "true" call :start_service model-generator
-if "%TS%" == "true" call :start_service frontend
+if "%TS%" == "true" call :start_service dashboard
 
 exit /b 0

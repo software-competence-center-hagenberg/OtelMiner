@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/data")
-@CrossOrigin({"http://localhost:3000", "http://frontend:3000"})
+@CrossOrigin({"http://localhost:3000", "http://frontend:3000", "http://dashboard:3000"})
 public class DataController {
     private final DataService dataService;
     private final ProbDeclareManagerService probDeclareManagerService;
