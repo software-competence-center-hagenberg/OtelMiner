@@ -63,7 +63,7 @@ Depending on the size of your data set, this may take a while.
 
 If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
 
-<img src=".readme_resources/screenshot_declare.png" alt="declare" width="75%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="25%">
+<img src=".readme_resources/screenshot_declare.png" alt="declare" width="60%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="40%">
 
 ## How to Use
 When you have a system running with a populated database.
