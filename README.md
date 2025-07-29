@@ -333,11 +333,11 @@ You can compare the expected with the actual result by clicking the button `EVAL
 ## Known Bugs
 
 - inconsistent state in Dashboard and Model-Generator when closing Prob Declare View with generated model
-  - workaround: RESET -> CLOSE
-  - bullet-proof-workaround: restart model-generator and dashboard
+  - workaround: `RESET` -> `CLOSE`
+  - bullet-proof-workaround: `docker compose restart model-generator dashboard`
 - inconsistent state when seeding a seeded model
-  - workaround RESET -> retrieve existing models -> select model again -> seed
-  - bullet-proof-workaround: restart model-generator and dashboard
+  - workaround `RESET` -> `SHOW EXISTING MODELS` -> select model again -> `SEED`
+  - bullet-proof-workaround: `docker compose restart model-generator dashboard`
 
 ---
 
