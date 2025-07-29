@@ -309,9 +309,35 @@ There are also advanced generation options and seeding options, make sure that y
 
 #### Seeding
 
+When Seeding a model, make sure that the generation is paused or finished. Paste a list of spans in the trace format of the current model into the the text box.
+Set number of times this trace should be seeded in the input box `Nr. Traces`, and give an ID prefix in `Trace Id`.
+
+Then, press `GENERATE DECLARE MODEL` and wait until the declare model of your trace is displayed on the right side.
+
+Then, press `CALCULATE EXPECTED RESULT` and wait until the expected result is calculated in the Dashboard. 
+
+Now the buttons `SHOW EXPECTED RESULT` and `SEED` should be enabled.
+
+`SHOW EXPECTED RESULT` lets you take a look at the raw JSON data of the expected result.
+
+If you are happy with the expected result, press `SEED`. The Model-Generator will flush all the currently cached traces, feed the seeded traces n times into the cache and then resume generation.
+
+You will see that the generation is finished once the `PAUSE` button is disabeld and the headline of the model says `generating: false`
+
+You can compare the expected with the actual result by clicking the button `EVALUATE SEEDING RESULT`
+
+![seeding-options.png](.readme_resources/seeding-options.png)
+
 ---
 
 ## Known Bugs
+
+- inconsistent state in Dashboard and Model-Generator when closing Prob Declare View with generated model
+  - workaround: RESET -> CLOSE
+  - bullet-proof-workaround: restart model-generator and dashboard
+- inconsistent state when seeding a seeded model
+  - workaround RESET -> retrieve existing models -> select model again -> seed
+  - bullet-proof-workaround: restart model-generator and dashboard
 
 ---
 
