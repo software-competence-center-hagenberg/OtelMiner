@@ -11,6 +11,10 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ---
 
+### Table of Contents
+
+---
+
 ## Background Information
 
 1. OpenTelementry (https://opentelemetry.io)
