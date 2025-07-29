@@ -13,6 +13,17 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ### Table of Contents
 
+1. [Background Information](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#background-information)
+2. [Related Work](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#related-work)
+3. [Technology Used](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#technology-used)
+4. [Architecture](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#technology-used)
+5. [How to Install](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-install)
+6. [How to Populate Database](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-populate-the-database)
+7. [How to Use](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-use)
+8. [How to Generate a Prob Declare Model](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
+9. [Known Bugs](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#known-bugs)
+10. [Acknowledgements](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#acknowledgements)
+
 ---
 
 ## Background Information
@@ -107,7 +118,10 @@ Run `docker compose up --detach` in the repository root, and you are good to go
 OR use `quickstart.sh -a` on unix systems
 OR use `quickstart.bat -a` on windows
 
-Make sure everything is running correctly by executing `docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Names}}'`.
+Make sure everything is running correctly by executing:
+
+`docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Names}}'`
+
 You should see something like this:
 ```
 CONTAINER ID   IMAGE                                      NAMES
@@ -171,11 +185,87 @@ If you run into a persistence error, make sure that the column constraintTemplat
 
 #### OTEL
 
+OpenTelemetry trace format with direct field mapping to span properties.
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `traceId` | string | Yes | Unique identifier for the trace | `trace_id` |
+| `spanId` | string | Yes | Unique identifier for the span | `span_id` |
+| `parentSpanId` | string | No | Parent span identifier (empty string if root) | `parent_span_id` |
+| `name` | string | Yes | Operation name for the span | `name` |
+| `kind` | string | No | Span kind (e.g., "CLIENT", "SERVER") | `kind` (decoded via `decode_span_kind`) |
+| `start` | int | No | Start time as Unix timestamp | `start_time_unix_nano` (converted to Int64) |
+| `end` | int | No | End time as Unix timestamp | `end_time_unix_nano` (converted to Int64) |
+| `attributes` | object | No | Key-value pairs of span attributes | `attributes` (decoded via `decode_attributes`) |
+
 #### JAEGER
+
+Jaeger trace format with reference-based parent relationships and duration calculation.
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `traceID` | string | Yes | Unique identifier for the trace | `trace_id` |
+| `spanID` | string | Yes | Unique identifier for the span | `span_id` |
+| `operationName` | string | Yes | Name of the operation | `name` |
+| `references` | array | No | Array of span references (CHILD_OF, FOLLOWS_FROM) | Used to extract `parent_span_id` |
+| `kind` | string | No | Span kind classification | `kind` (decoded via `decode_span_kind`) |
+| `startTime` | int | No | Start time in microseconds | `start_time_unix_nano` (converted to Int64) |
+| `duration` | int | No | Duration in microseconds | Added to `start_time_unix_nano` for `end_time_unix_nano` |
+
+**Reference Structure:**
+- `refType`: "CHILD_OF" or "FOLLOWS_FROM"
+- `spanID`: Referenced span identifier
 
 #### DYNATRACE
 
+Dynatrace trace format with root span detection and URL pruning capabilities.
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `trace.id` | string | Yes | Unique identifier for the trace | `trace_id` |
+| `span.id` | string | Yes | Unique identifier for the span | `span_id` |
+| `span.parent_id` | string | No | Parent span identifier (ignored if root span) | `parent_span_id` |
+| `request.is_root_span` | boolean | No | Indicates if this is a root span | Used in `extract_parent_id` logic |
+| `span.name` | string | Yes | Operation name (URL args are pruned) | `name` (processed via `prune_name`) |
+| `span.kind` | string | No | Span kind classification | `kind` (decoded via `decode_span_kind`) |
+| `start_time` | string | No | ISO 8601 formatted start time | `start_time_unix_nano` (via `map_iso_8601_date_to_int64`) |
+| `end_time` | string | No | ISO 8601 formatted end time | `end_time_unix_nano` (via `map_iso_8601_date_to_int64`) |
+
+**Special Processing:**
+- Root spans have empty `parent_span_id` regardless of `span.parent_id` value
+- Span names have query parameters removed (everything after '?')
+
 #### RESOURCE_SPANS
+
+OpenTelemetry Resource Spans format with hierarchical resource and scope organization.
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `resource` | object | Yes | Resource information container | `resource` (via `decode_resource`) |
+| `resource.attributes` | array | No | Resource-level attributes | Resource attributes |
+| `scopeSpans` | array | Yes | Array of instrumentation scope spans | `scope_spans` |
+| `schemaUrl` | string | No | Schema URL for the data | `schema_url` |
+
+**ScopeSpans Structure:**
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `scope` | object | No | Instrumentation scope information | `scope` (via `decode_scope`) |
+| `scope.name` | string | Yes | Name of the instrumentation scope | Scope name |
+| `spans` | array | Yes | Array of spans under this scope | `spans` |
+
+**Span Structure within Resource Spans:**
+
+| Field | Type | Required | Description | OCaml Mapping |
+|-------|------|----------|-------------|---------------|
+| `traceId` | string | Yes | Unique identifier for the trace | `trace_id` |
+| `spanId` | string | Yes | Unique identifier for the span | `span_id` |
+| `parentSpanId` | string | No | Parent span identifier | `parent_span_id` |
+| `name` | string | Yes | Operation name for the span | `name` |
+| `kind` | int | No | Span kind as integer enum | `kind` (via `decode_span_kind_from_int`) |
+| `startTimeUnixNano` | string | No | Start time in nanoseconds as string | `start_time_unix_nano` (parsed to Int64) |
+| `endTimeUnixNano` | string | No | End time in nanoseconds as string | `end_time_unix_nano` (parsed to Int64) |
+| `attributes` | array | No | Span attributes | `attributes` (via `decode_resource_spans_attribute`) |
 
 ---
 
