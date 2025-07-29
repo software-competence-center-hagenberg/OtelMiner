@@ -126,7 +126,7 @@ bf415d25033c   master-project-otel-to-declare-converter   master-project-otel-to
 
 You can change the number of worker threads by changing the value of environment variable `NR_THREADS` of the service `model-generator` 
 
-<img src=".readme_resources/screenshot_model-generator_docker_compose.png" alt="sc_model_gen_dc" width="50%">
+<img src=".readme_resources/screenshot_model-generator_docker_compose.png" alt="sc_model_gen_dc" width="100%">
 
 ---
 
@@ -161,7 +161,7 @@ Depending on the size of your data set, this may take a while.
 
 If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
 
-<img src=".readme_resources/screenshot_declare.png" alt="declare" width="50%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="50%">
+<img src=".readme_resources/screenshot_declare.png" alt="declare" width="60%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="40%">
 
 ### Supported Trace Formats
 
@@ -199,6 +199,7 @@ To start the generation with the default options, press start, the model will ap
 
 ![dashboard_model-gen-started](.readme_resources/screenshot_dashboard_model_gen_started.png)
 
+
 The button `SHOW STATISTICS` enables the view of two line charts and a bar chart. The first line chart shows all the traces by probability and the second one filters out all the probabilities below a configurable threshold. The bar chat shows the spread of probability ranges ([0.0,0.1[, [0.1,0.2[, [0.2,0.3[, [0.3,0.4[, [0.4,0.5[, [0.5,0.6[, [0.6,0.7[, [0.7,0.8[, [0.8,0.9[, [0.9,1[) and the DECLARE constraints which have a probility of 1..
 ![dashboard_statistics](.readme_resources/screenshot_dashboard_statistics.png)
 ![dashboard_statistics_1](.readme_resources/screenshot_dashboard_statistics-1.png)
@@ -217,3 +218,9 @@ There are also advanced generation options and seeding options, make sure that y
 ---
 
 ## Known Bugs
+
+---
+
+## Acknowledgements
+
+---
