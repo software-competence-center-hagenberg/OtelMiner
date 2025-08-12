@@ -12,9 +12,10 @@ Options:
     -o         Enable ocaml process
     -j         Enable all java processes
     -d         Enable db-service
-    -r         Enable trace-receiver
+    -r         Enable model-generator
     -t         Enable all typescript processes.
     -e         Enable all backend processes.
+    -l         Enable logging (disable detached mode)
 EOF
 }
 
@@ -23,12 +24,12 @@ BUILD=false
 OCAML=false
 SPRING=false
 DB_SERVICE=false
-TRACE_RECEIVER=false
+MODEL_GENERATOR=false
 TS=false
 DETACH=true
 
 # Parse command-line options
-while getopts "hbaojdrte" opt; do
+while getopts "hbaojdrtel" opt; do
     case ${opt} in
         h) show_help; exit 0 ;;
         b) echo "enabling build flag..."; BUILD=true ;;
@@ -36,13 +37,19 @@ while getopts "hbaojdrte" opt; do
         o) echo "enabling ocaml process..."; OCAML=true ;;
         j) echo "enabling all java processes..."; SPRING=true ;;
         d) echo "enabling db-service..."; DB_SERVICE=true ;;
-        r) echo "enabling trace-receiver..."; TRACE_RECEIVER=true ;;
+        r) echo "enabling model-generator..."; MODEL_GENERATOR=true ;;
         t) echo "enabling all typescript processes..."; TS=true ;;
         e) echo "enabling all backend processes..."; OCAML=true; SPRING=true ;;
         l) echo "log enabled -> not detaching..."; DETACH=false ;;
         *) echo "Invalid option: -$OPTARG" >&2; show_help; exit 1 ;;
     esac
 done
+
+if [ "$OCAML" = false ] && [ "$SPRING" = false ] && [ "$DB_SERVICE" = false ] &&
+   [ "$MODEL_GENERATOR" = false ] && [ "$TS" = false ]; then
+    echo "No services selected. Use -h for help."
+    exit 1
+fi
 
 # Start core services
 echo "Starting services from third party images..."
@@ -63,9 +70,9 @@ start_service() {
 
 # Start services based on flags
 [ "$OCAML" = true ] && start_service otel-to-declare-converter
-[ "$SPRING" = true ] && start_service "db-service trace-receiver"
+[ "$SPRING" = true ] && start_service "db-service model-generator"
 [ "$DB_SERVICE" = true ] && start_service db-service
-[ "$TRACE_RECEIVER" = true ] && start_service trace-receiver
-[ "$TS" = true ] && start_service frontend
+[ "$MODEL_GENERATOR" = true ] && start_service model-generator
+[ "$TS" = true ] && start_service dashboard
 
 exit 0

@@ -49,9 +49,9 @@ services:
         ARTIFACT_ID: db-service
     depends_on:
       - database
-  trace-receiver:
+  model-generator:
     environment:
-      NR_THREADS: 10
+      NR_THREADS: 4
     user: "1000:1000"
     cap_drop:
       - ALL
@@ -63,11 +63,11 @@ services:
       context: java
       dockerfile: ./Dockerfile
       args:
-        ARTIFACT_ID: trace-receiver
+        ARTIFACT_ID: model-generator
     restart: no #on-failure
     depends_on:
       - rabbitmq-server
-  frontend:
+  dashboard:
     #user: "1000:1000"
     ports:
       - "3000:3000"
@@ -76,7 +76,7 @@ services:
       dockerfile: ./Dockerfile
     restart: no
     depends_on:
-      - trace-receiver
+      - model-generator
   otel-to-declare-converter:
     # runs as non-root user opam
     build:
@@ -87,7 +87,7 @@ services:
       - rabbitmq-server
     deploy:
       mode: replicated
-      replicas: 10
+      replicas: 1
   # otel-generator:
   #   image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.104.0
   #   command: "traces --otlp-http --otlp-insecure --otlp-endpoint otelcol:4318 --traces 1" #"traces --otlp-endpoint otel-collector:4317 --otlp-insecure"
@@ -98,8 +98,6 @@ services:
   ##########################custom otel collector##########################
   # custom otel collector that exports to RabbitMQ, probably the nicer solution
   # NOTE for the future: If there is enough time then,
-  # TODO find out how to get AMQP message body as otlp_json instead of otlp_proto
-  # TODO OR how to properly convert olpt_proto to JSON
   #  otel-collector:
   #    build:
   #      context: ocaml/custom
@@ -107,7 +105,7 @@ services:
   #    restart: on-failure
   #    depends_on:
   #      - rabbitmq-server
-  #      - trace-receiver
+  #      - model-generator
   #######################standard otel collector##########################
   # otelcol:
   #   image: otel/opentelemetry-collector

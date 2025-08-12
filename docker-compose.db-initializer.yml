@@ -7,6 +7,16 @@ services:
       args:
         ARTIFACT_ID: db-initializer
     restart: on-failure
+    environment:
+      FILE_PATH_DYNATRACE: "/test-data/traces_spans.zip"
+      FILE_PATH_JAEGER: "/test-data/traces-jaeger.zip"
+      FILE_PATH_TRAIN_TICKET_SAMPLED: >
+           /test-data/train-ticket-sample-00.tar.gz,
+           /test-data/train-ticket-sample-01.tar.gz,
+           /test-data/train-ticket-sample-02.tar.gz,
+           /test-data/train-ticket-sample-03.tar.gz
+    volumes:
+      - ./test-data:/test-data
 networks:
   default:
     name: "master-project-network"

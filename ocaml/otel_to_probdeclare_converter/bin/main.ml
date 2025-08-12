@@ -20,7 +20,7 @@ let handler_single_trace (tt : trace_type) channel probd_result_queue message =
   let result = Message_processor.trace_model_to_json_string processed in
   Log.info "result: %s" result;
   Queue.publish channel probd_result_queue (Message.make result) >>= fun `Ok ->
-  Log.info "Sent result to trace-receiver";
+  Log.info "Sent result to model-generator";
   return ()
 
 (* 
@@ -39,7 +39,7 @@ let handler_resource_spans_and_multiple_traces (tt : trace_type) channel
   let result = Message_processor.traces_model_to_json_string processed in
   Log.info "result: %s" result;
   Queue.publish channel probd_result_queue (Message.make result) >>= fun `Ok ->
-  Log.info "Sent result to trace-receiver";
+  Log.info "Sent result to model-generator";
   return ()
 
 let rabbitmq_consumer_cancelled () = Log.info "Consumer cancelled"
