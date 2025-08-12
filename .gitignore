@@ -51,6 +51,7 @@ build/
 *.ear
 *.zip
 *.tar.gz
+!test-data/*
 !traces.tar.gz
 *.rar
 
