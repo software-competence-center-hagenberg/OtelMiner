@@ -13,16 +13,16 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ### Table of Contents
 
-1. [Background Information](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#background-information)
-2. [Related Work](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#related-work)
-3. [Technology Used](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#technology-used)
-4. [Architecture](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#technology-used)
-5. [How to Install](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-install)
-6. [How to Populate Database](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-populate-the-database)
-7. [How to Use](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-use)
-8. [How to Generate a Prob Declare Model](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
-9. [Known Bugs](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#known-bugs)
-10. [Acknowledgements](https://github.scch.at/SCCH-GMBH/master-thesis-freiseisen/tree/feature/prepare-repo-for-open-source-release?tab=readme-ov-file#acknowledgements)
+1. [Background Information](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#background-information)
+2. [Related Work](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#related-work)
+3. [Technology Used](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#technology-used)
+4. [Architecture](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#technology-used)
+5. [How to Install](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-install)
+6. [How to Populate Database](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-populate-the-database)
+7. [How to Use](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-use)
+8. [How to Generate a Prob Declare Model](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
+9. [Known Bugs](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#known-bugs)
+10. [Acknowledgements](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#acknowledgements)
 
 ---
 
