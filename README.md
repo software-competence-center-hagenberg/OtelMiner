@@ -13,16 +13,16 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ### Table of Contents
 
-1. [Background Information](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#background-information)
-2. [Related Work](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#related-work)
-3. [Technology Used](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#technology-used)
-4. [Architecture](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#technology-used)
-5. [How to Install](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-install)
-6. [How to Populate Database](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-populate-the-database)
-7. [How to Use](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-use)
-8. [How to Generate a Prob Declare Model](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
-9. [Known Bugs](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#known-bugs)
-10. [Acknowledgements](https://github.com/software-competence-center-hagenberg/OtelMiner/main?tab=readme-ov-file#acknowledgements)
+1. [Background Information](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#background-information)
+2. [Related Work](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#related-work)
+3. [Technology Used](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#technology-used)
+4. [Architecture](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#technology-used)
+5. [How to Install](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-install)
+6. [How to Populate Database](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-populate-the-database)
+7. [How to Use](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-use)
+8. [How to Generate a Prob Declare Model](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
+9. [Known Bugs](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#known-bugs)
+10. [Acknowledgements](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#acknowledgements)
 
 ---
 
@@ -38,7 +38,7 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ## Related Work
 
-1. Declare4Py (https://github.com/ivanDonadello/Declare4Py/tree/main)
+1. Declare4Py (https://github.com/ivanDonadello/Declare4Py/tree/blob/main/README.md)
 2. Declare Miner (https://ais.win.tue.nl/declare/declare-miner/index.html)
 3. Rule Miner (https://rulemining.org/)
 3. Prom (https://promtools.org/)
@@ -338,9 +338,5 @@ You can compare the expected with the actual result by clicking the button `EVAL
 - inconsistent state when seeding a seeded model
   - workaround `RESET` -> `SHOW EXISTING MODELS` -> select model again -> `SEED`
   - bullet-proof-workaround: `docker compose restart model-generator dashboard`
-
----
-
-## Acknowledgements
 
 ---
