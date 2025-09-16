@@ -1,7 +1,7 @@
 # OTel Miner
 
 OTel Miner is an open-source framework to incrementally discover Prob Declare models from OpenTelemetry (OTel) traces.<br>
-This project is the product of the following master's thesis: **TODO: add link**
+This project is the product of [this](https://epub.jku.at/obvulihs/content/titleinfo/12426378) master thesis.
 
 ---
 
