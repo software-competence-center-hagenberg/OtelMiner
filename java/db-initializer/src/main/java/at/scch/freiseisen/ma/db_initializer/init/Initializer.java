@@ -1,7 +1,7 @@
 package at.scch.freiseisen.ma.db_initializer.init;
 
 import at.scch.freiseisen.ma.commons.TraceDataType;
-import at.scch.freiseisen.ma.db_initializer.source_extraction.ArchiveExtractor;
+import at.scch.freiseisen.ma.db_initializer.source_extraction.ArchiveProcessor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.FileProcessor;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.DynatraceTracesJsonParser;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.parsing.FileParser;
@@ -25,7 +25,7 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class Initializer {
     private final ResourceLoader resourceLoader;
-    private final ArchiveExtractor archiveExtractor;
+    private final ArchiveProcessor archiveProcessor;
     private final FileProcessor fileProcessor;
     private final OtelTxtParser otelTxtParser;
     private final JaegerTracesJsonParser jaegerTracesJsonParser;
@@ -48,11 +48,11 @@ public class Initializer {
     public void start() {
         log.info("Starting DB initialization...");
         try {
-            if (dynatraceData != null) {
+            if (dynatraceData != null && !dynatraceData.isBlank()) {
                 log.info("Loading Dynatrace traces...");
                 unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
             }
-            if (jaegerData != null) {
+            if (jaegerData != null && !jaegerData.isBlank()) {
                 log.info("Loading Jaeger traces...");
                 unpackDataAndPopulateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
             }
@@ -78,13 +78,13 @@ public class Initializer {
 
     private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
                                                boolean sample) throws IOException {
-        Resource archiveResource = resourceLoader.getResource("classpath:" + resourceLocation);
+        Resource archiveResource = resourceLoader.getResource(/*"classpath:"*/ "file:" + resourceLocation);
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
-            archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
+            archiveProcessor.processTarGz(archiveResource, extractionDirectory, parser, traceDataType, sample);
         } else if (resourceLocation.endsWith(".zip")) {
-            archiveExtractor.extractZip(archiveResource, extractionDirectory);
+            archiveProcessor.processZip(archiveResource, extractionDirectory, parser, traceDataType, sample);
         }
-        fileProcessor.parseFiles(extractionDirectory, ".json", parser, traceDataType, sample);
+//        fileProcessor.parseFiles(extractionDirectory, ".json", parser, traceDataType, sample);
     }
 }

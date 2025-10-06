@@ -4,6 +4,7 @@ import at.scch.freiseisen.ma.commons.TraceDataType;
 import at.scch.freiseisen.ma.data_layer.entity.otel.Trace;
 import at.scch.freiseisen.ma.db_initializer.error.FileParsingException;
 import at.scch.freiseisen.ma.db_initializer.source_extraction.dto_creation.DTOCreator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -27,9 +30,9 @@ public class JaegerTracesJsonParser implements FileParser {
     @Override
     public void parse(Path path, HashMap<String, Trace> traces, TraceDataType traceDataType) {
         log.info("parsing {}", path);
-        try {
-            String content = Files.readString(path);
-            JsonNode jaegerTrace = objectMapper.readTree(content);
+        try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(path));
+             JsonParser parser = objectMapper.getFactory().createParser(inputStream)) {
+            JsonNode jaegerTrace = objectMapper.readTree(parser);
             jaegerTrace.get("data").forEach(trace -> {
                 JsonNode spans = trace.get("spans");
                 spans.forEach(span -> {
@@ -44,6 +47,23 @@ public class JaegerTracesJsonParser implements FileParser {
         } catch (IOException e) {
             throw new FileParsingException(path.toString());
         }
+//        try {
+//            String content = Files.readString(path);
+//            JsonNode jaegerTrace = objectMapper.readTree(content);
+//            jaegerTrace.get("data").forEach(trace -> {
+//                JsonNode spans = trace.get("spans");
+//                spans.forEach(span -> {
+//                    String traceId = span.get("traceID").asText();
+//                    String spanId = span.get("spanID").asText();
+//                    String parentSpanId = extractParentSpanId(span);
+//                    dtoCreator.addSpan(traceId, spanId, parentSpanId, path.toString(), span.toString(), traces, traceDataType);
+//                });
+//            });
+//            log.info("parsing done -> deleting temp file");
+//            Files.delete(path);
+//        } catch (IOException e) {
+//            throw new FileParsingException(path.toString());
+//        }
     }
 
     private String extractParentSpanId(JsonNode span) {

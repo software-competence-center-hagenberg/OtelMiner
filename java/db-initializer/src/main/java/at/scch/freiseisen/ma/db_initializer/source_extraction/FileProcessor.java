@@ -25,6 +25,9 @@ public class FileProcessor {
     private final HashMap<String, Trace> traces = new HashMap<>();
     private final HashMap<Integer, List<Trace>> tracesByNrNodes = new HashMap<>();
 
+//    private static final int BATCH_SIZE = 5;
+//    private int fileCounter = 0;
+
     @Value("${db-service.url}")
     private String dbServiceUrl;
 
@@ -50,6 +53,17 @@ public class FileProcessor {
         log.info("state cleaned up");
     }
 
+    public void parseSingleFile(Path path, FileParser fileParser, TraceDataType traceDataType, boolean sample) {
+        fileParser.parse(path, traces, traceDataType);
+//        fileCounter++;
+
+        // Flush every BATCH_SIZE files to avoid memory buildup
+//        if (fileCounter % BATCH_SIZE == 0) {
+//            log.info("Processed {} files, flushing batch to database...", fileCounter);
+            process(sample);
+//        }
+    }
+
     private void process(boolean sample) {
         traces.values().forEach(t -> {
             t.setSpans(t.getSpans().stream().distinct().toList());
@@ -61,18 +75,18 @@ public class FileProcessor {
                 tracesByNrNodes.put(nrNodes, new ArrayList<>(List.of(t)));
             }
         });
+        traces.clear();
         log.info("########## traces found with n nodes: ###########");
         tracesByNrNodes.forEach((nrNodes, traces) -> {
             log.info("{} traces with {} nodes found", traces.size(), nrNodes);
             if (!sample) {
                 if (nrNodes >= 5) {
-                    processNormaly(traces);
+                    processNormally(traces);
                 }
             } else {
                 processAndSample(traces);
             }
         });
-        traces.clear();
         tracesByNrNodes.clear();
         log.info("#################################################");
     }
@@ -87,10 +101,10 @@ public class FileProcessor {
             }
         });
         log.info("persisting {} sampled traces", sampled.size());
-        processNormaly(new ArrayList<>(sampled.values()));
+        processNormally(new ArrayList<>(sampled.values()));
     }
 
-    private void processNormaly(List<Trace> traces) {
+    private void processNormally(List<Trace> traces) {
         traces.forEach(trace -> {
             List<Span> spans = trace.getSpans();
             trace.setSpans(Collections.emptyList());
