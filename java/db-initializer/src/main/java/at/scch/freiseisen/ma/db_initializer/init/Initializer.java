@@ -78,7 +78,7 @@ public class Initializer {
 
     private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
                                                boolean sample) throws IOException {
-        Resource archiveResource = resourceLoader.getResource("classpath:" + resourceLocation);
+        Resource archiveResource = resourceLoader.getResource("file:" + resourceLocation);
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
             archiveExtractor.extractTarGz(archiveResource, extractionDirectory);
