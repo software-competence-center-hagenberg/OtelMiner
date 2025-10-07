@@ -152,6 +152,7 @@ You can change the number of worker threads by changing the value of environment
 
 ## How to Populate the Database
 
+**Note: Currently the data import in a docker container only works for the archive astro-shop.zip. The other archives can be imported via execution in the IDE.**
 The db-initializer will automatically populate the database, if configured correctly.
 Here is an example configuration:
 
@@ -164,7 +165,7 @@ Here is an example configuration:
         ARTIFACT_ID: db-initializer
     restart: on-failure
     environment:
-      FILE_PATH_DYNATRACE: "/test-data/traces_spans.zip"
+      FILE_PATH_DYNATRACE: "/test-data/astro-shop.zip"
       FILE_PATH_JAEGER: "/test-data/traces-jaeger.zip"
       FILE_PATH_TRAIN_TICKET_SAMPLED: >
         /test-data/train-ticket-sample-00.tar.gz,
