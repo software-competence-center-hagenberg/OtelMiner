@@ -153,6 +153,7 @@ You can change the number of worker threads by changing the value of environment
 ## How to Populate the Database
 
 **Note: Currently the data import in a docker container only works for the archive astro-shop.zip. The other archives can be imported via execution in the IDE.**
+
 The db-initializer will automatically populate the database, if configured correctly.
 Here is an example configuration:
 
