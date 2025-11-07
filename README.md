@@ -157,10 +157,6 @@ The db-initializer will automatically populate the database with the astro-shop 
 The population of the database with the astro-shop data set is straightforward. It can be done via the docker service as follows:
 Run "docker compose -f docker-compose.db-initializer.yml up --detach" in the repository root.
 
-If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
-
-<img src=".readme_resources/screenshot_declare.png" alt="declare" width="60%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="40%">
-
 ### Train Ticket
 Since the train ticket data set is too big to be persisted this way and too homogenous to be meaningful. It's first sampled. Unfortunately this is rather tricky in a docker with the current implementation because the needed heap space is too big for a standard docker container.
 In order to populate the database with this dataset execute the db-initializer on your machine with the flags `-Xmx6g`, `-Dspring.profiles.active=dev`, and the environment variables:
@@ -169,6 +165,13 @@ FILE_PATH_DYNATRACE="test-data/astro-shop.zip"
 FILE_PATH_TRAIN_TICKET_SAMPLED=test-data/train-ticket-sample-00.tar.gz,test-data/train-ticket-sample-01.tar.gz,test-data/train-ticket-sample-02.tar.gz,test-data/train-ticket-sample-03.tar.gz
 ```
 
+### Handling Persistence Errors
+
+If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
+
+<img src=".readme_resources/screenshot_declare.png" alt="declare" width="60%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="40%">
+
+**ATTENTION:** The db-initializer currently only supports the persistance of the JAEGER and DYNATRACE format from json files. OTEL is supported from txt, however not out-of-the-box. Check the source for implementation details.
 
 ### Supported Trace Formats
 
