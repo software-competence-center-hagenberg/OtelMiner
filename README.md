@@ -9,6 +9,8 @@ This project is the product of [this](https://epub.jku.at/obvulihs/content/title
 
 You should be at least familiar with docker and OpenTelemetry and have basic knowledge on process mining. Basic knowledge on Linear Temporal Logic and Prob Declare is of advantage. 
 
+Furthermore, this repository uses [Git Large File Storage](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) for its large files. In order to get those install Git LFS, move to the repository and execute `git lfs fetch --all` and `git lfs checkout`.
+
 ---
 
 ### Table of Contents

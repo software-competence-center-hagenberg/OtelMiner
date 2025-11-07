@@ -40,7 +40,7 @@ public class Initializer {
      * <pre>
      *     takes file-path(s) at resourceLocation, extracts archive if present.
      *     Then parses entries.
-     *     Currently only supports .json with jaeger traces
+     *     Currently only supports .json with jaeger or dynatrace traces
      * </pre>
      */
     @EventListener(ApplicationReadyEvent.class)
