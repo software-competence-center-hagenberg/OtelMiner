@@ -16,9 +16,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @Component
@@ -64,7 +66,7 @@ public class Initializer {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("error initializing db {}", e.getMessage());
         }
         log.info("... finished populating database.");
         log.info("exiting ...");
@@ -78,7 +80,7 @@ public class Initializer {
 
     private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
                                                boolean sample) throws IOException {
-        Resource archiveResource = resourceLoader.getResource(/*"classpath:"*/ "file:" + resourceLocation);
+        Resource archiveResource = resourceLoader.getResource(/*"classpath:"*/ "file:" + resolvePath(resourceLocation));
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
             archiveProcessor.processTarGz(archiveResource, extractionDirectory, parser, traceDataType, sample);
@@ -86,5 +88,16 @@ public class Initializer {
             archiveProcessor.processZip(archiveResource, extractionDirectory, parser, traceDataType, sample);
         }
 //        fileProcessor.parseFiles(extractionDirectory, ".json", parser, traceDataType, sample);
+    }
+
+    private String resolvePath(String location) {
+        // If it's already absolute, keep it
+        File file = new File(location);
+        if (file.isAbsolute()) {
+            return file.getAbsolutePath();
+        }
+
+        // Otherwise, resolve relative to project root (current working dir)
+        return new File(System.getProperty("user.dir"), location).getAbsolutePath();
     }
 }
