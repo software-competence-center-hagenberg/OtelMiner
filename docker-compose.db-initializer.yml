@@ -1,6 +1,8 @@
 name: db-init
 services:
   db-initializer:
+    mem_limit: 72g
+    memswap_limit: 72g
     build:
       context: java
       dockerfile: ./Dockerfile
@@ -8,13 +10,16 @@ services:
         ARTIFACT_ID: db-initializer
     restart: on-failure
     environment:
-      FILE_PATH_DYNATRACE: "/test-data/traces_spans.zip"
-      FILE_PATH_JAEGER: "/test-data/traces-jaeger.zip"
-      FILE_PATH_TRAIN_TICKET_SAMPLED: >
-           /test-data/train-ticket-sample-00.tar.gz,
-           /test-data/train-ticket-sample-01.tar.gz,
-           /test-data/train-ticket-sample-02.tar.gz,
-           /test-data/train-ticket-sample-03.tar.gz
+      FILE_PATH_DYNATRACE: "/test-data/astro-shop.zip"
+      FILE_PATH_TRAIN_TICKET_SAMPLED: ""
+      # ATTENTION: The train-ticket-sampled data-set is too big to conveniently process it inside a docker container.
+      # Execute db-initializer in your IDE with the following ENV set and Spring Profile "dev" activated and VM option
+      # "-Xmx6g"
+      # FILE_PATH_TRAIN_TICKET_SAMPLED: >
+      #   /test-data/train-ticket-sample-00.tar.gz,
+      #   /test-data/train-ticket-sample-01.tar.gz,
+      #   /test-data/train-ticket-sample-02.tar.gz,
+      #   /test-data/train-ticket-sample-03.tar.gz
     volumes:
       - ./test-data:/test-data
 networks:

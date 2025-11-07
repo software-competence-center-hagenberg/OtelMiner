@@ -16,4 +16,5 @@ RUN chmod +x app.jar
 #COPY ./db-initializer/src/main/resources/test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz /test-data/
 #RUN cd /test-data && tar -xvf /test-data/2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz && rm 2024-05-23-11-26-05-ts-error-F8-generated-with-ts-travel-service.tar.gz
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xms32768M", "-Xmx65536M", "-jar", "app.jar"]
+#ENTRYPOINT ["java", "-jar", "app.jar"]
