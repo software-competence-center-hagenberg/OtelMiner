@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Slf4j
 @Component
@@ -34,8 +33,6 @@ public class Initializer {
     private final DynatraceTracesJsonParser dynatraceTracesJsonParser;
     @Value("${test-data.file-paths.dynatrace}")
     private String dynatraceData;
-    @Value("${test-data.file-paths.jaeger}")
-    private String jaegerData;
     @Value("${test-data.file-paths.sample}")
     private String[] sampledData;
 
@@ -52,11 +49,7 @@ public class Initializer {
         try {
             if (dynatraceData != null && !dynatraceData.isBlank()) {
                 log.info("Loading Dynatrace traces...");
-                unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST);
-            }
-            if (jaegerData != null && !jaegerData.isBlank()) {
-                log.info("Loading Jaeger traces...");
-                unpackDataAndPopulateDatabase(jaegerData, jaegerTracesJsonParser, TraceDataType.JAEGER_SPANS_LIST);
+                unpackDataAndPopulateDatabase(dynatraceData, dynatraceTracesJsonParser, TraceDataType.DYNATRACE_SPANS_LIST, false);
             }
             if (sampledData != null && sampledData.length > 0) {
                 log.info("Creating Sample for train-ticket system...");
@@ -73,31 +66,32 @@ public class Initializer {
         System.exit(0);
     }
 
-    private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType)
-            throws IOException {
-        unpackDataAndPopulateDatabase(resourceLocation, parser, traceDataType, false);
-    }
-
     private void unpackDataAndPopulateDatabase(String resourceLocation, FileParser parser, TraceDataType traceDataType,
                                                boolean sample) throws IOException {
-        Resource archiveResource = resourceLoader.getResource(/*"classpath:"*/ "file:" + resolvePath(resourceLocation));
+        Resource archiveResource = resourceLoader.getResource("file:" + resolvePath(resourceLocation));
         Path extractionDirectory = Files.createTempDirectory("extraction");
         if (resourceLocation.endsWith(".tar.gz")) {
             archiveProcessor.processTarGz(archiveResource, extractionDirectory, parser, traceDataType, sample);
         } else if (resourceLocation.endsWith(".zip")) {
             archiveProcessor.processZip(archiveResource, extractionDirectory, parser, traceDataType, sample);
         }
-//        fileProcessor.parseFiles(extractionDirectory, ".json", parser, traceDataType, sample);
     }
 
-    private String resolvePath(String location) {
-        // If it's already absolute, keep it
-        File file = new File(location);
+    /**
+     * <pre>
+     *     Helper method for resolving relative paths.
+     *     If the given path is already an absolute path -> keep it.
+     *     Else, resolve relative to project root (current working dir)
+     * </pre>
+     * @param path to resolve
+     * @return resolved absolute path
+     */
+    private String resolvePath(String path) {
+        File file = new File(path);
         if (file.isAbsolute()) {
             return file.getAbsolutePath();
         }
 
-        // Otherwise, resolve relative to project root (current working dir)
-        return new File(System.getProperty("user.dir"), location).getAbsolutePath();
+        return new File(System.getProperty("user.dir"), path).getAbsolutePath();
     }
 }

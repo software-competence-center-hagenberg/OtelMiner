@@ -13,16 +13,15 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 
 ### Table of Contents
 
-1. [Background Information](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#background-information)
-2. [Related Work](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#related-work)
-3. [Technology Used](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#technology-used)
-4. [Architecture](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#technology-used)
-5. [How to Install](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-install)
-6. [How to Populate Database](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-populate-the-database)
-7. [How to Use](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-use)
-8. [How to Generate a Prob Declare Model](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#how-to-generate-a-prob-declare-model)
-9. [Known Bugs](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#known-bugs)
-10. [Acknowledgements](https://github.com/software-competence-center-hagenberg/OtelMiner/blob/main/README.md?tab=readme-ov-file#acknowledgements)
+1. [Background Information](#background-information)
+2. [Related Work](#related-work)
+3. [Technology Used](#technology-used)
+4. [Architecture](#technology-used)
+5. [How to Install](#how-to-install)
+6. [How to Populate Database](#how-to-populate-the-database)
+7. [How to Use](#how-to-use)
+8. [How to Generate a Prob Declare Model](#how-to-generate-a-prob-declare-model)
+9. [Known Bugs](#known-bugs)
 
 ---
 
@@ -41,7 +40,7 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 1. Declare4Py (https://github.com/ivanDonadello/Declare4Py/tree/blob/main/README.md)
 2. Declare Miner (https://ais.win.tue.nl/declare/declare-miner/index.html)
 3. Rule Miner (https://rulemining.org/)
-3. Prom (https://promtools.org/)
+4. Prom (https://promtools.org/)
 
 ---
 
@@ -52,8 +51,8 @@ You should be at least familiar with docker and OpenTelemetry and have basic kno
 3. Spring Boot (https://spring.io/projects/spring-boot)
 4. OCaml (https://ocaml.org/)
 5. Dune (https://dune.build/)
-5. Next.js (https://nextjs.org/)
-6. PostgreSQL (https://www.postgresql.org/)
+6. Next.js (https://nextjs.org/)
+7. PostgreSQL (https://www.postgresql.org/)
 
 ---
 
@@ -150,36 +149,24 @@ You can change the number of worker threads by changing the value of environment
 
 ## How to Populate the Database
 
-The db-initializer will automatically populate the database, if configured correctly.
-Here is an example configuration:
+The db-initializer will automatically populate the database with the astro-shop data set or (small enough) custom data sets.
 
-```yaml
-  db-initializer:
-    build:
-      context: java
-      dockerfile: ./Dockerfile
-      args:
-        ARTIFACT_ID: db-initializer
-    restart: on-failure
-    environment:
-      FILE_PATH_DYNATRACE: "/test-data/traces_spans.zip"
-      FILE_PATH_JAEGER: "/test-data/traces-jaeger.zip"
-      FILE_PATH_TRAIN_TICKET_SAMPLED: >
-        /test-data/train-ticket-sample-00.tar.gz,
-        /test-data/train-ticket-sample-01.tar.gz,
-        /test-data/train-ticket-sample-02.tar.gz,
-        /test-data/train-ticket-sample-03.tar.gz
-    volumes:
-      - ./test-data:/test-data
-```
-
+### Astro-Shop
+The population of the database with the astro-shop data set is straightforward. It can be done via the docker service as follows:
 Run "docker compose -f docker-compose.db-initializer.yml up --detach" in the repository root.
-
-Depending on the size of your data set, this may take a while.
 
 If you run into a persistence error, make sure that the column constraintTemplate of the table declare has the type varchar(500), for some reason, this is initialized with varchar(250), although it is configured as varchar(500) in the jpa class.
 
 <img src=".readme_resources/screenshot_declare.png" alt="declare" width="60%"><img src=".readme_resources/screenshot_declare_jpa.png" alt="declare_jpa" width="40%">
+
+### Train Ticket
+Since the train ticket data set is too big to be persisted this way and too homogenous to be meaningful. It's first sampled. Unfortunately this is rather tricky in a docker with the current implementation because the needed heap space is too big for a standard docker container.
+In order to populate the database with this dataset execute the db-initializer on your machine with the flags `-Xmx6g`, `-Dspring.profiles.active=dev`, and the environment variables:
+```
+FILE_PATH_DYNATRACE="test-data/astro-shop.zip"
+FILE_PATH_TRAIN_TICKET_SAMPLED=test-data/train-ticket-sample-00.tar.gz,test-data/train-ticket-sample-01.tar.gz,test-data/train-ticket-sample-02.tar.gz,test-data/train-ticket-sample-03.tar.gz
+```
+
 
 ### Supported Trace Formats
 

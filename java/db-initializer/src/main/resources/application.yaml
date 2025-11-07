@@ -17,5 +17,4 @@ db-service:
 test-data:
   file-paths:
     dynatrace: ${FILE_PATH_DYNATRACE}
-    jaeger: ${FILE_PATH_JAEGER}
     sample: ${FILE_PATH_TRAIN_TICKET_SAMPLED}
